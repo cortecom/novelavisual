@@ -872,6 +872,7 @@ monogatari.assets ('sounds', {
     'low_vibration': 'low_vibration.ogg',
     // Minijuego Guardianes
     'eco': 'eco.ogg',
+	'capitulo1': 'eco.ogg',
     'viento': 'viento.ogg',
     'vibracion': 'vibracion.ogg',
 	// Las 7 maravillas
@@ -1540,7 +1541,7 @@ monogatari.script({
         showInventoryBar();
     },
 
-     'jump Escena24'
+     'jump Capitulo1'
     ],
 
 /* =====================================================
@@ -1551,7 +1552,7 @@ monogatari.script({
 	'Capitulo1': [
 		'show scene negro with fadeIn duration 1s',
 		'centered <h1>Capítulo I</h1><p>El Origen Oculto</p>',
-		//'play music capitulo1 with loop fade 2',
+		'play music capitulo1 with loop fade 2',
 		'jump Escena1_QuintaNormal'   // primera escena real del capítulo
 	],
 
