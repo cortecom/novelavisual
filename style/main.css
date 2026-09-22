@@ -1,0 +1,524 @@
+/**
+ * =============================================================================
+ * This is the file where all your styling should go in.
+ * Instead of modifying the styles found in the monogatari.css file or others,
+ * you should overwrite those styles in this file.
+ *
+ * The CSS selectors shown are not an extensive list but they are the most
+ * common you might want to change. To find what other elements are available,
+ * you can take a look at the monogatari.css file or use your browser's dev
+ * tools to inspect the elements.
+ * =============================================================================
+**/
+
+/**
+ * ===========================
+ * General Styling
+ * ===========================
+**/
+
+/* General Style */
+body {
+
+}
+
+/* Simple Button styles*/
+button {
+
+}
+
+/* Simple Button Style on Hover */
+button:hover {
+
+}
+
+/* General Styling for Menu Screens */
+[data-screen] {
+
+}
+
+/**
+ * ===========================
+ * Main Menu Styling
+ * ===========================
+**/
+
+/* Main Menu Styling */
+[data-screen="main"] {
+
+}
+
+/* Main Menu Buttons Styling */
+[data-screen="main"] button {
+
+}
+
+/**
+ * ===========================
+ * Save and Load Menus Styling
+ * ===========================
+**/
+
+/* Slots Style */
+[data-component="save-slot"] figure {
+
+}
+
+/* Slot's Image Style */
+[data-component="save-slot"] img {
+
+}
+
+/* Slots Title Style */
+[data-component="save-slot"] figcaption {
+
+}
+
+/* Slots Delete Button Style */
+[data-component="save-slot"] button {
+
+}
+
+/**
+ * ===========================
+ * Game Elements Styling
+ * ===========================
+**/
+
+/* Choice Buttons style */
+[data-component="choice-container"] button {
+
+}
+
+/* Choice Button Style on Hover */
+[data-component="choice-container"] button:hover {
+
+}
+
+/* Text Box styling */
+[data-component="text-box"] {
+
+}
+
+/* Character Name Style */
+[data-ui="who"] {
+
+}
+
+/* Style for Centered Text */
+[data-component="centered-dialog"] {
+
+}
+
+/* Character Images Styles */
+[data-screen="game"] [data-character] {
+
+}
+
+/* Other Images Styles */
+[data-screen="game"] [data-image] {
+
+}
+
+/* Asegura que los personajes tengan transiciones fluidas de posición */
+[data-character] {
+    transition: left 6s ease, right 6s ease, top 6s ease, bottom 6s ease, transform 6s ease;
+}
+
+/**
+ * ===========================
+ * Quick Menu Styling
+ * ===========================
+**/
+
+/* These styles are applied to the Mobile version of the Quick Menu */
+
+/* Quick Menu Style */
+[data-component="quick-menu"] {
+
+}
+
+/* Quick Menu Buttons Style */
+[data-component="quick-menu"] span {
+
+}
+
+/* Quick Menu Buttons Style on Hover */
+[data-component="quick-menu"] span:hover {
+
+}
+
+/* Quick Menu Buttons Icon Style */
+[data-component="quick-menu"] > span > .fa {
+
+}
+
+/**
+ * ===========================
+ * Range Styling
+ * ===========================
+**/
+
+/* Use the background property to set a color for these */
+input[type=range]:focus::-webkit-slider-runnable-track {
+
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+
+}
+
+input[type=range]:focus::-ms-fill-upper {
+
+}
+
+input[type=range]:focus::-ms-fill-lower {
+
+}
+
+input[type=range]::-moz-range-track {
+
+}
+
+input[type=range]::-ms-fill-lower {
+
+}
+
+input[type=range]::-ms-fill-upper {
+
+}
+
+/** Medium Screens, Phablets (601px) **/
+@media screen and (min-width: 37.56255em) {
+	/* Styles for the desktop version of the Quick Menu */
+
+	/* Quick Menu Style */
+	[data-component="quick-menu"] {
+        z-index: 1000000 !important;
+	}
+
+	/* Quick Menu Buttons Style */
+	[data-component="quick-menu"] span {
+
+	}
+
+	/* Quick Menu Buttons Style on Hover */
+	[data-component="quick-menu"] span:hover {
+
+	}
+}
+
+/** Medium Devices, Tablets (992px)**/
+@media screen and (min-width: 62em) {
+
+}
+
+/** HD Screen, Large Devices, Wide Screens, Desktop (1200px) **/
+@media screen and (min-width: 75em) {
+
+}
+
+/** Full HD Screen, Large Devices, Wide Screens, Large Desktops (1920px) **/
+@media screen and (min-width: 120em) {
+
+}
+
+/** Retina Screen , Large Devices, Wide Screens(2560px) **/
+@media screen and (min-width: 160em) {
+
+}
+
+/** 4k Screens, Large Devices, Wide Screens (3840px) **/
+@media screen and (min-width: 240em) {
+
+}
+
+/** 5k Screens, Large Devices, Wide Screens (5000px) **/
+@media screen and (min-width: 312.5em) {
+
+}
+
+/** 8k Screens, Large Devices, Wide Screens (8000px) **/
+@media screen and (min-width: 500em) {
+
+}
+
+text-box.highlight {
+    background: rgba(255, 255, 0, 0.3);
+}
+
+text-box.warning {
+    border: 2px solid red;
+}
+
+centered-dialog.dramatic {
+    font-size: 10em;
+    text-shadow: 0 0 10px white;
+} 
+
+.inventory {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    width: 200px;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+}
+.hidden {
+    display: none;
+}
+
+.inventory2-bar {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.85);
+    padding: 10px 20px;
+    border-radius: 12px;
+    display: none;
+    z-index: 9999;
+}
+
+.inventory-bar {
+    position: fixed;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    display: none;
+    z-index: 1000000 !important;   /* antes: 9999 (sin !important) */
+
+    background: rgba(255,255,255,0.85);
+    padding: 12px 8px;
+    border-radius: 12px;
+}
+
+.inventory2-bar ul {
+    list-style: none;
+    display: flex;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+}
+
+.inventory-bar ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column; /* vertical en vez de horizontal */
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+}
+
+.inventory-bar li {
+    width: 48px;
+    height: 48px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.inventory-bar li.selected {
+    border-color: #00bfff;
+}
+
+.inventory-bar img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* -----------------------------------------
+   HOTSPOT DE PUERTA
+----------------------------------------- */
+
+#puerta-hotspot {
+    position: absolute;
+    left: 40%;
+    top: 25%;
+    width: 20%;
+    height: 50%;
+    cursor: pointer;
+    display: none;
+
+    /*background: rgba(255, 0, 0, 0.5) !important;*/
+    z-index: 999999 !important;
+    pointer-events: auto !important;
+}
+
+#grieta {
+    position: absolute;
+    right: 25%;
+    top: 50%;
+    width: 10%;
+    height: 10%;
+    cursor: pointer;
+    display: none;
+
+    /*background: rgba(255, 0, 0, 0.5) !important;*/
+    z-index: 999999 !important;
+    pointer-events: auto !important;
+}
+
+#camino1-hotspot {
+    position: absolute;
+    left: 40%;
+    top: 25%;
+    width: 20%;
+    height: 50%;
+    cursor: pointer;
+   display: none;
+
+    /*background: rgba(255, 0, 0, 0.5) !important;*/
+    z-index: 999999 !important;
+    pointer-events: auto !important;
+}
+
+#camino2-hotspot {
+    position: absolute;
+    left: 20%;
+    top: 25%;
+    width: 20%;
+    height: 50%;
+    cursor: pointer;
+   display: none;
+
+    /*background: rgba(255, 0, 0, 0.5) !important;*/
+    z-index: 999999 !important;
+    pointer-events: auto !important;
+}
+
+#camino3-hotspot {
+    position: absolute;
+    left: 60%;
+    top: 25%;
+    width: 20%;
+    height: 50%;
+    cursor: pointer;
+
+    /*background: rgba(255, 0, 0, 0.5) !important;*/
+    z-index: 999999 !important;
+    pointer-events: auto !important;
+}
+
+.flying-item {
+    position: fixed;
+    z-index: 1000001;             /* ítem volando, por encima del inventario */
+    pointer-events: none;
+    width: 40px;
+    height: 40px;
+}
+
+.game-tooltip {
+    position: fixed;
+    max-width: 220px;
+    background: rgba(20, 20, 30, 0.92);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    line-height: 1.3;
+    pointer-events: none;
+    z-index: 1000002;             /* tooltip, siempre el tope */
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.15);
+}
+
+.game-tooltip.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+[class^="hotspot-c"] {
+    position: absolute;
+    cursor: pointer;
+    display: none;
+    width: 20%;
+    height: 20%;
+    z-index: 999999 !important;
+    pointer-events: auto !important;
+    /* background: rgba(255, 0, 0, 0.3); /* descomenta para depurar visualmente */
+}
+
+/* Columnas */
+.hotspot-c1 { left: 0%; }
+.hotspot-c2 { left: 20%; }
+.hotspot-c3 { left: 40%; }
+.hotspot-c4 { left: 60%; }
+.hotspot-c5 { left: 80%; }
+
+/* Filas */
+.hotspot-r1 { top: 0%; }
+.hotspot-r2 { top: 20%; }
+.hotspot-r3 { top: 40%; }
+.hotspot-r4 { top: 60%; }
+.hotspot-r5 { top: 80%; }
+
+.item-panuelo.center {
+    position: absolute;
+    top: 40%;
+    left: 20%;
+    right: auto;
+    bottom: auto;
+    margin: 0;
+    width: 4.9vw;
+    height: auto;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+}
+
+[data-scene^="bg_narrador_"] {
+    animation: kenBurns 18s ease-in-out infinite alternate;
+    will-change: transform;
+}
+
+@keyframes kenBurns {
+    from { transform: scale(1); }
+    to   { transform: scale(1.08); }
+}
+
+/* ===== Overlays (vignette / grano / letterbox) ===== */
+/* ===== Overlays (vignette / grano / letterbox) — pantalla completa, sin repetición ===== */
+[data-image="overlay_vignette_sepia"] {
+    width: 100% !important;
+    height: 100% !important;
+}
+[data-image="overlay_grano"] {
+    width: 100% !important;
+    height: 100% !important;
+    animation: granoParpadeo 0.4s steps(2) infinite;
+    opacity: 0.12; /* antes 0.12 */
+}
+[data-image="overlay_letterbox"] {
+    position: absolute !important;
+    inset: 0 !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+
+    /* por si el motor lo renderiza como <img> */
+    object-fit: cover;
+
+    /* por si el motor lo renderiza como background-image en un div */
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+
+    pointer-events: none;
+    mix-blend-mode: multiply;
+    z-index: 6; /* por encima del scene (kenBurns), por debajo del character/text-box */
+}

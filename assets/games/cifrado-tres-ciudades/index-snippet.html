@@ -1,0 +1,32 @@
+<!--
+  Bloque listo para copiar dentro de tu index.html.
+  No es un archivo que se cargue solo — es una referencia para pegar
+  en los lugares indicados de tu propio index.html.
+-->
+
+<!-- ============================================================ -->
+<!-- 1) Justo antes de tu <script src="script.js"></script>,      -->
+<!--    y después de que "monogatari" ya exista como variable     -->
+<!--    global (después de tu main.js / init.js):                 -->
+<!-- ============================================================ -->
+
+<script src="assets/games/cifrado-tres-ciudades/rune-puzzle.js"></script>
+<script src="assets/games/cifrado-tres-ciudades/puzzle-action.js"></script>
+
+
+<!-- ============================================================ -->
+<!-- 2) Dentro de <game-screen> (donde ya viven <dialog-log>,     -->
+<!--    <text-box> y <quick-menu>) — colócalo como PRIMER hijo    -->
+<!--    para que quede detrás del menú, como el fondo de la       -->
+<!--    escena actual:                                            -->
+<!-- ============================================================ -->
+
+<game-screen>
+
+  <rune-puzzle id="cityPuzzle"></rune-puzzle>
+
+  <dialog-log></dialog-log>
+  <text-box></text-box>
+  <quick-menu></quick-menu>
+
+</game-screen>
