@@ -872,7 +872,7 @@ monogatari.assets ('sounds', {
     'low_vibration': 'low_vibration.ogg',
     // Minijuego Guardianes
     'eco': 'eco.ogg',
-	'capitulo1': 'eco.ogg',
+	'capitulo1': 'sting_inicio_capitulo.ogg',
     'viento': 'viento.ogg',
     'vibracion': 'vibracion.ogg',
 	// Las 7 maravillas
