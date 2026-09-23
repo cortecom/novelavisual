@@ -1561,10 +1561,6 @@ monogatari.script({
 		'show scene negro with fadeIn duration 1s',
 		//'play sound capitulo1 with loop fade 2',
 		'centered <h1>Capítulo I</h1><p>El Origen Oculto</p>',
-<<<<<<< HEAD
-=======
-		//'play sound capitulo1 with loop fade 2',
->>>>>>> 4c67b2f (Ajusta inventario y flujo del capítulo 1)
 		'jump Escena1_QuintaNormal'   // primera escena real del capítulo
 	],
 
