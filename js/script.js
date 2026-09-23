@@ -543,6 +543,14 @@ function updateInventoryIcons() {
     }
     list.innerHTML = '';
 
+    // Inventario en columnas: máximo 10 objetos por columna. Al llegar al
+    // objeto 11 el grid de main.css (.inventory-bar ul) abre una columna nueva.
+    // Con menos de 10 objetos, las filas se ajustan a la cantidad real para
+    // que la barra no quede más alta de lo necesario.
+    const MAX_FILAS_INVENTARIO = 10;
+    const filas = Math.max(1, Math.min(inv.length, MAX_FILAS_INVENTARIO));
+    list.style.setProperty('--inv-filas', filas);
+
     inv.forEach(item => {
         const data = itemIcons[item] || {};
         const li = document.createElement('li');
@@ -1553,6 +1561,10 @@ monogatari.script({
 		'show scene negro with fadeIn duration 1s',
 		//'play sound capitulo1 with loop fade 2',
 		'centered <h1>Capítulo I</h1><p>El Origen Oculto</p>',
+<<<<<<< HEAD
+=======
+		//'play sound capitulo1 with loop fade 2',
+>>>>>>> 4c67b2f (Ajusta inventario y flujo del capítulo 1)
 		'jump Escena1_QuintaNormal'   // primera escena real del capítulo
 	],
 

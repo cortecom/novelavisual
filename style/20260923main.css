@@ -303,40 +303,18 @@ centered-dialog.dramatic {
     padding: 0;
 }
 
-/* -----------------------------------------
-   INVENTARIO EN COLUMNAS (máx. 10 objetos por columna)
-   - Cada columna tiene como máximo 10 objetos (constante en script.js).
-   - Al llegar al objeto 11 se crea una columna nueva, a la IZQUIERDA
-     de la anterior, así la primera columna nunca se mueve del borde.
-   - --inv-filas lo actualiza updateInventoryIcons() (script.js) con
-     min(cantidad de objetos, 10): con pocos objetos la barra no queda
-     con huecos vacíos.
-   - --inv-slot se achica en pantallas bajas para que las 10 filas
-     siempre quepan en el alto de la ventana.
------------------------------------------ */
-.inventory-bar {
-    --inv-gap: 12px;
-    --inv-slot: min(48px, calc((100vh - 160px) / 10));
-    max-height: calc(100vh - 24px);
-}
-
 .inventory-bar ul {
     list-style: none;
-    display: grid;
-    grid-auto-flow: column;                 /* llena por columnas */
-    grid-template-rows: repeat(var(--inv-filas, 1), var(--inv-slot));
-    grid-auto-columns: var(--inv-slot);
-    gap: var(--inv-gap);
-    direction: rtl;                         /* columnas nuevas crecen hacia la izquierda */
+    display: flex;
+    flex-direction: column; /* vertical en vez de horizontal */
+    gap: 12px;
     margin: 0;
     padding: 0;
 }
 
 .inventory-bar li {
-    direction: ltr;
-    box-sizing: border-box;
-    width: var(--inv-slot);
-    height: var(--inv-slot);
+    width: 48px;
+    height: 48px;
     border-radius: 6px;
     background: rgba(255,255,255,0.9);
     display: flex;
@@ -351,8 +329,8 @@ centered-dialog.dramatic {
 }
 
 .inventory-bar img {
-    width: calc(var(--inv-slot) - 8px);
-    height: calc(var(--inv-slot) - 8px);
+    width: 40px;
+    height: 40px;
     object-fit: contain;
 }
 
