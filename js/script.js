@@ -631,6 +631,16 @@ const hotspotsAbiertos = new Set();
 
 function showHotspot(item) {
     const hotspot = document.getElementById(item);
+    if (!hotspot) {
+        // Defensivo: si el hotspot no existe en el DOM en este instante (p.ej.
+        // al retroceder/avanzar en la narración deja el guion en un punto
+        // donde este hotspot no corresponde a la escena visible), salimos sin
+        // tronar en vez de lanzar una excepción que dejaría 'block' pegado en
+        // true en el motor (mismo problema que ya se corrigió en addItem() y
+        // updateInventoryIcons()).
+        console.warn('[showHotspot] hotspot no encontrado en el DOM, se omite:', item);
+        return;
+    }
     hotspot.style.display = "block";
     hotspot.style.pointerEvents = "auto";
     hotspotsAbiertos.add(item);
@@ -1444,6 +1454,14 @@ function TomarObjeto(item) {
 	if (!hasItem(item)) {
 		showHotspot(item);
 		const hotspot = document.getElementById(item);
+		if (!hotspot) {
+			// Ver nota defensiva en showHotspot(): sin este guard, un hotspot
+			// ausente (p.ej. tras retroceder/avanzar en la narración) lanzaba
+			// una excepción sin atrapar dentro de un function-step, dejando
+			// 'block' pegado en true y congelando el clic-para-avanzar.
+			console.warn('[TomarObjeto] hotspot no encontrado en el DOM, se omite:', item);
+			return;
+		}
 		hotspot.onclick = () => {
 			hotspot.style.pointerEvents = 'none';
 			if (!hasItem(item)) {
@@ -1458,6 +1476,10 @@ function TomarObjeto(item) {
 function VerObjeto(item) {
 	showHotspot(item);
 	const hotspot = document.getElementById(item);
+	if (!hotspot) {
+		console.warn('[VerObjeto] hotspot no encontrado en el DOM, se omite:', item);
+		return;
+	}
 	hotspot.onclick = () => {
 		hotspot.style.pointerEvents = 'none';
 		monogatari.run('narrator No hay nada interesante aqui para tomar.');
@@ -1467,6 +1489,10 @@ function VerObjeto(item) {
 function UsarObjeto(item, objeto, exito, fracaso) {
 	showHotspot(item);
 	const hotspot = document.getElementById(item);
+	if (!hotspot) {
+		console.warn('[UsarObjeto] hotspot no encontrado en el DOM, se omite:', item);
+		return;
+	}
 	hotspot.onclick = () => {
 		hotspot.style.pointerEvents = 'none';
 		if (selectedItem === objeto) {
@@ -1534,9 +1560,33 @@ function usarObjetoSobreObjeto(destino) {
 
 document.addEventListener('DOMContentLoaded', initHotspotTooltips);
 
+/**
+ * Reseteo defensivo de bajo costo del flag interno 'block' de Monogatari.
+ *
+ * Si por cualquier motivo (una excepción no atrapada en un function-step,
+ * o una carrera entre el botón "atrás"/retroceder y una transición de
+ * escena en curso) el flag 'block' queda pegado en true, el clic-para-
+ * avanzar deja de responder en cualquier escena posterior y el juego
+ * parece congelarse sin ningún error visible.
+ *
+ * Se agrega como primer paso de cada escena (ver más abajo) para que, al
+ * entrar a una escena nueva, el flag se libere sin importar en qué estado
+ * haya quedado por lo que pasó antes (incluido un retroceso aleatorio).
+ * Envuelto en try/catch por si la API cambiara en una versión futura del
+ * motor: si fallara, solo se loguea una advertencia, nunca rompe el guion.
+ */
+function liberarBlock() {
+    try {
+        monogatari.global('block', false);
+    } catch (e) {
+        console.warn('[liberarBlock] No se pudo resetear el flag block:', e);
+    }
+}
+
 monogatari.script({
 
     'Start': [
+		() => liberarBlock(),
         //() => hideDoorHotspot(),
         //() => hideInventoryBar(),
         
@@ -1558,6 +1608,7 @@ monogatari.script({
 ===================================================== */
 
 	'Capitulo1': [
+		() => liberarBlock(),
 		'show scene negro with fadeIn duration 1s',
 		//'play sound capitulo1 with loop fade 2',
 		'centered <h1>Capítulo I</h1><p>El Origen Oculto</p>',
@@ -1568,6 +1619,7 @@ monogatari.script({
 	// ESCENA 1 — Museo Nacional de Historia Natural (Santiago)
 	// -------------------------------------------------------------------------
 	'Escena1_QuintaNormal': [
+		() => liberarBlock(),
 		'show scene quinta_normal with fadeIn',
 		'La Quinta Normal, ubicada en Santiago, nació en el siglo XIX como un espacio dedicado a la experimentación agrícola y la educación pública. Con el tiempo se transformó en uno de los parques más emblemáticos de la ciudad, albergando instituciones culturales clave.',
 		'show scene museo_historico_nacional with fadeIn',
@@ -1576,6 +1628,7 @@ monogatari.script({
 	],
 
 	'Escena1_Museo': [
+		() => liberarBlock(),
 		'show scene museo with fadeIn',
 		'show character gabriel normal at left with fadeIn',
 		() => addItem('libro'),
@@ -1585,6 +1638,7 @@ monogatari.script({
 	],
 
 	'Escena1_Sala': [
+		() => liberarBlock(),
     	'show scene museo_sala_precolombina with fadeIn',
 		//'show image panuelo with fadeIn item-panuelo',
 		'En la sala de culturas precolombinas, la luz tenue revela piezas que han sobrevivido siglos.',
@@ -1612,6 +1666,7 @@ monogatari.script({
 	],	
 
 	'Escena1_Abrir': [
+		() => liberarBlock(),
 		'show scene museo_sala_precolombina',
 		//'show image panuelo with fadeIn item-panuelo',
         //() => hideHotspot('vitrina'),
@@ -1624,12 +1679,14 @@ monogatari.script({
 	],	
 
 	'Escena1_Tomar': [
+		() => liberarBlock(),
 		'show scene museo_sala_precolombina_vitrina_abierta with fadeIn',
 		() => UsarObjeto('vitrina','panuelo','jump Escena1_Decidir'),
 		'narrator Necesitas la piedra de Ngenechén. La vitrina está abierta.'
 	],	
 
 	'Escena1_Decidir': [
+		() => liberarBlock(),
 		'show scene museo_sala_precolombina_sin_piedra with fadeIn',
 		() => hideAllHotspots(),
 		() => addItem('piedra_ngenechen'),
@@ -1659,6 +1716,7 @@ monogatari.script({
 	],	
 
 	'Escena1_Examinar': [
+		() => liberarBlock(),
 		'gabriel (Saca su lupa táctica de bolsillo y examina minuciosamente los microsurcos de la talla)',
 		'Revela micrograbados de trazos alfabéticos ocultos bajo la pátina volcánica.',
 		'show storage Dato_Microescritura true',
@@ -1668,6 +1726,7 @@ monogatari.script({
 	],
 
 	'Escena1_Origen': [
+		() => liberarBlock(),
 		'isidora (Consulta sus fichas catalográficas archivadas) La pieza proviene de los diarios de excavación de 1978 en la Región de Aysén.',
 		'show storage Coordenadas_Aysen true',
         () => addItem('fichas_cartograficas'),
@@ -1676,6 +1735,7 @@ monogatari.script({
 	],
 
 	'Escena1_Notas': [
+		() => liberarBlock(),
 		'gabriel (Dibuja meticulosamente la geometría de la espiral en su libreta de cuero)',
 		'show storage Objeto_Libreta true',
         () => addItem('diagrama_espiral'),
@@ -1687,6 +1747,7 @@ monogatari.script({
 	// ESCENA 2 — Aula Magna, Universidad de Santiago de Chile (USACH)
 	// -------------------------------------------------------------------------
 	'Escena2_Usach': [
+		() => liberarBlock(),
 		'show scene usach with fadeIn',
 		'La USACH vibra con vida académica. En el Aula Magna, los murales históricos observan desde las paredes.',
 		'Estudiantes conversan, laptops abiertas, cuadernos llenos de anotaciones.',
@@ -1695,12 +1756,7 @@ monogatari.script({
 	],
 
 	'Escena2_AulaMagna': [
-		// Reseteo defensivo de bajo costo: si por cualquier motivo 'block' quedó
-		// pegado en true (p.ej. una excepción no atrapada en un paso de función
-		// anterior), esto lo libera antes de que la escena necesite el primer
-		// clic-para-avanzar. No tiene efecto si ya estaba en false.
-		//() => monogatari.global('block', false),	
-		//() => monogatari.proceed({ userInitiated: true, skip: false, autoPlay: false }),
+		() => liberarBlock(),
 		'show scene bg_usach_aula_magna with fadeIn',
 		'show character gabriel normal at left with fadeIn',
 
@@ -1740,12 +1796,14 @@ monogatari.script({
 	],
 
 	'Escena2_Cautela': [
+		() => liberarBlock(),
 		'gabriel Debemos mantener el rigor científico y no especular sin pruebas contundentes.',
 		'Mantiene la tensión institucional, pero Tomás se muestra más reservado.',
 		'jump Escena3_Laboratorio'
 	],
 
 	'Escena2_Confesar': [
+		() => liberarBlock(),
 		'gabriel Comparto tus sospechas, Tomás. Hay vacíos cronológicos que insinúan esa posibilidad.',
 		'show character tomas entusiasmado at right',
 		'tomas ¡Cuente con mi apoyo absoluto para investigar lo que sea necesario, profesor!',
@@ -1755,6 +1813,7 @@ monogatari.script({
 	],
 
 	'Escena2_Ignorar': [
+		() => liberarBlock(),
 		'gabriel Esa pregunta está fuera del programa de la asignatura. Sigamos.',
 		'Tomás se frustra, pero no pierde su entusiasmo.',
 		'jump Escena3_Laboratorio'
@@ -1764,6 +1823,7 @@ monogatari.script({
 	// ESCENA 3 — Laboratorio Arqueológico, USACH
 	// -------------------------------------------------------------------------
 	'Escena3_Laboratorio': [
+		() => liberarBlock(),
 		'show scene laboratorio with fadeIn',
 		'show character gabriel normal at left with fadeIn',
 		'show character lucia normal at right with fadeIn',
@@ -1773,6 +1833,7 @@ monogatari.script({
 	],
 
 	'Escena3_Laboratorio_piedra': [
+		() => liberarBlock(),
 		'show scene laboratorio with fadeIn',
 		'show character gabriel pensativo at right with fadeIn',
 		'show character lucia analitica at center with fadeIn',
@@ -1816,18 +1877,21 @@ monogatari.script({
 	],
 
 	'Escena3_Espectral': [
+		() => liberarBlock(),
 		'El análisis confirma que la roca es basalto patagónico con rastros de sedimentos del Mediterráneo oriental.',
 		() => addItem('analisis_sedimento'),
 		'jump Escena4_LabEscaneo'
 	],
 
 	'Escena3_Cotejar': [
+		() => liberarBlock(),
 		'Desbloqueas en la libreta el paralelismo directo con los frisos del Mausoleo de Halicarnaso.',
 		() => addItem('relieve_halicarnaso'),
 		'jump Escena4_LabEscaneo'
 	],
 
 	'Escena3_Atenas': [
+		() => liberarBlock(),
 		'Helena Papadakis confirma la anomalía arqueológica desde Grecia y ofrece colaboración internacional.',
 		'show storage Contacto_Helena true',
 		() => addItem('contacto_helena'),
@@ -1838,6 +1902,7 @@ monogatari.script({
 	// ESCENA 4 — Laboratorio de Análisis Digital y Escaneo 3D, USACH
 	// -------------------------------------------------------------------------
 	'Escena4_LabEscaneo': [
+		() => liberarBlock(),
 		'show scene lab_escaneo with fadeIn',
 		//'show character gabriel normal at left with fadeIn',
 		//'show character lucia concentrada at center with fadeIn',
@@ -1857,6 +1922,7 @@ monogatari.script({
 	// Monogatari respeta el clic del jugador entre cada línea (a diferencia de encadenar
 	// varios monogatari.run() sueltos, que se disparaban todos de corrido sin esperar).
 	'Escena4_Traduccion': [
+		() => liberarBlock(),
 		'show scene laboratorio_escaneo with fadeIn',
 		() => hideAllHotspots(),
 		() => addItem('escritura_antigua'),
@@ -1872,6 +1938,7 @@ monogatari.script({
 
  
 	'Escena4_Decision': [
+		() => liberarBlock(),
 		'show scene laboratorio_escaneo with fadeIn',
 		() => {
 			const choice = {
@@ -1908,6 +1975,7 @@ monogatari.script({
 	// ESCENA 5 — Carretera Austral / Ruta 7, Magallanes (Patagonia Chile)
 	// -------------------------------------------------------------------------
 	'Escena5_Patagonia': [
+		() => liberarBlock(),
 		'show scene ruta7 with fadeIn',
 	
 		//'show character gabriel serio at left with fadeIn',
@@ -1946,6 +2014,7 @@ monogatari.script({
 	],
 
 	'Escena5_Cascada': [
+		() => liberarBlock(),
 		'show scene cascada_congelada_jeep with fadeIn',
 		// Interacción con Objeto
 		'[INTERACCIÓN DE INVENTARIO]',
@@ -1960,6 +2029,7 @@ monogatari.script({
 	// ESCENA 6 — Caverna del Fiordo (Patagonia)
 	// -------------------------------------------------------------------------
 	'Escena6_Caverna': [
+		() => liberarBlock(),
 		'show scene caverna with fadeIn',
 		'show character isidora sorprendida at right with fadeIn',
 		'El interior de la caverna es un templo natural esculpido por el agua y el tiempo.',
@@ -1982,6 +2052,7 @@ monogatari.script({
 	// ESCENA 7 — Derrumbe en la Caverna (Secuencia de Acción)
 	// -------------------------------------------------------------------------
 	'Escena7_Derrumbe': [
+		() => liberarBlock(),
 		'show scene caverna with shake infinite',
 		'¡UN ESTRUENDO RETUMBA EN LA CAVERNA! El suelo tiembla con violencia mientras bloques de basalto caen desde la bóveda.',
 
@@ -2005,6 +2076,7 @@ monogatari.script({
 	// ESCENA 8 — Cámara Profunda de los Guardianes
 	// -------------------------------------------------------------------------
 	'Escena8_CamaraProfunda': [
+		() => liberarBlock(),
 		'show scene camara_profunda with fadeIn',
 		'show character gabriel serio at left with fadeIn',
 		'show character isidora analitica at right with fadeIn',
@@ -2020,6 +2092,7 @@ monogatari.script({
 	// ESCENA 9 — Altar Subterráneo y Extracción del Pergamino
 	// -------------------------------------------------------------------------
 	'Escena9_Altar': [
+		() => liberarBlock(),
 		'show scene altar with fadeIn',
 		() => addItem('bisturi_termico'),
 		'En el centro exacto de la estancia reposa un altar de piedra volcánica pulida.',
@@ -2038,6 +2111,7 @@ monogatari.script({
 	],
 
 	'Escena9_Coordenadas': [		
+		() => liberarBlock(),
 		'show scene altar',
 		() => hideAllHotspots(),
 		'[INVENTARIO USADO]: Bisturí Térmico de Campo.',
@@ -2074,6 +2148,7 @@ monogatari.script({
 	// ESCENA 10 — Fogón Nocturno en el Refugio Patagónico
 	// -------------------------------------------------------------------------
 	'Escena10_Fogon': [
+		() => liberarBlock(),
 		'show scene fogon with fadeIn',
 		'show character gabriel pensativo at left with fadeIn',
 		'show character isidora normal at right with fadeIn',
@@ -2095,6 +2170,7 @@ monogatari.script({
 	// ESCENA 11 — Decisión Estratégica Final del Capítulo 1
 	// -------------------------------------------------------------------------
 	'Escena11_DecisionEstrategica': [
+		() => liberarBlock(),
 		'show scene mapa_estrategico with fadeIn',
 		'show character gabriel serio at left with fadeIn',
 
@@ -2141,6 +2217,7 @@ monogatari.script({
 	// ESCENA 12 — Preparación del Viaje Internacional y Cierre del Capítulo 1
 	// -------------------------------------------------------------------------
 	'Escena12_Grecia': [
+		() => liberarBlock(),
 		'show scene embarque with fadeIn',
 		'show character tomas entusiasmado at right with fadeIn',
 		'tomas Todo el equipo de escaneo térmico y las copias 3D van en el equipaje de mano, profesor. Volamos directo a Atenas.',
@@ -2154,6 +2231,7 @@ monogatari.script({
 	],
 
 	'Escena12_Egipto': [
+		() => liberarBlock(),
 		'show scene embarque with fadeIn',
 		'show character tomas entusiasmado at right with fadeIn',
 		'tomas Equipos listos y visados confirmados. Volamos directo a Alejandría, Egipto.',
@@ -2161,6 +2239,7 @@ monogatari.script({
 	],
 
 	'Escena12_Babilonia': [
+		() => liberarBlock(),
 		'show scene embarque with fadeIn',
 		'show character tomas entusiasmado at right with fadeIn',
 		'tomas Protocolos de seguridad activados. Volamos rumbo a los sitios arqueológicos de Mesopotamia.',
@@ -2168,6 +2247,7 @@ monogatari.script({
 	],
 
 	'Cierre_Capitulo1_Grecia': [
+		() => liberarBlock(),
 		'[INTERACCIÓN Y SELLADO DE SEGURIDAD FINAL]',
 		'Objeto en escena: Maletín Táctico de Seguridad de Viaje.',
 		'Acción requerida: Seleccionar el Candado Biométrico de Seguridad, instalarlo en el maletín y registrar la huella de Gabriel para sellar las evidencias.',
@@ -2178,6 +2258,7 @@ monogatari.script({
 	],
 
 	'Cierre_Capitulo1_Egipto': [
+		() => liberarBlock(),
 		'[INTERACCIÓN Y SELLADO DE SEGURIDAD FINAL]',
 		'Objeto en escena: Maletín Táctico de Seguridad de Viaje.',
 		'Acción requerida: Seleccionar el Candado Biométrico de Seguridad, instalarlo en el maletín y registrar la huella de Gabriel para sellar las evidencias.',
@@ -2188,6 +2269,7 @@ monogatari.script({
 	],
 
 	'Cierre_Capitulo1_Babilonia': [
+		() => liberarBlock(),
 		'[INTERACCIÓN Y SELLADO DE SEGURIDAD FINAL]',
 		'Objeto en escena: Maletín Táctico de Seguridad de Viaje.',
 		'Acción requerida: Seleccionar el Candado Biométrico de Seguridad, instalarlo en el maletín y registrar la huella de Gabriel para sellar las evidencias.',
@@ -2198,6 +2280,7 @@ monogatari.script({
 	],
 
 	'Capitulo2': [
+		() => liberarBlock(),
 		'stop music with fade 3',
 		'show scene negro with fadeIn duration 2s',
 		'centered <h1>Fin del Capítulo I</h1><p>El Origen Oculto</p>',
@@ -2209,6 +2292,7 @@ monogatari.script({
 	],
 
 'Escena13': [
+		() => liberarBlock(),
 		'show scene atenas_atardecer with fadeIn',
 		'Atenas recibe al equipo con un atardecer dorado. El Partenón se recorta contra el cielo como un recordatorio de la grandeza antigua. Las calles vibran con vida: cafés, turistas, estudiantes, arqueólogos. Pero para Gabriel, Atenas no es un destino turístico. Es el primer paso para entender por qué una piedra mapuche contiene símbolos helenísticos.',
 		'show character helena normal at right with fadeIn',
@@ -2246,6 +2330,7 @@ monogatari.script({
 	// ESCENA 14 - Biblioteca de la Universidad de Atenas (Puzzle del Epigrama)
 	// -------------------------------------------------------------
 	'Escena14': [
+		() => liberarBlock(),
 		'show scene biblioteca_atenas with fadeIn',
 		'La biblioteca es un templo moderno del conocimiento. Entre estantes infinitos, Helena guía al equipo hacia una sección restringida donde se guardan copias de epigramas helenísticos.',
 		'show character helena normal at right with fadeIn',
@@ -2270,6 +2355,7 @@ monogatari.script({
 	],
 
 'Escena14_Decision': [
+		() => liberarBlock(),
 		'show scene biblioteca_atenas with fadeIn',
 		{
 			'Choice': {
@@ -2298,6 +2384,7 @@ monogatari.script({
 	],
 
 	'Escena14_Poema': [
+		() => liberarBlock(),
 		'"La Bibliotheca historica", es un conjunto de 40 libros (sobreviven completos los libros 1-5 y 11-20), fué escrita entre el 60 y el 30 a.C.',
 		() => addItem('contacto_diodoro'),
 		'helena Diodoro Sículo recopiló información de fuentes más antiguas, muchas de las cuales se han perdido. Sus libros contienen referencias a las Siete Maravillas y a otras construcciones notables del mundo antiguo.',
@@ -2306,12 +2393,14 @@ monogatari.script({
 	],
 
 	'Escena14_Mausoleo': [
+		() => liberarBlock(),
 		'Desbloqueas en la libreta el paralelismo directo con los frisos del Mausoleo de Halicarnaso.',
 		() => addItem('relieve_halicarnaso'),
 		'jump Escena20'
 	],
 
 	'Escena14_Antipatro': [
+		() => liberarBlock(),
 		'El "Epigrama de Antípatro" es un libro que enumera las Siete Maravillas del Mundo Antiguo (Antología Palatina IX.58, c. 140 a.C.). Es una de las listas más tempranas conocidas de las Siete Maravillas.',
 		'Trazar el mapa de asentamientos helenísticos vinculados con las 3 divinidades griegas, mencionadas en los libros: Zeus, Artemisa y Helios',
 		() => addItem('contacto_antipatro'),
@@ -2336,6 +2425,7 @@ monogatari.script({
 	],
 
 	'Escena14_Omar': [
+		() => liberarBlock(),
 		'helena La persona que buscas es Omar Al-Khazraji, un arqueólogo iraquí que ha trabajado en excavaciones de Babilonia y Halicarnaso.',
 		'helena Omar tiene acceso a archivos de Diodoro Sículo y podría ayudarte a entender la relación entre los libros perdidos y las Siete Maravillas.',
 		'helena Te daré su contacto, pero ten cuidado. Omar es un hombre muy reservado y no le gusta que lo molesten con preguntas triviales.',
@@ -2347,12 +2437,14 @@ monogatari.script({
 	// ESCENA 15 - Olimpia, Grecia (Estatua de Zeus)
 	// -------------------------------------------------------------
 	'Escena15': [
+		() => liberarBlock(),
 		'show scene olimpia_ruinas with fadeIn',
 		'Olimpia es un santuario de ruinas y silencio. El templo donde se alzaba la Estatua de Zeus está reducido a columnas rotas y fragmentos de mármol. Pero el aire parece aún cargado de la presencia del dios.',
 		'jump Escena_Narrador_ZeusOlimpia'
 	],
 
 	'Escena_Narrador_ZeusOlimpia': [
+		() => liberarBlock(),
 		'show scene bg_narrador_zeus_olimpia with fadeIn',
 		'show image overlay_vignette_sepia with fadeIn',
 		'show image overlay_grano with fadeIn',
@@ -2378,6 +2470,7 @@ monogatari.script({
 	],
 
 	'Escena15_Olimpia': [
+		() => liberarBlock(),
 		'show scene olimpia_ruinas with fadeIn',
 		'show character gabriel pensativo at left with fadeIn',
 		'gabriel La Estatua de Zeus era una obra maestra. Oro, marfil, proporciones perfectas.',
@@ -2426,6 +2519,7 @@ monogatari.script({
 	// ESCENA 16 - Objeto oculto: Fragmento de marfil carbonizado
 	// -------------------------------------------------------------
 	'Escena16': [
+		() => liberarBlock(),
 		'Entre los restos del templo, el jugador encuentra un pequeño fragmento de marfil quemado.',
 
 		// Interacción con Objeto Oculto: Fragmento de Marfil Carbonizado
@@ -2474,12 +2568,14 @@ monogatari.script({
 	// ESCENA 17 - Éfeso, Turquía (Templo de Artemisa)
 	// -------------------------------------------------------------
 	'Escena17': [
+		() => liberarBlock(),
 		'show scene efeso_ruinas with fadeIn',
 		'El Templo de Artemisa fue una de las maravillas más grandes jamás construidas. Hoy solo quedan columnas rotas y un silencio que parece eterno.',
 		'jump Escena_Narrador_TemploArtemisa'
 	],
 
 	'Escena_Narrador_TemploArtemisa': [
+		() => liberarBlock(),
 		'show scene bg_narrador_templo_efeso with fadeIn',
 		'show image overlay_vignette_sepia with fadeIn',
 		'show image overlay_grano with fadeIn',
@@ -2505,6 +2601,7 @@ monogatari.script({
 	],
 
 	'Escena17_Efeso': [
+		() => liberarBlock(),
 		'show scene efeso_ruinas with fadeIn',
 		'show character helena normal at right with fadeIn',
 		'helena Aquí ocurrió uno de los incendios más famosos de la historia. Heróstrato lo quemó para ser recordado.',
@@ -2530,6 +2627,7 @@ monogatari.script({
 	],
 
 	'Escena17_Decision': [
+		() => liberarBlock(),
 		'show scene efeso_ruinas',
 		() => VerObjeto('inscripciones'),
 		() => VerObjeto('patina'),
@@ -2577,6 +2675,7 @@ monogatari.script({
 	// ESCENA 18 - Minijuego Acción: Temblor en Éfeso
 	// -------------------------------------------------------------
 	'Escena18': [
+		() => liberarBlock(),
 		() => hideAllHotspots(),
 		//'[MINIJEUEGO DE ACCIÓN: TEMBLOR EN ÉFESO]',
 		//'Un temblor sacude las ruinas. El jugador debe esquivar columnas que caen y avanzar hacia una cámara subterránea.',
@@ -2619,6 +2718,7 @@ monogatari.script({
 	// ESCENA 19 - Inscripción secreta en Éfeso
 	// -------------------------------------------------------------
 	'Escena19': [
+		() => liberarBlock(),
 		'show scene efeso_subterraneo with fadeIn',
 		'En una cámara oculta, el jugador encuentra una inscripción: “La luz del sur preservará lo que el norte destruye.”',
 
@@ -2667,12 +2767,14 @@ monogatari.script({
 	// ESCENA 20 - Halicarnaso, Turquía (Mausoleo)
 	// -------------------------------------------------------------
 	'Escena20': [
+		() => liberarBlock(),
 		'show scene halicarnaso_ruinas with fadeIn',
 		'El Mausoleo de Halicarnaso fue una mezcla de culturas: griega, egipcia, persa. Hoy solo quedan fragmentos dispersos.',
 		'jump Escena_Narrador_MausoleoHalicarnaso'
 	],
 
 	'Escena_Narrador_MausoleoHalicarnaso': [
+		() => liberarBlock(),
 		'show scene bg_narrador_mausoleo_halicarnaso with fadeIn',
 		'show image overlay_vignette_sepia with fadeIn',
 		'show image overlay_grano with fadeIn',
@@ -2698,6 +2800,7 @@ monogatari.script({
 	],
 
 	'Escena20_Halicarnaso': [
+		() => liberarBlock(),
 		'show scene halicarnaso_ruinas with fadeIn',
 		'show character gabriel pensativo at left with fadeIn',
 		'gabriel La espiral de la piedra proviene de aquí. Es un símbolo de transición entre mundos.',
@@ -2742,6 +2845,7 @@ monogatari.script({
 	// ESCENA 21 - Objeto oculto: Miniatura de la cuadriga
 	// -------------------------------------------------------------
 	'Escena21': [
+		() => liberarBlock(),
 		'El jugador encuentra una miniatura de la cuadriga que coronaba el Mausoleo.',
 
 		// Interacción con Objeto Oculto: Miniatura de la Cuadriga de Bronce
@@ -2791,12 +2895,14 @@ monogatari.script({
 	// ESCENA 22 - Rodas, Grecia (Coloso)
 	// -------------------------------------------------------------
 	'Escena22': [
+		() => liberarBlock(),
 		'show scene rodas_puerto with fadeIn',
 		'El puerto de Rodas es tranquilo. El Coloso ya no existe, pero su sombra parece seguir presente.',
 		'jump Escena_Narrador_ColosoRodas'
 	],
 
 	'Escena_Narrador_ColosoRodas': [
+		() => liberarBlock(),
 		'show scene bg_narrador_coloso_rodas with fadeIn',
 		'show image overlay_vignette_sepia with fadeIn',
 		'show image overlay_grano with fadeIn',
@@ -2822,6 +2928,7 @@ monogatari.script({
 	],
 
 	'Escena22_Rodas': [
+		() => liberarBlock(),
 		'show scene rodas_puerto with fadeIn',
 		'show character gabriel pensativo at left with fadeIn',
 		'gabriel Dicen que cayó por un terremoto. Pero... ¿y si no fue natural?',
@@ -2845,6 +2952,7 @@ monogatari.script({
 	],
 
 	'Escena22_Decision': [
+		() => liberarBlock(),
 		{
 			'Choice': {
 				'Dialog': 'gabriel (Decisión del jugador)',
@@ -2865,12 +2973,14 @@ monogatari.script({
 	],
 
 	'Escena22_BuceoPuerto': [
+		() => liberarBlock(),
 		'⛏️ Consultar mapas antiguos del fondo marino del puerto.',
 		'No se ve nada interesante, habría que bucear para descubrirlo.',
 		'jump Escena22_Decision'
 	],
 
 	'Escena22_RegistrosForos': [
+		() => liberarBlock(),
 		'Revisar crónicas locales sobre la venta del bronce colosal, habría que buscar en el puerto antiguo.',
 		'No se ve nada interesante',
 		'jump Escena22_Decision'
@@ -2880,6 +2990,7 @@ monogatari.script({
 	// ESCENA 23 - Minijuego Puzzle: Reconstrucción del Coloso
 	// -------------------------------------------------------------
 	'Escena23': [
+		() => liberarBlock(),
 		'show scene rodas_puerto',
 		'[MINIJUGO PUZZLE: RECONSTRUCCIÓN DEL COLOSO]',
 		'Debemos encontrar las piezas correctas y ensamblarlas en el orden adecuado para reconstruir digitalmente la estatua.',
@@ -2932,12 +3043,14 @@ monogatari.script({
 	// ESCENA 24 - Alejandría, Egipto (Faro de Alejandría)
 	// -------------------------------------------------------------
 	'Escena24': [
+		() => liberarBlock(),
 		'show scene alejandria_ciudad with fadeIn',
 		'Alejandría es una mezcla de modernidad y ruinas antiguas. El Faro ya no existe, pero sus cimientos permanecen bajo el agua.',
 		'jump Escena_Narrador_FaroAlejandria'
 	],
 		
 	'Escena_Narrador_FaroAlejandria': [
+		() => liberarBlock(),
 		'show scene bg_narrador_faro_alejandria with fadeIn',
 		'show image overlay_vignette_sepia with fadeIn',
 		'show image overlay_grano with fadeIn',
@@ -2963,6 +3076,7 @@ monogatari.script({
 	],
 
 	'Escena24_Alejandria': [
+		() => liberarBlock(),
 		'show scene alejandria_ciudad with fadeIn',
 		'Omar al-Hassan, egiptólogo, guardián de archivos del Faro.',
 		'show character omar normal at right with fadeIn',
@@ -2978,6 +3092,7 @@ monogatari.script({
 	],
 
 	'Escena24_Archivo': [
+		() => liberarBlock(),
 		'show scene alejandria_archivo with fadeIn',
 		'show character omar erudito at right',
 		'omar Bienvenido a la nueva Biblioteca de Alejandría. Aquí se guardan los secretos que el mundo ha olvidado.',
@@ -3008,6 +3123,7 @@ monogatari.script({
 	],
 
 	'Escena24_Decision': [
+		() => liberarBlock(),
 		{
 			'Choice': {
 				'Dialog': 'gabriel (Decisión del jugador)',
@@ -3028,11 +3144,13 @@ monogatari.script({
 	],
 
 	'Escena24_Faro': [
+		() => liberarBlock(),
 		'omar La desaparición del Faro de Alejandría es un misterio. Los bloques de basalto y granito fueron arrastrados por el mar, pero algunos permanecen bajo el agua.',
 		'jump Escena24_Decision'
 	],
 
 	'Escena24_Biblioteca': [
+		() => liberarBlock(),
 		'omar Los catálogos de la Gran Biblioteca contienen registros de obras perdidas, incluyendo textos sobre filosofía y astronomía.',
 		'jump Escena24_Decision'
 	],
@@ -3041,6 +3159,7 @@ monogatari.script({
 	// ESCENA 25 - Narración histórica: Diodoro Sículo
 	// -------------------------------------------------------------
 	'Escena25': [
+		() => liberarBlock(),
 		'show scene alejandria_archivo_oculto with fadeIn',
 		'Omar revela pergaminos que mencionan los libros perdidos VI-X de Diodoro Sículo. Estos libros describían contactos culturales desconocidos.',
 
@@ -3082,6 +3201,7 @@ monogatari.script({
 	// ESCENA 26 - Objeto oculto: Pergamino del Faro
 	// -------------------------------------------------------------
 	'Escena26': [
+		() => liberarBlock(),
 		'show scene alejandria_archivo_oculto with fadeIn',
 		'El pergamino menciona: “Un viaje hacia las montañas del fin del mundo.”',
 		()=> addItem('pergamino_faro'),
@@ -3135,6 +3255,7 @@ monogatari.script({
 	// ESCENA 27 - Minijuego Acción: Atentado en el Archivo
 	// -------------------------------------------------------------
 	'Escena27': [
+		() => liberarBlock(),
 		'show scene alejandria_archivo_oculto with fadeIn',
 		'[MINIJEUEGO ACCIÓN: ATENTADO EN EL ARCHIVO]',
 		'Enemigos atentan contra el archivo intentando inundarlo. El jugador debe proteger los pergaminos y escapar.',
@@ -3195,6 +3316,7 @@ monogatari.script({
 	// ESCENA 28 - Revelación final del capítulo
 	// -------------------------------------------------------------
 	'Escena28': [
+		() => liberarBlock(),
 		'show scene alejandria_ciudad with fadeIn',
 		'show character gabriel serio at left with fadeIn',
 		'gabriel La octava luz... La que guía a las siete...',
@@ -3223,6 +3345,7 @@ monogatari.script({
 	],
 
 	'Capitulo3': [
+		() => liberarBlock(),
 		'stop music with fade 3',
 		'show scene negro with fadeIn duration 2s',
 		'centered <h1>Fin del Capítulo II</h1><p>El Eco del Mediterraneo</p>',
@@ -3237,6 +3360,7 @@ monogatari.script({
 	// ESCENA 29: Babilonia, Irak (Jardines Colgantes)
 	// -------------------------------------------------------------
 	'Escena29_Babilonia': [
+		() => liberarBlock(),
 		'show scene bg_babilonia with fadeIn',
 		'El calor del desierto envuelve a Babilonia como un velo antiguo.',
 		'El Éufrates serpentea silencioso, cargando siglos de historia.',
@@ -3246,6 +3370,7 @@ monogatari.script({
 	],
 
 	'Escena_Narrador_JardinesColgantes': [
+		() => liberarBlock(),
 		'show scene bg_narrador_jardines_babilonia with fadeIn',
 		'show image overlay_vignette_sepia with fadeIn',
 		'show image overlay_grano with fadeIn',
@@ -3271,6 +3396,7 @@ monogatari.script({
 	],		
 
 	'Escena29_Babilonia_Bienvenida': [
+		() => liberarBlock(),
 		'show scene bg_babilonia with fadeIn',
 		'show character layla normal at center with fadeIn',
 		'layla Bienvenidos a Babilonia. Aquí, cada piedra tiene una historia... y cada silencio, un secreto.',
@@ -3284,6 +3410,7 @@ monogatari.script({
 	// ESCENA 30: Minijuego Puzzle - Reconstrucción del Jardín
 	// -------------------------------------------------------------
 	'Escena30_PuzzleJardin': [
+		() => liberarBlock(),
 		'gabriel Si las crónicas no mienten, aquí es donde deberían estar los restos de los Jardines Colgantes.',
 		'isidora Todo esto está enterrado bajo siglos de arena... esto va a tomar tiempo.',
 		'gabriel Empecemos por esta zona. Yo te ayudo a buscar.',
@@ -3328,24 +3455,28 @@ monogatari.script({
 	],
 
 	'Escena30_Overlay': [
+		() => liberarBlock(),
 		'Las líneas transversales cruzan directamente sobre puntos estratégicos del Mediterráneo y el Vaticano.',
 		'show storage decision_31 1',
 		'jump Escena30_Vaticano'
 	],
 
 	'Escena30_Frecuencia': [
+		() => liberarBlock(),
 		'El algoritmo detecta coincidencias directas en la arquitectura sacra del siglo IV en Roma.',
 		'show storage decision_31 2',
 		'jump Escena30_Vaticano'
 	],
 
 	'Escena30_Imprimir': [
+		() => liberarBlock(),
 		'Obtienes un bajorrelieve físico que servirá como llave comparativa en el Vaticano.',
 		'show storage decision_31 3',
 		'jump Escena30_Vaticano'
 	],
 
 'Escena30_Vaticano': [
+		() => liberarBlock(),
 		'gabriel Esto es increíble. La octava luz está vinculada a la arquitectura cristiana primitiva.',
 		'gabriel Debemos ir al Vaticano y verificar los registros de intervención en sitios helenísticos.',
 		'gabriel Si los Jardines Colgantes fueron destruidos por motivos religiosos, los archivos del Vaticano deberían tener evidencia.',
@@ -3373,6 +3504,7 @@ monogatari.script({
 	// -------------------------------------------------------------
 
 	'Escena31_Ruinas': [
+		() => liberarBlock(),
 		'show scene bg_hallazgo_babilonico with fadeIn',
 		'El jugador decide examinar los restos del palacio. Esto activa un hallazgo crucial.',
 		() => VerObjeto('bajorelieve_babilonico1'),
@@ -3390,6 +3522,7 @@ monogatari.script({
 
 
 	'Escena31_ObjetoOcultoBabilonia': [
+		() => liberarBlock(),
 		() => hideAllHotspots(),
 		'show scene bg_hallazgo_babilonico with fadeIn',
 
@@ -3434,6 +3567,7 @@ monogatari.script({
 	],
 
 	'Escena31_Guardar': [
+		() => liberarBlock(),
 		'Sellas la muestra con nitrógeno gaseoso para evitar el deterioro de la arcilla.',
 		'gabriel La preservación es clave. Este hallazgo podría cambiar nuestra comprensión de la historia.',
 		'gabriel Debemos asegurarnos de que llegue a los laboratorios de la USACH para su análisis.',
@@ -3442,6 +3576,7 @@ monogatari.script({
 	],
 
 	'Escena31_Digitalizar': [
+		() => liberarBlock(),
 		'El escáner 3D genera una nube de puntos precisa de la incripción φῶς νότου.',
 		'gabriel La digitalización permite preservar la información para futuros estudios.',
 		'gabriel Esta información será invaluable para los investigadores de la USACH.',
@@ -3450,6 +3585,7 @@ monogatari.script({
 	],
 
 	'Escena31_Debatir': [
+		() => liberarBlock(),
 		'gabriel El vínculo se vuelve irrefutable; la doctrina se expandió llevando la reference del extremo sur.',
 		'gabriel Debemos analizar estos hallazgos en el contexto de la expansión del cristianismo primitivo.',
 		'show storage decision_31 3',
@@ -3457,6 +3593,7 @@ monogatari.script({
 	],
 
 	'Escena31_Vaticano': [		
+		() => liberarBlock(),
 		'[ACCIÓN DE INVENTARIO] Usas la Criba Arqueológica de Pincel Fino para remover el polvo de arcilla y los escombros de la mampostería.',
 
 		{
@@ -3479,6 +3616,7 @@ monogatari.script({
 	],
 
 	'Escena31_Relieves': [
+		() => liberarBlock(),
 		'Analizas los surcos en la piedra: la técnica revela golpes sistemáticos orientados a borrar rostros paganos.',
 		'gabriel Estos bajorrelieves podrían contener pistas sobre la destrucción de símbolos religiosos.',
 		'gabriel debemos partir al Vaticano para verificar los registros de intervención en sitios helenísticos.',
@@ -3487,6 +3625,7 @@ monogatari.script({
 	],
 
 	'Escena31_Interrogar': [
+		() => liberarBlock(),
 		'layla Los registros sugieren obispos del siglo IV actuando por decreto en zonas helenizadas.',
 		'gabriel debemos partir al Vaticano para verificar los registros de intervención en sitios helenísticos.',
 		'show storage decision_31 2',
@@ -3494,6 +3633,7 @@ monogatari.script({
 	],
 
 	'Escena31_Georradar': [
+		() => liberarBlock(),
 		'El georradar detecta una oquedad oculta tras un bloque fracturado por impacto manual.',
 		'gabriel Debemos analizar esta hallazgo en el contexto de la expansión del cristianismo primitivo.',
 		'gabriel debemos partir al Vaticano para verificar los registros de intervención en sitios helenísticos.',
@@ -3506,6 +3646,7 @@ monogatari.script({
 	// ESCENA 32: Ciudad del Vaticano, Italia
 	// -------------------------------------------------------------
 	'Escena32_Vaticano': [
+		() => liberarBlock(),
 		'show scene bg_plaza_vaticano with fadeIn',
 		'show character gabriel talk at left with fadeIn',
 		'gabriel La Ciudad del Vaticano es un enclave de poder y misterio. Cada piedra parece susurrar secretos de siglos pasados.',
@@ -3566,18 +3707,21 @@ monogatari.script({
 	],
 
 	'Escena32_Etica': [
+		() => liberarBlock(),
 		'marcus (Sorprendido) El sello de la luz del sur... Pensé que todos habían sido destruidos.',
 		'show storage decision_32 1',
 		'jump Escena33_BibliotecaVaticana'
 	],
 
 	'Escena32_Decretos': [
+		() => liberarBlock(),
 		'marcus Conocen bien la patrística... Muy bien, verán los registros de la ejecución de esos decretos.',
 		'show storage decision_32 2',
 		'jump Escena33_BibliotecaVaticana'
 	],
 
 	'Escena32_Diplomacia': [
+		() => liberarBlock(),
 		'marcus Sus credenciales son válidas, aunque la verdad que solicitan pesa más que cualquier título.',
 		'show storage decision_32 3',
 		'jump Escena33_BibliotecaVaticana'
@@ -3588,6 +3732,7 @@ monogatari.script({
 // (reemplaza la narración plana original por el minijuego)
 // -------------------------------------------------------------
 'Escena33_BibliotecaVaticana': [
+		() => liberarBlock(),
 	'show scene bg_manuscrito with fadeIn',
 
 	'show character marcus normal at center with fadeIn',
@@ -3622,6 +3767,7 @@ monogatari.script({
 	// ESCENA 33: Documentos del siglo IV
 	// -------------------------------------------------------------
 	'Escena33_DocumentosVaticano': [
+		() => liberarBlock(),
 		'show scene bg_manuscrito with fadeIn',
 		'Marcus revela documentos que explican:',
 		'• La Estatua de Zeus fue destruida por obispos locales.',
@@ -3660,18 +3806,21 @@ monogatari.script({
 	],
 
 	'Escena33_CopiaDigital': [
+		() => liberarBlock(),
 		'Almacenas los datos en el servidor seguro cifrado de la expedición.',
 		'show storage decision_33 1',
 		'jump Escena34_ObjetoOcultoVaticano'
 	],
 
 	'Escena33_Cuestionar': [
+		() => liberarBlock(),
 		'marcus Porque la octava luz no era un ídolo, sino un repositorio primigenio de fe y ciencia.',
 		'show storage decision_33 2',
 		'jump Escena34_ObjetoOcultoVaticano'
 	],
 
 	'Escena33_ExigirLista': [
+		() => liberarBlock(),
 		'marcus Los envíos fueron dirigidos al Archivo de Diodoro Sículo en territorio sirio.',
 		'show storage decision_33 3',
 		'jump Escena34_ObjetoOcultoVaticano'
@@ -3682,6 +3831,7 @@ monogatari.script({
 	// -------------------------------------------------------------
 	'Escena34_ObjetoOcultoVaticano': [
 
+		() => liberarBlock(),
 		'show character gabriel talk at left with fadeIn',
 		'gabriel Pero hay algo más en estos documentos. Un texto distinto a los demás...',
 		'marcus Eso... no debería estar ahí.',
@@ -3720,18 +3870,21 @@ monogatari.script({
 	],
 
 	'Escena34_Confrontar': [
+		() => liberarBlock(),
 		'marcus No fue ocultamiento por malicia, sino un pacto para evitar que la luz fuera profanada.',
 		'show storage decision_34 1',
 		'jump Escena35_SiriaArchivo'
 	],
 
 	'Escena34_Tinta': [
+		() => liberarBlock(),
 		'El análisis arrojó trazas minerales de hematita idénticas a las cuevas patagónicas.',
 		'show storage decision_34 2',
 		'jump Escena35_SiriaArchivo'
 	],
 
 	'Escena34_Partida': [
+		() => liberarBlock(),
 		'Recoges tus instrumentos y te organizas con el equipo para dejar Roma inmediatamente.',
 		'show storage decision_34 3',
 		'jump Escena35_SiriaArchivo'
@@ -3741,6 +3894,7 @@ monogatari.script({
 	// ESCENA 35: Siria (Archivo de Diodoro)
 	// -------------------------------------------------------------
 	'Escena35_SiriaArchivo': [
+		() => liberarBlock(),
 		'show scene bg_siria_archivo with fadeIn',
 		'En Siria, entre ruinas y edificios modernos, se encuentra un archivo que guarda fragmentos de textos antiguos.',
 		'Layla Nasser se une nuevamente al equipo.',
@@ -3753,6 +3907,7 @@ monogatari.script({
 	],
 
 'Escena_Narrador_Piramide': [
+		() => liberarBlock(),
     'show scene bg_narrador_piramide_giza with fadeIn',
     'show image overlay_vignette_sepia with fadeIn',
     'show image overlay_grano with fadeIn',
@@ -3778,6 +3933,7 @@ monogatari.script({
 ],
 
 	'Escena35_Archivos': [
+		() => liberarBlock(),
 		'show scene bg_siria_archivo with fadeIn',
 		'show character gabriel talk at left with fadeIn',
 		'gabriel ¿Tienes los libros perdidos de Diodoro Sículo?',
@@ -3812,18 +3968,21 @@ monogatari.script({
 	],
 
 	'Escena35_Antipatro': [
+		() => liberarBlock(),
 		'Descubres referencias a los viajes secretos del poeta más allá del mar conocido.',
 		'show storage decision_35 1',
 		'jump Escena36_SaqueoSiria'
 	],
 
 	'Escena35_Catalogo': [
+		() => liberarBlock(),
 		'layla Gracias por la ayuda, archivaremos esto en servidores seguros fuera del país.',
 		'show storage decision_35 2',
 		'jump Escena36_SaqueoSiria'
 	],
 
 	'Escena35_Rutas': [
+		() => liberarBlock(),
 		'Los textos confirman naves preparadas para travesías oceánicas de larga duración.',
 		'show storage decision_35 3',
 		'jump Escena36_SaqueoSiria'
@@ -3833,6 +3992,7 @@ monogatari.script({
 	// ESCENA 36: Minijuego Acción - Saqueadores en Siria
 	// -------------------------------------------------------------
 	'Escena36_SaqueoSiria': [
+		() => liberarBlock(),
 		'show scene bg_saqueo_siria with fadeIn',
 		'¡Saqueadores atacan el archivo! El jugador debe proteger los fragmentos y escapar.',
 
@@ -3870,24 +4030,28 @@ monogatari.script({
 	],
 
 	'Escena36_ProtegerMaletin': [
+		() => liberarBlock(),
 		'Logras resguardar todo el material digitalizado e impreso sin bajas ni pérdidas.',
 		'show storage decision_36 1',
 		'jump Escena36_Salida'
 	],
 
 	'Escena36_Bloquear': [
+		() => liberarBlock(),
 		'Ganas valiosos minutos mientras los agresores intentan despejar la entrada.',
 		'show storage decision_36 2',
 		'jump Escena36_Salida'
 	],
 
 	'Escena36_Subterrano': [
+		() => liberarBlock(),
 		'El paso subterráneo los conduce de forma segura hacia el vehículo de evacuación.',
 		'show storage decision_36 3',
 		'jump Escena36_Salida'
 	],
 
 	'Escena36_Salida': [
+		() => liberarBlock(),
 		'show scene bg_saqueo_siria with fadeIn',
 		'gabriel Esto confirma que Antípatro tenía conocimiento de tierras lejanas y de la octava luz.',
 		'gabriel Debemos avanzar hacia Sidón para seguir sus pasos y descubrir la verdad detrás de sus escritos.',
@@ -3901,6 +4065,7 @@ monogatari.script({
 	// ESCENA 37: Sidón, Líbano (Ciudad de Antípatro)
 	// -------------------------------------------------------------
 	'Escena37_Sidon': [
+		() => liberarBlock(),
 		'show scene bg_sidon with fadeIn',
 		'Sidón es una ciudad antigua junto al mar. Aquí nació Antípatro de Sidón, el poeta que enumeró las maravillas.',
 
@@ -3924,6 +4089,7 @@ monogatari.script({
 
 
 	'Escena37_Biblioteca_Sidon': [
+		() => liberarBlock(),
 		'show scene bg_biblioteca_sidon with fadeIn',
 		'El quipo decide examinar la biblioteca. Esto activa un hallazgo crucial.',
 		() => VerObjeto('poesia_votiva'),
@@ -3980,6 +4146,7 @@ monogatari.script({
 	// ESCENA 38: Objeto oculto - Epigrama original
 	// -------------------------------------------------------------
 	'Escena38_EpigramaOriginal': [
+		() => liberarBlock(),
 		//'show scene bg_epigrama with fadeIn',
 
 		'show scene bg_biblioteca_sidon with fadeIn',
@@ -4015,18 +4182,21 @@ monogatari.script({
 	],
 
 	'Escena38_Impronta': [
+		() => liberarBlock(),
 		'Obtienes un duplicado perfecto de la estela para el cuaderno de campo de la expedición.',
 		'show storage decision_38 1',
 		'jump Escena39_Sinai'
 	],
 
 	'Escena38_Gramatica': [
+		() => liberarBlock(),
 		'La estructura léxica es idéntica, demostrando que provienen del mismo autor o círculo.',
 		'show storage decision_38 2',
 		'jump Escena39_Sinai'
 	],
 
 	'Escena38_Logistica': [
+		() => liberarBlock(),
 		'Preparas los pertrechos de montaña y las autorizaciones para la expedición al desierto.',
 		'show storage decision_38 3',
 		'jump Escena39_Sinai'
@@ -4036,6 +4206,7 @@ monogatari.script({
 	// ESCENA 39: Monte Sinaí, Egipto / Medio Oriente
 	// -------------------------------------------------------------
 	'Escena39_Sinai': [
+		() => liberarBlock(),
 		'show scene bg_sinai with fadeIn',
 		'JUSTIFICACIÓN COMPLETA DE LLEGADA: El equipo llega al Monte Sinaí porque:',
 		'• Es el lugar donde nació la lucha contra la idolatría.',
@@ -4056,6 +4227,7 @@ monogatari.script({
 	],
 
 'Escena39_Caverna': [
+		() => liberarBlock(),
 		'show scene bg_sinai_caverna with fadeIn',
 		'El quipo decide examinar la biblioteca. Esto activa un hallazgo crucial.',
 		() => VerObjeto('pared1'),
@@ -4071,6 +4243,7 @@ monogatari.script({
 	],
 
 'Escena39_Revelacion': [
+		() => liberarBlock(),
 		'show scene bg_sinai_revelacion with fadeIn',
 		() => hideAllHotspots(),
 		'La excavación revela un sitio con un altar muy antiguo, antes de los primeros cristianos, de origen judio.',
@@ -4094,18 +4267,21 @@ monogatari.script({
 	],
 
 	'Escena39_Isidora': [
+		() => liberarBlock(),
 		'Isidora El escáner detecta una pared falsa erigida con mortero antiguo. Es un altar judio-cristiano.',
 		'show storage decision_39 1',
 		'jump Escena40_RevelacionFinal'
 	],
 
 	'Escena39_InterrogarMarcus': [
+		() => liberarBlock(),
 		'marcus Comprendieron que si el mundo caía en la oscuridad, el origen en el sur debía perdurar.',
 		'show storage decision_39 2',
 		'jump Escena40_RevelacionFinal'
 	],
 
 	'Escena39_Muestras': [
+		() => liberarBlock(),
 		'Las muestras contienen mirra y aceites de consagración fechados en el siglo IV.',
 		'show storage decision_39 3',
 		'jump Escena40_RevelacionFinal'
@@ -4115,6 +4291,7 @@ monogatari.script({
 	// ESCENA 40: Revelación final del capítulo
 	// -------------------------------------------------------------
 	'Escena40_RevelacionFinal': [
+		() => liberarBlock(),
 		'show scene bg_sinai_revelacion with fadeIn',
 
 		'show character gabriel talk at left with fadeIn',
@@ -4153,6 +4330,7 @@ monogatari.script({
 	],
 
 	'Cierre_Capitulo3_Bitacora': [
+		() => liberarBlock(),
 		'Consignas formalmente el descubrimiento del pacto global de preservación.',
 		'show storage decision_40 1',
 		'[FIN DEL CAPÍTULO 3]: Rumbo al desenlace en la Patagonia.',
@@ -4160,6 +4338,7 @@ monogatari.script({
 	],
 
 	'Cierre_Capitulo3_Informe': [
+		() => liberarBlock(),
 		'El laboratorio en Chile inicia la preparación del equipo de excavación profunda.',
 		'show storage decision_40 2',
 		'[FIN DEL CAPÍTULO 3]: Rumbo al desenlace en la Patagonia.',
@@ -4167,6 +4346,7 @@ monogatari.script({
 	],
 
 	'Cierre_Capitulo3_Geodesico': [
+		() => liberarBlock(),
 		'Los cálculos confirman una alineación exacta entre ambos puntos sagrados.',
 		'show storage decision_40 3',
 		'[FIN DEL CAPÍTULO 3]: Rumbo al desenlace en la Patagonia.',
@@ -4180,6 +4360,7 @@ monogatari.script({
    ============================================================ */
 
    	'Capitulo4': [
+		() => liberarBlock(),
 		'stop music with fade 3',
 		'show scene negro with fadeIn duration 2s',
 		'centered <h1>Fin del Capítulo III</h1><p>Sombras del Imperio</p>',
@@ -4196,6 +4377,7 @@ monogatari.script({
 
 'Escena41': [
 
+		() => liberarBlock(),
     'show scene bg_patagonia_glaciar with fadeIn duration 3s',
     'narrator El avión desciende sobre la Patagonia como si atravesara un velo de silencio.',
     'narrator Las montañas se alzan como gigantes dormidos, cubiertas por un manto blanco que parece respirar.',
@@ -4235,12 +4417,14 @@ monogatari.script({
 ],
 
 'Escena41_Coordenadas': [
+		() => liberarBlock(),
     'narrator Sigues las coordenadas exactas reveladas en el Capítulo 1.',
     'narrator La entrada a la cueva final se activa.',
     'jump Escena42'
 ],
 
 'Escena41_Glaciar': [
+		() => liberarBlock(),
     'narrator Exploras el glaciar y encuentras un fragmento de hielo fósil con marcas geométricas.',
     () => addItem('hielo_fosil'),
     'narrator El objeto ha sido añadido al inventario.',
@@ -4248,6 +4432,7 @@ monogatari.script({
 ],
 
 'Escena41_Erik': [
+		() => liberarBlock(),
     'erik Hubo una expedición hace años... pero desaparecieron. Nunca supe por qué.',
     'narrator La ruta se vuelve más peligrosa.',
     'jump Escena42'
@@ -4260,6 +4445,7 @@ monogatari.script({
 
 'Escena42': [
 
+		() => liberarBlock(),
     'show scene camara_profunda with fadeIn duration 3s',
     'narrator En la entrada de la cueva, el equipo llega nuevamente a la camara con el altar circular con ranuras.',
     'narrator Ocho ranuras. Una por cada maravilla que Antípatro y Diodoro documentaron... y una octava, la que las precede a todas.',
@@ -4291,6 +4477,7 @@ monogatari.script({
    ============================================================ */
 
 'Escena43': [
+		() => liberarBlock(),
 	'show scene camara_secreta with fadeIn',
     'narrator Se abren las puertas del fondo.',
     'narrator Se puede apreciar un camara de grandes proporciones y algo increible...',
@@ -4333,17 +4520,20 @@ monogatari.script({
 ],
 
 'Escena43_Examinar': [
+		() => liberarBlock(),
     'narrator Encuentras un panel oculto con símbolos mixtos.',
     () => addItem('panel_simbolos'),
     'jump Escena44'
 ],
 
 'Escena43_Medir': [
+		() => liberarBlock(),
     'narrator Las medidas coinciden con proporciones de Giza.',
     'jump Escena44'
 ],
 
 'Escena43_Buscar': [
+		() => liberarBlock(),
     'narrator Un pasadizo opcional se activa.',
     () => addItem('pasadizo_oculto'),
     'jump Escena44'
@@ -4356,6 +4546,7 @@ monogatari.script({
 
 'Escena44': [
 
+		() => liberarBlock(),
     'show scene bg_historia_luz with fadeIn duration 3s',
     'narrator La octava luz es la primera maravilla del mundo antiguo.',
     'narrator La única construida antes de la expansión de las civilizaciones mediterráneas.',
@@ -4383,16 +4574,19 @@ monogatari.script({
 ],
 
 'Escena44_Aceptar': [
+		() => liberarBlock(),
     'gabriel Esto cambia la historia humana.',
     'jump Escena45'
 ],
 
 'Escena44_Cuestionar': [
+		() => liberarBlock(),
     'isidora ¿Y si esta narrativa fue manipulada por siglos?',
     'jump Escena45'
 ],
 
 'Escena44_Pruebas': [
+		() => liberarBlock(),
     'narrator Analizas el material de la estructura.',
     () => addItem('material_octava_luz'),
     'jump Escena45'
@@ -4420,6 +4614,7 @@ monogatari.script({
 
 'Escena45': [
 
+		() => liberarBlock(),
     'show scene bg_camara_subterranea with shake infinite',
     'narrator Un estruendo sacude la cámara subterránea.',
     'narrator El suelo vibra como si la tierra quisiera expulsar la estructura.',
@@ -4550,6 +4745,7 @@ monogatari.script({
 
 'Escena46': [
 
+		() => liberarBlock(),
     'show scene bg_pedestal_luz with fadeIn',
 	() => ImagenEnHotspot('palo_antorcha', { escala: 0.5 }),
     'narrator Tras escapar del derrumbe, el equipo llega a una cámara secundaria.',
@@ -4572,6 +4768,7 @@ monogatari.script({
 
 'Escena46_antorcha': [
 
+		() => liberarBlock(),
     'show scene bg_pedestal_luz',
 	() => hideAllHotspots(),
 	() => removeItem('palo_antorcha'),
@@ -4590,6 +4787,7 @@ monogatari.script({
 	],
 
 'Escena46_rutas': [
+		() => liberarBlock(),
 	'show scene bg_pedestal_rutas with fadeIn duration 3s',
 	() => hideAllHotspots(),
     'narrator Función: proyecta un mapa tridimensional del mundo antiguo.',
@@ -4621,12 +4819,14 @@ monogatari.script({
 ],
 
 'Escena46_Activar': [
+		() => liberarBlock(),
     'narrator El artefacto se ilumina y proyecta un mapa tridimensional.',
     'narrator La luz se desplaza desde la Patagonia hacia la Antártida.',
     'jump Escena47'
 ],
 
 'Escena46_Analizar': [
+		() => liberarBlock(),
     'narrator Tomas una muestra microscópica de la aleación.',
     'narrator El material no coincide con ningún metal conocido.',
     () => addItem('analisis_aleacion'),
@@ -4634,6 +4834,7 @@ monogatari.script({
 ],
 
 'Escena46_Registrar': [
+		() => liberarBlock(),
     'narrator Registras los símbolos en tu cuaderno digital.',
     () => addItem('diccionario_simbolos'),
     'jump Escena47'
@@ -4646,6 +4847,7 @@ monogatari.script({
 
 'Escena47': [
 
+		() => liberarBlock(),
     'show scene bg_camara_subterranea_derrumbe with fadeIn duration 3s',
     () => addItem('artefacto_luz'),
     'narrator El Artefacto de la Luz ha sido añadido al inventario.',
@@ -4678,18 +4880,21 @@ monogatari.script({
 ],
 
 'Escena47_Celebrar': [
+		() => liberarBlock(),
     'narrator El equipo sonríe, abrazándose brevemente.',
     'narrator Por primera vez desde que comenzó el viaje, sienten que han logrado algo imposible.',
     'jump Escena48'
 ],
 
 'Escena47_Divulgacion': [
+		() => liberarBlock(),
     'gabriel Debemos preparar un informe. Esto no puede quedar oculto.',
     'narrator El equipo asiente, consciente del impacto global.',
     'jump Escena48'
 ],
 
 'Escena47_Riesgos': [
+		() => liberarBlock(),
     'gabriel Si revelamos esto sin cuidado... podría desencadenar conflictos.',
     'narrator El equipo guarda silencio, comprendiendo la gravedad.',
     'jump Escena48'
@@ -4708,6 +4913,7 @@ monogatari.script({
 
 'Escena48': [
 
+		() => liberarBlock(),
     //'show scene bg_cueva_silencio with fadeIn duration 3s',
 	'show scene bg_camara_subterranea_derrumbe',
     'narrator El silencio dentro de la cámara es absoluto.',
@@ -4759,18 +4965,21 @@ monogatari.script({
 ],
 
 'Escena48_Aceptar': [
+		() => liberarBlock(),
     'gabriel Si existe una novena luz... debemos encontrarla.',
     'narrator El equipo asiente con solemnidad.',
     'jump Escena49_Fogon'
 ],
 
 'Escena48_Dudar': [
+		() => liberarBlock(),
     'tomas ¿Y si el artefacto está dañado? ¿O si interpreta mal la información?',
     'isidora No. La precisión geométrica es perfecta. Esto no es un error.',
     'jump Escena49_Fogon'
 ],
 
 'Escena48_Viajar': [
+		() => liberarBlock(),
     'gabriel No podemos esperar. Si hay otra estructura, debemos llegar antes de que alguien más lo haga.',
     'isidora ¿Estás diciendo que no somos los únicos que podrían estar buscando esto?',
     'gabriel Exactamente.',
@@ -4783,6 +4992,7 @@ monogatari.script({
    ============================================================ */
 
 	'Escena49_Fogon': [
+		() => liberarBlock(),
 		'show scene fogon with fadeIn',
 		'show character gabriel pensativo at left with fadeIn',
 		'show character isidora normal at right with fadeIn',
@@ -4793,6 +5003,7 @@ monogatari.script({
 
 'Escena49': [
 	
+		() => liberarBlock(),
     'show scene bg_cueva_salida with fadeIn duration 3s',
     'narrator De pronto, al igual que la vez anterior, el artefacto empieza a vibrar y proyecta una coordenada exacta en la Antártida.',
     'narrator Una estructura enterrada bajo kilómetros de hielo.',
@@ -4836,18 +5047,21 @@ monogatari.script({
 ],
 
 'Escena49_Expedicion': [
+		() => liberarBlock(),
     'gabriel Prepararemos todo. No podemos perder tiempo.',
     'narrator El equipo comienza a organizar mentalmente los pasos.',
     'jump Escena50'
 ],
 
 'Escena49_Apoyo': [
+		() => liberarBlock(),
     'isidora Si buscamos apoyo internacional, podríamos obtener recursos... pero también atención no deseada.',
     'gabriel Es un riesgo que debemos evaluar.',
     'jump Escena50'
 ],
 
 'Escena49_Investigar': [
+		() => liberarBlock(),
     'isidora Antes de viajar, debemos entender qué estamos buscando.',
     'narrator El equipo asiente, consciente de la importancia de la información.',
     'jump Escena50'
@@ -4860,6 +5074,7 @@ monogatari.script({
 
 'Escena50': [
 
+		() => liberarBlock(),
     'show scene bg_patagonia_amanecer with fadeIn duration 4s',
     'narrator El sol comienza a asomarse detrás de las montañas patagónicas.',
     'narrator La luz dorada ilumina el glaciar, reflejándose en miles de tonos que parecen despedirse del equipo.',
@@ -4901,24 +5116,28 @@ monogatari.script({
 ],
 
 'FinCapitulo4_Aceptar': [
+		() => liberarBlock(),
     'narrator Aceptas la misión con determinación.',
     'narrator El viaje hacia la novena luz comenzará pronto.',
     'jump Creditos'
 ],
 
 'FinCapitulo4_Cuestionar': [
+		() => liberarBlock(),
     'gabriel ¿Estamos preparados para lo que viene?',
     'narrator La duda se mezcla con esperanza.',
     'jump Creditos'
 ],
 
 'FinCapitulo4_Reflexion': [
+		() => liberarBlock(),
     'narrator Cierras los ojos y respiras el aire frío de la Patagonia.',
     'narrator Sabes que tu vida cambió para siempre.',
     'jump Creditos'
 ],
 
 'Creditos': [
+		() => liberarBlock(),
     'stop music with fade 3',
     'show scene negro with fadeIn duration 2s',
     //'play music creditos with loop fade 2',
