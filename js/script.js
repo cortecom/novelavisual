@@ -912,6 +912,8 @@ monogatari.assets ('videos', {
 // Define the images used in the game.
 monogatari.assets ('images', {
 	'palo_antorcha': 'palo_antorcha.png',
+	'panuelo': 'panuelo.png',
+	'llave_antigua': 'llave_antigua.png',
 	'overlay_vignette_sepia': 'overlay_vignette_sepia.png',
 	'overlay_grano': 'overlay_grano.png',
 	'overlay_letterbox': 'overlay_letterbox.png'
@@ -1643,7 +1645,9 @@ monogatari.script({
         //() => hideHotspot('vitrina'),
         //() => stopIconFollow(),
 		() => VerObjeto('idolo'),
+		() => ImagenEnHotspot('panuelo', { escala: 0.3 }),
         () => TomarObjeto('panuelo'),
+		() => ImagenEnHotspot('llave_antigua', { escala: 0.3 }),
 		() => TomarObjeto('llave_antigua'),
 		() => UsarObjeto('vitrina','llave_antigua','jump Escena1_Tomar'),
 		'narrator Necesitas la piedra de Ngenechén. La vitrina está cerrada.'
