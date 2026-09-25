@@ -7,8 +7,7 @@ tu-proyecto/
   assets/
     games/
       cifrado-tres-ciudades/   <- esta carpeta, sin modificar su contenido
-        rune-puzzle.js
-        puzzle-action.js
+        rune-puzzle.js          (componente + Acción de Monogatari, un solo archivo)
         mare-nostrum-bg.png
         INTEGRACION.md
         index-snippet.html
@@ -18,20 +17,24 @@ tu-proyecto/
 No hace falta tocar nada dentro de la carpeta — todas las rutas ya están
 pre-configuradas para vivir en `assets/games/cifrado-tres-ciudades/`.
 
-## Paso 1 — Cargar los scripts en tu `index.html`
+## Paso 1 — Cargar el script en tu `index.html`
 
-Ábrelo y busca donde cargas tu propio `script.js` (normalmente cerca del
-final del `<body>`, después de que Monogatari ya esté inicializado). Justo
-antes de esa línea, agrega:
+`rune-puzzle.js` incluye **todo**: el componente `<rune-puzzle>` (Web
+Component, Shadow DOM) y el registro de la Acción `puzzle` de Monogatari, en
+un único archivo. Ábrelo y busca donde cargas tu propio `script.js`
+(normalmente cerca del final del `<body>`, después de que Monogatari ya esté
+inicializado). Justo antes de esa línea, agrega:
 
 ```html
 <script src="assets/games/cifrado-tres-ciudades/rune-puzzle.js"></script>
-<script src="assets/games/cifrado-tres-ciudades/puzzle-action.js"></script>
 ```
 
-`puzzle-action.js` necesita que la variable global `monogatari` ya exista,
-así que si tu `main.js` crea la instancia, carga estos dos scripts **después**
-de ese archivo (pero antes de `script.js`, donde escribes tu guion).
+Este archivo necesita que la variable global `monogatari` ya exista, así que
+si tu `main.js` crea la instancia, cárgalo **después** de ese archivo (pero
+antes de `script.js`, donde escribes tu guion). Si `Monogatari`/`monogatari`
+todavía no existen cuando se carga, el componente `<rune-puzzle>` igual
+queda definido con normalidad — solo el registro de la Acción se salta, con
+un aviso en la consola.
 
 ## Paso 2 — Colocar el elemento dentro de la pantalla de juego
 
@@ -120,8 +123,7 @@ templo antes del acertijo y la reacción de después.
 
 | Archivo | Qué es | ¿Hay que tocarlo? |
 |---|---|---|
-| `rune-puzzle.js` | El componente `<rune-puzzle>` (Web Component, Shadow DOM) | No |
-| `puzzle-action.js` | Registra el verbo `puzzle` como Acción de Monogatari | No |
+| `rune-puzzle.js` | El componente `<rune-puzzle>` + la Acción `puzzle` de Monogatari, en un solo archivo | No |
 | `mare-nostrum-bg.png` | Fondo del mapa | No, salvo que quieras cambiar la imagen |
 | `index-snippet.html` | Bloque para copiar en tu `index.html` | Copiar, no editar la carpeta original |
 | `escena-ejemplo.js` | Ejemplo de guion usando `'puzzle cityPuzzle'` | Copiar/adaptar a tu propio `script.js` |
@@ -132,6 +134,8 @@ Todo vive dentro de `_build()` en `rune-puzzle.js`, en el array `CITIES`
 (coordenadas cifradas en numerales griegos + posición en píxeles sobre
 `mare-nostrum-bg.png`, que mide 603×730). Está comentado línea por línea;
 no debería hacer falta tocar nada más del archivo para ese tipo de ajustes.
+La Acción de Monogatari (clase `PuzzleAction`) está en la segunda mitad del
+mismo archivo, en su propio IIFE, después de `customElements.define(...)`.
 
 ## Coordenadas reales usadas como base del cifrado
 
@@ -140,3 +144,49 @@ no debería hacer falta tocar nada más del archivo para ese tipo de ajustes.
 | Alejandría   | 31°12′N, 29°55′E             | `ΛΑ'ΙΒ'Β, ΚΘ'ΝΕ'Α`            |
 | Halicarnaso  | 37°02′N, 27°26′E             | `ΛΖ'Β'Β, ΚΖ'Κϛ'Α`             |
 | Babilonia    | 32°32′N, 44°25′E             | `ΛΒ'ΛΒ'Β, ΜΔ'ΚΕ'Α`            |
+
+## Notas de la última corrección
+
+**Un solo archivo.** `rune-puzzle.js` y `puzzle-action.js` se fusionaron en
+un único `rune-puzzle.js` (el componente y la Acción viven en dos IIFEs
+separados dentro del mismo archivo). Si tenías `puzzle-action.js` cargado
+por separado en tu `index.html`, quita esa línea — ya no existe como archivo
+aparte.
+
+**Texto más grande.** Se aumentó el tamaño de fuente en todo el rompecabezas
+(claves, fichas, pergamino, mapa) para que se lea mejor, especialmente en
+pantallas pequeñas.
+
+**El mapa no se veía en teléfonos — corregido.** En pantallas angostas
+(menos de 880px), el rompecabezas ahora muestra un selector "Pistas / Mapa"
+en la parte superior: cada vista ocupa su propio espacio completo en vez de
+apilarse todo verticalmente y depender de hacer scroll para llegar al mapa
+(que en la práctica no se podía alcanzar en varios celulares/tabletas). El
+sello y el mensaje de acierto/error ahora son una franja compartida, visible
+en ambas vistas — y en cuanto las tres runas de una coordenada quedan
+correctas, el rompecabezas cambia automáticamente a la vista "Mapa" para que
+el jugador no tenga que adivinar que debe tocar el botón. En pantallas
+anchas (escritorio) el selector permanece oculto y el diseño se ve igual que
+antes, con ambos paneles visibles a la vez.
+
+Bugs corregidos previamente (siguen vigentes en esta versión):
+
+1. **La X cerraba el rompecabezas sin forma de volver a abrirlo, dejando la
+   narración pegada.** Como esta línea del guion *bloquea* la historia hasta
+   que se resuelve, no existe ningún hotspot externo que pueda reabrirlo una
+   vez cerrado — cerrarlo dejaba la promesa de la Acción esperando para
+   siempre. Ahora, mientras el rompecabezas está abierto por el guion (la
+   Acción marca el elemento con el atributo `mandatory`), la X se oculta
+   automáticamente. Si en cambio abres el componente tú mismo con `.open()`
+   desde un hotspot opcional (sin pasar por la Acción de guion), la X sigue
+   disponible normalmente porque en ese caso sí existe una forma de volver a
+   abrirlo.
+
+2. **La narración se quedaba pegada justo al hablar Isidora por primera vez,
+   inmediatamente después de resolver el acertijo.** La causa: los clics
+   dentro del rompecabezas (incluyendo el botón "Continuar") se propagaban
+   hacia afuera del Shadow Root y llegaban también al manejador de "clic para
+   avanzar diálogo" del propio Monogatari, generando un avance duplicado que
+   desincronizaba el guion. Ahora el evento `click` (solo ese, no
+   mousedown/mouseup/touch — necesarios para el arrastre del sello) detiene
+   su propagación antes de salir hacia el DOM del juego.

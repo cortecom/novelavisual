@@ -57,19 +57,19 @@
   /* ---------- Header ---------- */
   .title-wrap{ text-align:center; margin-bottom:22px; }
   .eyebrow{
-    font-family:'Cinzel', serif; letter-spacing:0.35em; font-size:11px;
+    font-family:'Cinzel', serif; letter-spacing:0.35em; font-size:14px;
     color:var(--bronze-light); text-transform:uppercase; margin-bottom:6px;
   }
   h1{
     font-family:'Cinzel Decorative', serif;
-    font-size:clamp(24px,4vw,40px);
+    font-size:clamp(28px,4.5vw,46px);
     margin:0; color:var(--glow);
     text-shadow:0 2px 0 #000, 0 0 24px rgba(232,185,90,0.25);
     letter-spacing:0.02em;
   }
   .subtitle{
     font-style:italic; color:#cbb98a; max-width:620px; margin:10px auto 0;
-    font-size:15px; line-height:1.5;
+    font-size:19px; line-height:1.5;
   }
 
   /* ---------- Layout ---------- */
@@ -80,6 +80,24 @@
     gap:22px;
   }
   @media (max-width:880px){ .stage{grid-template-columns:1fr;} }
+
+  /* ---------- Mobile view toggle (Pistas / Mapa) ---------- */
+  .mobile-view-toggle{ display:none; gap:8px; width:100%; max-width:420px; margin:0 auto; }
+  .mobile-view-toggle .view-btn{
+    flex:1; font-family:'Cinzel', serif; font-size:14px; letter-spacing:0.06em;
+    text-transform:uppercase; padding:10px 8px; border-radius:6px;
+    background:rgba(140,106,63,0.18); color:#cbb98a; border:1px solid var(--bronze);
+    cursor:pointer;
+  }
+  .mobile-view-toggle .view-btn.active{ background:var(--parchment); color:var(--ink); }
+  @media (max-width:880px){
+    .mobile-view-toggle{ display:flex; margin-bottom:4px; }
+    /* Each panel gets its own full viewport-height budget instead of stacking
+       endlessly — the map is never reached only by scrolling past everything
+       else, which is what made it unreachable on phones. */
+    .mobile-panel.hidden-mobile{ display:none; }
+    .map-wrap{ width:100%; }
+  }
 
   /* ---------- Codex (cipher key) ---------- */
   .codex{
@@ -100,31 +118,31 @@
     pointer-events:none;
   }
   .codex h2{
-    font-family:'Cinzel', serif; font-size:14px; letter-spacing:0.12em;
+    font-family:'Cinzel', serif; font-size:18px; letter-spacing:0.12em;
     margin:0 0 4px; text-transform:uppercase; color:var(--blood);
     text-align:center;
   }
   .codex .hint{
-    font-size:12.5px; text-align:center; color:var(--ink-soft); margin:0 0 12px;
+    font-size:16px; text-align:center; color:var(--ink-soft); margin:0 0 12px;
     font-style:italic;
   }
-  table.numerals{ width:100%; border-collapse:collapse; font-size:13px; }
+  table.numerals{ width:100%; border-collapse:collapse; font-size:17px; }
   table.numerals caption{
-    font-family:'Cinzel', serif; font-size:11px; letter-spacing:0.08em;
+    font-family:'Cinzel', serif; font-size:14px; letter-spacing:0.08em;
     text-transform:uppercase; color:var(--ink-soft); margin-bottom:4px; text-align:left;
   }
   table.numerals td{ padding:2px 4px; border-bottom:1px dotted rgba(80,55,20,0.3); }
-  table.numerals td.g{ font-family:'Cinzel', serif; font-weight:700; font-size:15px; width:28px; }
+  table.numerals td.g{ font-family:'Cinzel', serif; font-weight:700; font-size:19px; width:28px; }
   .numeral-block{ margin-bottom:12px; }
   .directions{ margin-top:10px; padding-top:10px; border-top:2px solid rgba(80,55,20,0.35); }
   .directions h3{
-    font-family:'Cinzel', serif; font-size:11.5px; letter-spacing:0.08em;
+    font-family:'Cinzel', serif; font-size:15px; letter-spacing:0.08em;
     text-transform:uppercase; margin:0 0 6px; color:var(--blood);
   }
-  .dir-row{ display:flex; justify-content:space-between; font-size:13px; padding:2px 0; }
+  .dir-row{ display:flex; justify-content:space-between; font-size:17px; padding:2px 0; }
   .dir-row b{ font-family:'Cinzel', serif; }
   .codex-note{
-    margin-top:12px; font-size:12px; color:var(--ink-soft); line-height:1.4;
+    margin-top:12px; font-size:15px; color:var(--ink-soft); line-height:1.4;
     border-top:1px dashed rgba(80,55,20,0.35); padding-top:8px;
   }
 
@@ -134,7 +152,7 @@
   /* Clue tabs */
   .clue-tabs{ display:flex; gap:8px; flex-wrap:wrap; }
   .clue-tab{
-    font-family:'Cinzel', serif; font-size:12px; letter-spacing:0.06em;
+    font-family:'Cinzel', serif; font-size:15px; letter-spacing:0.06em;
     text-transform:uppercase; padding:8px 16px; border-radius:4px 4px 0 0;
     background:rgba(140,106,63,0.18); color:#cbb98a; border:1px solid var(--bronze);
     border-bottom:none; cursor:pointer; transition:background .2s;
@@ -155,10 +173,10 @@
     position:relative;
   }
   .scroll h2{
-    font-family:'Cinzel Decorative', serif; font-size:22px; text-align:center;
+    font-family:'Cinzel Decorative', serif; font-size:28px; text-align:center;
     margin:0 0 4px; color:var(--blood);
   }
-  .scroll .loc-sub{ text-align:center; font-size:12px; letter-spacing:0.1em; color:var(--ink-soft);
+  .scroll .loc-sub{ text-align:center; font-size:15px; letter-spacing:0.1em; color:var(--ink-soft);
     text-transform:uppercase; margin-bottom:16px; font-family:'Cinzel', serif; }
 
   .rune-line{
@@ -166,7 +184,7 @@
     flex-wrap:wrap; margin-bottom:16px;
   }
   .rune-line .lbl{
-    font-family:'Cinzel', serif; font-size:11px; color:var(--ink-soft);
+    font-family:'Cinzel', serif; font-size:14px; color:var(--ink-soft);
     text-align:right; text-transform:uppercase; letter-spacing:0.06em;
     padding-top:18px; width:56px;
   }
@@ -175,19 +193,19 @@
   }
   .rune-group:last-of-type{ border-right:none; }
 
-  .tile{ width:54px; display:flex; flex-direction:column; align-items:center; gap:5px; }
+  .tile{ width:64px; display:flex; flex-direction:column; align-items:center; gap:5px; }
   .tile-face{
-    width:100%; height:56px; border-radius:5px; display:flex;
+    width:100%; height:64px; border-radius:5px; display:flex;
     align-items:center; justify-content:center;
     background:linear-gradient(160deg,#3a2c19,#241a0e);
-    color:var(--bronze-light); font-family:'Cinzel', serif; font-size:24px; font-weight:700;
+    color:var(--bronze-light); font-family:'Cinzel', serif; font-size:31px; font-weight:700;
     box-shadow:inset 0 0 10px rgba(0,0,0,.6); border:1px solid var(--bronze);
     transition:border-color .2s, box-shadow .2s;
   }
-  .tile.dir .tile-face{ color:var(--verdigris); font-size:20px; }
+  .tile.dir .tile-face{ color:var(--verdigris); font-size:26px; }
   .tile select{
-    width:100%; font-family:'Cinzel', serif; font-size:11px; text-align:center;
-    padding:4px 2px; border-radius:4px; border:1px solid var(--bronze);
+    width:100%; font-family:'Cinzel', serif; font-size:14px; text-align:center;
+    padding:7px 2px; border-radius:4px; border:1px solid var(--bronze);
     background:var(--parchment); color:var(--ink); cursor:pointer;
   }
   .tile.correct .tile-face{ border-color:var(--verdigris); box-shadow:0 0 10px rgba(79,122,108,0.6); }
@@ -199,18 +217,21 @@
     75%{transform:translateX(4px);}
   }
 
-  .comma{ font-family:'Cinzel', serif; font-size:20px; color:var(--ink-soft); margin:0 2px; }
+  .comma{ font-family:'Cinzel', serif; font-size:26px; color:var(--ink-soft); margin:0 2px; }
 
   .readout{
     margin-top:6px; padding:12px 14px; border-radius:6px;
     background:rgba(255,255,255,0.35); border:1px dashed var(--bronze);
-    text-align:center; font-family:'Cinzel', serif; font-size:15px; letter-spacing:0.03em;
+    text-align:center; font-family:'Cinzel', serif; font-size:19px; letter-spacing:0.03em;
     min-height:22px; color:var(--ink);
   }
-  .readout .waiting{ color:var(--ink-soft); font-style:italic; font-family:'EB Garamond',serif; font-size:13px; }
+  .readout .waiting{ color:var(--ink-soft); font-style:italic; font-family:'EB Garamond',serif; font-size:17px; }
 
+  .seal-bar{
+    width:100%; max-width:480px; text-align:center; margin:0 auto;
+  }
   .drop-hint{
-    text-align:center; font-size:12.5px; color:var(--ink-soft); margin-top:8px; font-style:italic;
+    text-align:center; font-size:16px; color:var(--ink-soft); margin-top:8px; font-style:italic;
   }
 
   .marker-source{
@@ -222,7 +243,7 @@
     border:2px solid #5e1a15;
     box-shadow:0 4px 10px rgba(0,0,0,.5);
     display:flex; align-items:center; justify-content:center;
-    color:#f4dcc0; font-family:'Cinzel Decorative'; font-size:11px; text-align:center;
+    color:#f4dcc0; font-family:'Cinzel Decorative'; font-size:14px; text-align:center;
     cursor:grab; user-select:none; touch-action:none;
     opacity:0.35; pointer-events:none; transition:opacity .3s;
   }
@@ -230,7 +251,7 @@
   .seal.dragging{ position:fixed; z-index:999; cursor:grabbing; }
 
   .feedback{
-    text-align:center; margin-top:10px; font-family:'Cinzel', serif; font-size:12.5px;
+    text-align:center; margin-top:10px; font-family:'Cinzel', serif; font-size:16px;
     min-height:16px; letter-spacing:0.03em;
   }
   .feedback.ok{ color:var(--verdigris); }
@@ -247,7 +268,7 @@
   .map-bg{ display:block; width:100%; height:auto; }
   svg#worldmap{ position:absolute; inset:0; width:100%; height:100%; }
   .map-wrap h3{
-    font-family:'Cinzel', serif; font-size:12px; letter-spacing:0.12em;
+    font-family:'Cinzel', serif; font-size:15px; letter-spacing:0.12em;
     text-transform:uppercase; color:var(--blood); text-align:center; margin:2px 0 6px;
   }
   svg#worldmap{ width:100%; height:auto; display:block; }
@@ -279,10 +300,10 @@
     color:var(--ink);
   }
   .victory-card h2{ font-family:'Cinzel Decorative'; color:var(--blood); margin-top:0; }
-  .victory-card p{ font-size:14.5px; line-height:1.5; }
+  .victory-card p{ font-size:19px; line-height:1.5; }
   .continue-btn{
     margin-top:14px; font-family:'Cinzel', serif; letter-spacing:0.08em;
-    text-transform:uppercase; font-size:13px; padding:10px 22px;
+    text-transform:uppercase; font-size:17px; padding:10px 22px;
     background:var(--blood); color:#f4e6c9; border:none; border-radius:4px;
     cursor:pointer; transition:background .2s;
   }
@@ -315,7 +336,7 @@
   position:absolute; top:16px; right:20px; z-index:20;
   width:38px; height:38px; border-radius:50%;
   background:rgba(20,16,10,0.75); color:#e8d9b3; border:1px solid var(--bronze-light);
-  font-family:'Cinzel', serif; font-size:16px; cursor:pointer; line-height:1;
+  font-family:'Cinzel', serif; font-size:20px; cursor:pointer; line-height:1;
 }
 .rp-close:hover{ background:rgba(138,43,38,0.85); }
 :host([mandatory]) .rp-close{ display:none; }
@@ -327,7 +348,8 @@
   <div class="title-wrap">
     <div class="eyebrow">Fragmento recuperado &middot; Cifrado numeral griego</div>
     <h1>El Cifrado de las Tres Ciudades</h1>
-    <p class="subtitle">El pergamino indica las coordenadas de tres ciudades escritas en el antiguo sistema de numerales griegos. Descifra cada runa y traza su lugar en el mapa.</p>
+    <p class="subtitle">Tres pergaminos ocultan las coordenadas de Alejandría, Halicarnaso y Babilonia,
+      escritas en el antiguo sistema de numerales griegos. Descifra cada runa y traza su lugar en el mapa.</p>
   </div>
 
   <div class="stage">
@@ -367,16 +389,13 @@
 
     <!-- RIGHT COLUMN -->
     <div class="right-col">
-      <div class="clue-tabs" id="clueTabs"></div>
 
-      <div class="scroll" id="scrollCard">
-        <h2 id="scrollTitle">&mdash;</h2>
-        <div class="loc-sub">Coordenada cifrada</div>
+      <div class="mobile-view-toggle" id="mobileViewToggle">
+        <button type="button" class="view-btn active" data-view="clue">Pistas</button>
+        <button type="button" class="view-btn" data-view="map">Mapa</button>
+      </div>
 
-        <div class="rune-line" id="latLine"></div>
-        <div class="rune-line" id="lonLine"></div>
-
-        <div class="readout" id="readout"><span class="waiting">Elige el valor de cada runa consultando la clave…</span></div>
+      <div class="seal-bar">
         <div class="marker-source">
           <div class="seal" id="sealSource">Sello<br>del lugar</div>
         </div>
@@ -384,13 +403,30 @@
         <div class="feedback" id="feedback"></div>
       </div>
 
-      <div class="map-wrap">
-        <h3>Mapa del Mare Nostrum</h3>
-        <div class="map-frame">
-          <img src="mare-nostrum-bg.png" alt="Mapa antiguo del Mare Nostrum" class="map-bg">
-          <svg id="worldmap" viewBox="0 0 603 730" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"></svg>
+      <div class="mobile-panel clue-panel" id="cluePanel">
+        <div class="clue-tabs" id="clueTabs"></div>
+
+        <div class="scroll" id="scrollCard">
+          <h2 id="scrollTitle">&mdash;</h2>
+          <div class="loc-sub">Coordenada cifrada</div>
+
+          <div class="rune-line" id="latLine"></div>
+          <div class="rune-line" id="lonLine"></div>
+
+          <div class="readout" id="readout"><span class="waiting">Elige el valor de cada runa consultando la clave…</span></div>
         </div>
       </div>
+
+      <div class="mobile-panel map-panel hidden-mobile" id="mapPanel">
+        <div class="map-wrap">
+          <h3>Mapa del Mare Nostrum</h3>
+          <div class="map-frame">
+            <img src="mare-nostrum-bg.png" alt="Mapa antiguo del Mare Nostrum" class="map-bg">
+            <svg id="worldmap" viewBox="0 0 603 730" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"></svg>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -659,6 +695,7 @@
       readout.innerHTML = `${latDeg}°${String(latMin).padStart(2,"0")}′ ${DIR[city.lat.dir]},
         ${lonDeg}°${String(lonMin).padStart(2,"0")}′ ${DIR[city.lon.dir]}`;
       seal.classList.add("active");
+      if(typeof switchView === "function") switchView("map");
     } else {
       readout.innerHTML = '<span class="waiting">Elige el valor de cada runa consultando la clave…</span>';
       seal.classList.remove("active");
@@ -714,7 +751,7 @@
     const label = document.createElementNS(svgNS,"text");
     label.setAttribute("x","8");
     label.setAttribute("y","3");
-    label.setAttribute("font-size","10");
+    label.setAttribute("font-size","13");
     label.textContent = opts.showLabel ? cfg.name : "";
     g.appendChild(label);
 
@@ -850,6 +887,21 @@
     }));
   });
 
+  // ---------- Mobile view toggle (Pistas / Mapa) ----------
+  const cluePanel = root.getElementById("cluePanel");
+  const mapPanel = root.getElementById("mapPanel");
+  const viewButtons = Array.from(root.querySelectorAll(".mobile-view-toggle .view-btn"));
+
+  function switchView(view){
+    cluePanel.classList.toggle("hidden-mobile", view !== "clue");
+    mapPanel.classList.toggle("hidden-mobile", view !== "map");
+    viewButtons.forEach(btn=>btn.classList.toggle("active", btn.getAttribute("data-view") === view));
+  }
+
+  viewButtons.forEach(btn=>{
+    btn.addEventListener("click", ()=>switchView(btn.getAttribute("data-view")));
+  });
+
   renderTabs();
   renderScroll();
 
@@ -859,4 +911,99 @@
   }
 
   customElements.define("rune-puzzle", RunePuzzle);
+})();
+
+/*!
+ * Acción de Monogatari "puzzle" — antes vivía en puzzle-action.js, ahora
+ * fusionada en este mismo archivo para simplificar la integración.
+ *
+ * Convierte a <rune-puzzle> en una Acción nativa del guion, usable como
+ * "show background" o "jump":
+ *
+ *   monogatari.script({
+ *     'Templo-Perdido': [
+ *       'show background templo-interior',
+ *       'Cristian Aquí está el pergamino con las tres coordenadas...',
+ *       'puzzle cityPuzzle',                 // <- pausa la historia y abre el minijuego
+ *       'Cristian ¡Las tres ciudades reveladas!',
+ *       'jump Camara-Siguiente'
+ *     ]
+ *   });
+ *
+ * La historia se detiene en la línea "puzzle cityPuzzle" hasta que el
+ * jugador resuelve las tres coordenadas (evento "puzzle:cifrado-completo"
+ * disparado por el propio componente); después continúa sola con la
+ * siguiente línea del guion.
+ */
+(function(){
+
+  if(typeof Monogatari === "undefined" || !Monogatari.Action){
+    console.warn('[Puzzle] Monogatari no está disponible todavía — la Acción "puzzle" no se registró. ' +
+      'Asegúrate de cargar este archivo después de que "Monogatari"/"monogatari" existan como variables globales.');
+    return;
+  }
+
+  class PuzzleAction extends Monogatari.Action {
+
+    // Identificador único de la acción
+    static id = 'Puzzle';
+
+    // Reconoce statements que empiezan con 'puzzle', ej: "puzzle cityPuzzle"
+    static matchString([action]){
+      return action === 'puzzle';
+    }
+
+    constructor([puzzle, elementId]){
+      super();
+      // Si no se especifica id, usa 'cityPuzzle' por defecto
+      this.elementId = elementId || 'cityPuzzle';
+    }
+
+    apply(){
+      return new Promise((resolve)=>{
+        const el = document.getElementById(this.elementId);
+
+        if(!el){
+          console.warn(`[Puzzle] No se encontró <rune-puzzle id="${this.elementId}">`);
+          resolve();
+          return;
+        }
+
+        const onComplete = ()=>{
+          el.removeEventListener('puzzle:cifrado-completo', onComplete);
+          el.removeAttribute('mandatory');
+          el.close();
+          resolve();
+        };
+
+        el.addEventListener('puzzle:cifrado-completo', onComplete);
+        // "mandatory" oculta la X de cierre: mientras esta línea del guion
+        // esté bloqueando la historia, no hay forma de reabrir el rompecabezas
+        // salvo resolviéndolo (no existe un hotspot externo que lo reabra aquí).
+        el.setAttribute('mandatory', '');
+        el.open();
+      });
+    }
+
+    didApply(){
+      // Una vez resuelto el rompecabezas, la historia avanza sola
+      // a la siguiente línea del guion (como si fuera un "Next" automático).
+      return Promise.resolve({ advance: true });
+    }
+
+    revert(){
+      // Si el jugador retrocede sobre esta línea, simplemente cerramos
+      // el rompecabezas si estuviera abierto; no re-abrimos el minijuego.
+      const el = document.getElementById(this.elementId);
+      if(el){ el.removeAttribute('mandatory'); el.close(); }
+      return Promise.resolve();
+    }
+
+    didRevert(){
+      return Promise.resolve({ advance: true, step: true });
+    }
+  }
+
+  monogatari.registerAction(PuzzleAction);
+
 })();
