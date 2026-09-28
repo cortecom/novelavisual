@@ -916,8 +916,18 @@ monogatari.assets ('images', {
 	'llave_antigua': 'llave_antigua.png',
 	'overlay_vignette_sepia': 'overlay_vignette_sepia.png',
 	'overlay_grano': 'overlay_grano.png',
-	'overlay_letterbox': 'overlay_letterbox.png'
+	'overlay_letterbox': 'overlay_letterbox.png',
 
+	'collar': 'collar.png',
+	'amuleto': 'amuleto.png',
+	'tubo': 'tubo.png',
+	'palanca': 'palanca.png',
+	'pincel_arqueologico': 'pincel_arqueologico.png',
+	'lupa_filologo': 'lupa_filologo.png',
+	'simbolo_babilonico': 'simbolo_babilonico.png',
+	'reactivo_acido': 'reactivo_acido.png',
+	'epigrama_antipatro': 'epigrama_antipatro.png',
+	'paleta': 'paleta.png'
 });
 
 // Define the backgrounds for each scene.
@@ -1130,12 +1140,12 @@ monogatari.characters ({
         color: '#9B59B6',
         directory: 'lucia',
         sprites: {
-            normal: 'lucia_normal.png',
-            analitica: 'lucia_analyzing.png',
-	        concentrada: 'lucia_concentrada.png', 
+            normal: 'normal.png',
+            analitica: 'analitica.png',
+			   concentrada: 'concentrada.png',
 			scared: 'scared.png',
 			thinking: 'thinking.png',
-			calm: 'lucia_normal.png',
+			calm: 'normal.png',
 			smile: 'smile.png'
         }
     },
@@ -1645,9 +1655,9 @@ monogatari.script({
         //() => hideHotspot('vitrina'),
         //() => stopIconFollow(),
 		() => VerObjeto('idolo'),
-		() => ImagenEnHotspot('panuelo', { escala: 0.3 }),
+		() => ImagenEnHotspot('panuelo', { escala: 0.2 }),
         () => TomarObjeto('panuelo'),
-		() => ImagenEnHotspot('llave_antigua', { escala: 0.3 }),
+		() => ImagenEnHotspot('llave_antigua', { escala: 0.2 }),
 		() => TomarObjeto('llave_antigua'),
 		() => UsarObjeto('vitrina','llave_antigua','jump Escena1_Tomar'),
 		'narrator Necesitas la piedra de Ngenechén. La vitrina está cerrada.'
@@ -1797,8 +1807,8 @@ monogatari.script({
 	// -------------------------------------------------------------------------
 	'Escena3_Laboratorio': [
 		'show scene laboratorio with fadeIn',
-		'show character gabriel normal at left with fadeIn',
-		'show character lucia normal at right with fadeIn',
+		'show character gabriel normal at right with fadeIn',
+		'show character lucia normal at center with fadeIn',
 
 		'El laboratorio es un caos organizado: lámparas articuladas, herramientas de excavación, cajas con fragmentos y pizarras llenas de notas.',
 		'jump Escena3_Laboratorio_piedra', 
@@ -2072,8 +2082,11 @@ monogatari.script({
 		'Acción requerida: Activar el Bisturí Térmico de Campo para fundir el anillo de resina cristalizada.',
 		() => VerObjeto('cantaro'),
         () => TomarObjeto('collar'),
+		() => ImagenEnHotspot('collar', { escala: 0.2 }),
 		() => TomarObjeto('amuleto'),
+		() => ImagenEnHotspot('amuleto', { escala: 0.2 }),
 		() => UsarObjeto('tubo','bisturi_termico','jump Escena9_Coordenadas'),
+		() => ImagenEnHotspot('tubo', { escala: 0.2 }),
 		'narrator Necesitas el contenido del tubo. El tubo esta cerrado.'
 	],
 
@@ -2609,7 +2622,9 @@ monogatari.script({
 		() => VerObjeto('patina'),
 		() => VerObjeto('pantano'),
         () => TomarObjeto('palanca'),
+		() => ImagenEnHotspot('palanca', { escala: 0.2 }),
 		() => TomarObjeto('pincel_arqueologico'),
+		() => ImagenEnHotspot('pincel_arqueologico', { escala: 0.2 }),
 		() => UsarObjeto('patina','pincel_arqueologico','Se despega el oxido y se revela un grabado en bajo relieve con la espiral doble'),
 		() => UsarObjeto('canal','palanca','jump Escena18'),
 		'narrator Necesitas revisar el lugar en busca de una pista.'
@@ -3533,11 +3548,14 @@ monogatari.script({
 		() => VerObjeto('bajorelieve_babilonico2'),
 		() => VerObjeto('bajorelieve_babilonico_destruido'),
 		() => TomarObjeto('pincel_arqueologico'),
+		() => ImagenEnHotspot('pincel_arqueologico', { escala: 0.2 }),
 		() => TomarObjeto('lupa_filologo'),
+		() => ImagenEnHotspot('lupa_filologo', { escala: 0.2 }),
 		() => UsarObjeto('muro1','pincel_arqueologico','Analizas los surcos en la piedra: la técnica revela golpes sistemáticos orientados a borrar rostros paganos.'),
 		() => UsarObjeto('muro2','pincel_arqueologico','Analizas los surcos en la piedra: la técnica revela golpes sistemáticos orientados a borrar rostros paganos.'),
 		() => UsarObjetoSobreObjeto('simbolo_babilonico','lupa_filologo','jump Escena31_ObjetoOcultoBabilonia','Símbolo babilónico de fertilidad, una cruz cristiana primitiva, Inscripción en griego arcaico: φῶς νότου («luz del sur»)'),
 		() => TomarObjeto('simbolo_babilonico'),
+		() => ImagenEnHotspot('simbolo_babilonico', { escala: 0.2 }),
 		'narrator Necesitas revisar el lugar en busca de alguna pista. Después debes analizar la pista'
 	],
 
@@ -4111,11 +4129,14 @@ monogatari.script({
 		() => VerObjeto('poesia_votiva'),
 		() => VerObjeto('epigramas_funerarios'),
 		() => TomarObjeto('lupa_filologo'),
+		() => ImagenEnHotspot('lupa_filologo', { escala: 0.2 }),
 		() => TomarObjeto('reactivo_acido'),
+		() => ImagenEnHotspot('reactivo_acido', { escala: 0.2 }),
 		() => UsarObjeto('estante1','lupa_filologo','Poesía écfrástica y descriptiva: Poemas dedicados a describir obras de arte, monumentos y lugares célebres (de aquí surge su famoso poema sobre las Siete Maravillas del Mundo Antiguo).'),
 		() => UsarObjeto('estante2','lupa_filologo','La Antología Griega (Anthologia Graeca): Una colección de poemas y epigramas griegos que abarca varios siglos, incluyendo obras de poetas como Antípatro de Sidón.'),
 		() => UsarObjetoSobreObjeto('epigrama_antipatro','reactivo_acido','jump Escena38_EpigramaOriginal','El epigrama menciona: La octava luz guía a las siete desde el sur del mundo. El origen de la destrucción de las maravillas se encuentra en el Monte Sinaí.'),
 		() => TomarObjeto('epigrama_antipatro'),
+		() => ImagenEnHotspot('epigrama_antipatro', { escala: 0.2 }),
 		'narrator Necesitas revisar el lugar en busca de alguna pista. Después debes analizar la pista'
 	],
 /*
@@ -4255,6 +4276,7 @@ monogatari.script({
 		() => VerObjeto('pared5'),
 		() => VerObjeto('pared6'),
 		() => TomarObjeto('paleta'),
+		() => ImagenEnHotspot('paleta', { escala: 0.2 }),
 		() => UsarObjeto('pared1','paleta','jump Escena39_Revelacion'),
 		() => UsarObjeto('pared2','paleta','jump Escena39_Revelacion'),
 		'narrator Necesitas revisar el lugar en busca de alguna pista.'
@@ -4766,7 +4788,7 @@ monogatari.script({
 'Escena46': [
 
     'show scene bg_pedestal_luz with fadeIn',
-	() => ImagenEnHotspot('palo_antorcha', { escala: 0.5 }),
+	() => ImagenEnHotspot('palo_antorcha', { escala: 0.2 }),
     'narrator Tras escapar del derrumbe, el equipo llega a una cámara secundaria.',
     'narrator En el centro, un pedestal iluminado por una luz suave revela un artefacto.',
     'narrator El objeto parece tener energía propia.',
