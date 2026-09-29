@@ -1865,20 +1865,38 @@ monogatari.script({
 	'Escena3_Espectral': [
 		'El análisis confirma que la roca es basalto patagónico con rastros de sedimentos del Mediterráneo oriental.',
 		() => addItem('analisis_sedimento'),
-		'jump Escena4_LabEscaneo'
+		() => {
+			if (hasItem('mapa')) {
+			monogatari.run('jump Escena11_DecisionEstrategica');
+			} else {
+					   monogatari.run('jump Escena4_LabEscaneo');
+			}
+		}
 	],
 
 	'Escena3_Cotejar': [
 		'Desbloqueas en la libreta el paralelismo directo con los frisos del Mausoleo de Halicarnaso.',
 		() => addItem('relieve_halicarnaso'),
-		'jump Escena4_LabEscaneo'
+		() => {
+			if (hasItem('mapa')) {
+			monogatari.run('jump Escena11_DecisionEstrategica');
+			} else {
+					   monogatari.run('jump Escena4_LabEscaneo');
+			}
+		}
 	],
 
 	'Escena3_Atenas': [
 		'Helena Papadakis confirma la anomalía arqueológica desde Grecia y ofrece colaboración internacional.',
 		'show storage Contacto_Helena true',
 		() => addItem('contacto_helena'),
-		'jump Escena4_LabEscaneo'	
+		() => {
+			if (hasItem('mapa')) {
+			monogatari.run('jump Escena11_DecisionEstrategica');
+			} else {
+					   monogatari.run('jump Escena4_LabEscaneo');
+			}
+		}
 	],
 
 	// -------------------------------------------------------------------------
