@@ -1652,6 +1652,7 @@ monogatari.script({
 
 	'Escena1_Abrir': [
 		'show scene museo_sala_precolombina',
+		() => showInventoryBar(),
 		//'show image panuelo with fadeIn item-panuelo',
         //() => hideHotspot('vitrina'),
         //() => stopIconFollow(),
@@ -1904,6 +1905,7 @@ monogatari.script({
 	// -------------------------------------------------------------------------
 	'Escena4_LabEscaneo': [
 		'show scene lab_escaneo with fadeIn',
+		() => showInventoryBar(),
 		//'show character gabriel normal at left with fadeIn',
 		//'show character lucia concentrada at center with fadeIn',
 		// Interacción de Inventario
@@ -2090,6 +2092,7 @@ monogatari.script({
 	// -------------------------------------------------------------------------
 	'Escena9_Altar': [
 		'show scene altar with fadeIn',
+		() => showInventoryBar(),
 		() => addItem('bisturi_termico'),
 		'En el centro exacto de la estancia reposa un altar de piedra volcánica pulida.',
 		'Tiene un conjunto de ranuras, no hay información para poder descifrarlo ahora',
@@ -2637,6 +2640,7 @@ monogatari.script({
 
 	'Escena17_Decision': [
 		'show scene efeso_ruinas',
+		() => showInventoryBar(),
 		() => VerObjeto('inscripciones'),
 		() => VerObjeto('patina'),
 		() => VerObjeto('pantano'),
@@ -3562,6 +3566,7 @@ monogatari.script({
 
 	'Escena31_Ruinas': [
 		'show scene bg_hallazgo_babilonico with fadeIn',
+		() => showInventoryBar(),
 		'El jugador decide examinar los restos del palacio. Esto activa un hallazgo crucial.',
 		() => VerObjeto('bajorelieve_babilonico1'),
 		() => VerObjeto('bajorelieve_babilonico2'),
@@ -4144,6 +4149,7 @@ monogatari.script({
 
 	'Escena37_Biblioteca_Sidon': [
 		'show scene bg_biblioteca_sidon with fadeIn',
+		() => showInventoryBar(),
 		'El quipo decide examinar la biblioteca. Esto activa un hallazgo crucial.',
 		() => VerObjeto('poesia_votiva'),
 		() => VerObjeto('epigramas_funerarios'),
@@ -4282,11 +4288,13 @@ monogatari.script({
 		'show character isidora talk at right with fadeIn',
 		'isidora Pero... ¿por qué preservar una octava luz?',
 		'[ACCIÓN DE INVENTARIO] Usas el Altimétro Barométrico y GPS Táctico para ubicar la cueva de la meseta superior descrita en las crónicas.',
-		'[EFECTO]: Localiza la entrada oculta de la gruta de los concilios primigenios.'
+		'[EFECTO]: Localiza la entrada oculta de la gruta de los concilios primigenios.',
+		'jump Escena39_Caverna'
 	],
 
 'Escena39_Caverna': [
 		'show scene bg_sinai_caverna with fadeIn',
+		() => showInventoryBar(),
 		'El quipo decide examinar la biblioteca. Esto activa un hallazgo crucial.',
 		() => VerObjeto('pared1'),
 		() => VerObjeto('pared2'),
@@ -4805,8 +4813,8 @@ monogatari.script({
    ============================================================ */
 
 'Escena46': [
-
     'show scene bg_pedestal_luz with fadeIn',
+	() => showInventoryBar(),
 	() => ImagenEnHotspot('palo_antorcha', { escala: 0.2 }),
     'narrator Tras escapar del derrumbe, el equipo llega a una cámara secundaria.',
     'narrator En el centro, un pedestal iluminado por una luz suave revela un artefacto.',
@@ -4827,8 +4835,8 @@ monogatari.script({
 	],
 
 'Escena46_antorcha': [
-
     'show scene bg_pedestal_luz',
+	() => showInventoryBar(),
 	() => hideAllHotspots(),
 	() => removeItem('palo_antorcha'),
 	() => addItem('antorcha_encendida'), 
