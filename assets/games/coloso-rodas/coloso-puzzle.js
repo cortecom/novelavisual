@@ -1,3 +1,9 @@
+/*!
+ * coloso-puzzle.js (fusionado)
+ * Union de coloso-puzzle.js (componente) + coloso-action.js (Accion de Monogatari)
+ * en un solo archivo -- misma logica, sin cambios de comportamiento.
+ * index.html ya no necesita cargar coloso-action.js por separado.
+ */
 (function () {
   'use strict';
 
@@ -903,4 +909,60 @@
   }
 
   customElements.define('coloso-puzzle', ColosoPuzzle);
+})();
+
+/* ---- coloso-action.js fusionado a continuacion ---- */
+(function () {
+  'use strict';
+
+  class ColosoAction extends Monogatari.Action {
+    static id = 'ColosoAction';
+
+    static matchString([action]) {
+      return action === 'coloso';
+    }
+
+    constructor([verb, elementId]) {
+      super();
+      this.elementId = elementId;
+    }
+
+    willApply() {
+      return Promise.resolve();
+    }
+
+    apply() {
+      return new Promise((resolve) => {
+        const el = document.getElementById(this.elementId);
+        if (!el) {
+          resolve();
+          return;
+        }
+        const onDone = () => {
+          el.removeEventListener('coloso:completado', onDone);
+          resolve();
+        };
+        el.addEventListener('coloso:completado', onDone);
+        el.open();
+      });
+    }
+
+    didApply() {
+      return Promise.resolve({ advance: true });
+    }
+
+    willRevert() {
+      return Promise.resolve();
+    }
+
+    revert() {
+      return Promise.resolve();
+    }
+
+    didRevert() {
+      return Promise.resolve({ advance: true });
+    }
+  }
+
+  monogatari.registerAction(ColosoAction);
 })();

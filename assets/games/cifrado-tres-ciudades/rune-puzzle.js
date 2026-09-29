@@ -227,28 +227,45 @@
   }
   .readout .waiting{ color:var(--ink-soft); font-style:italic; font-family:'EB Garamond',serif; font-size:17px; }
 
-  .seal-bar{
-    width:100%; max-width:480px; text-align:center; margin:0 auto;
+  /* ---------- Seals placed directly over the map (tap-to-select, tap-to-place) ---------- */
+  .seal-tray{
+    position:absolute; top:8px; left:0; right:0; z-index:15;
+    display:flex; justify-content:center; gap:12px; pointer-events:none;
   }
+  .map-seal{
+    width:46px; height:46px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #6b5236, #3a2c19 70%);
+    border:2px solid var(--bronze);
+    box-shadow:0 4px 10px rgba(0,0,0,.5);
+    display:flex; align-items:center; justify-content:center;
+    color:#8a7a5c; font-family:'Cinzel Decorative'; font-size:18px;
+    cursor:default; user-select:none; pointer-events:auto;
+    opacity:0.4; transition:opacity .3s, transform .2s, box-shadow .2s, background .3s, border-color .3s, color .3s;
+  }
+  .map-seal .map-seal-num{ pointer-events:none; }
+  .map-seal.ready{
+    opacity:1; cursor:pointer;
+    background:radial-gradient(circle at 35% 30%, #c24b3e, var(--blood) 70%);
+    border-color:#5e1a15; color:#f4dcc0;
+    animation:sealPulse 1.6s ease-in-out infinite;
+  }
+  .map-seal.ready.selected{
+    animation:none; transform:scale(1.18);
+    box-shadow:0 0 0 4px rgba(232,185,90,0.55), 0 4px 14px rgba(0,0,0,.6);
+  }
+  .map-seal.solved{
+    opacity:0.9; cursor:default; animation:none; transform:none;
+    background:radial-gradient(circle at 35% 30%, var(--verdigris), #2f4d44 70%);
+    border-color:#1e332c; color:#e8f4ef;
+  }
+  @keyframes sealPulse{
+    0%,100%{ box-shadow:0 4px 10px rgba(0,0,0,.5); }
+    50%{ box-shadow:0 4px 10px rgba(0,0,0,.5), 0 0 0 6px rgba(232,185,90,0.3); }
+  }
+
   .drop-hint{
     text-align:center; font-size:16px; color:var(--ink-soft); margin-top:8px; font-style:italic;
   }
-
-  .marker-source{
-    display:flex; justify-content:center; margin-top:10px;
-  }
-  .seal{
-    width:54px; height:54px; border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, #c24b3e, var(--blood) 70%);
-    border:2px solid #5e1a15;
-    box-shadow:0 4px 10px rgba(0,0,0,.5);
-    display:flex; align-items:center; justify-content:center;
-    color:#f4dcc0; font-family:'Cinzel Decorative'; font-size:14px; text-align:center;
-    cursor:grab; user-select:none; touch-action:none;
-    opacity:0.35; pointer-events:none; transition:opacity .3s;
-  }
-  .seal.active{ opacity:1; pointer-events:auto; }
-  .seal.dragging{ position:fixed; z-index:999; cursor:grabbing; }
 
   .feedback{
     text-align:center; margin-top:10px; font-family:'Cinzel', serif; font-size:16px;
@@ -340,7 +357,6 @@
 }
 .rp-close:hover{ background:rgba(138,43,38,0.85); }
 :host([mandatory]) .rp-close{ display:none; }
-.seal.dragging{ z-index:5000 !important; }
 
 </style>
 <div class="rp-root">
@@ -395,14 +411,6 @@
         <button type="button" class="view-btn" data-view="map">Mapa</button>
       </div>
 
-      <div class="seal-bar">
-        <div class="marker-source">
-          <div class="seal" id="sealSource">Sello<br>del lugar</div>
-        </div>
-        <div class="drop-hint">Arrastra el sello descifrado y suéltalo sobre la ciudad correcta del mapa.</div>
-        <div class="feedback" id="feedback"></div>
-      </div>
-
       <div class="mobile-panel clue-panel" id="cluePanel">
         <div class="clue-tabs" id="clueTabs"></div>
 
@@ -423,7 +431,10 @@
           <div class="map-frame">
             <img src="mare-nostrum-bg.png" alt="Mapa antiguo del Mare Nostrum" class="map-bg">
             <svg id="worldmap" viewBox="0 0 603 730" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"></svg>
+            <div class="seal-tray" id="sealTray"></div>
           </div>
+          <div class="drop-hint">Toca un sello activo y luego toca la ciudad correcta en el mapa.</div>
+          <div class="feedback" id="feedback"></div>
         </div>
       </div>
 
@@ -464,17 +475,11 @@
       });
 
       // Evita que cualquier clic dentro del rompecabezas (dropdowns, fichas,
-      // el sello, "Continuar", la X) se filtre hacia el DOM de Monogatari.
-      // Sin esto, el mismo clic que usamos internamente puede además ser
-      // interpretado por el "clic para avanzar diálogo" del motor y
-      // desincronizar el guion (síntoma: la narración se queda pegada justo
+      // sellos, ciudades del mapa, "Continuar", la X) se filtre hacia el DOM
+      // de Monogatari. Sin esto, el mismo clic que usamos internamente puede
+      // además ser interpretado por el "clic para avanzar diálogo" del motor
+      // y desincronizar el guion (síntoma: la narración se queda pegada justo
       // después de resolver el acertijo).
-      // Solo "click": mousedown/mouseup/touchstart/touchend deben seguir
-      // llegando a los listeners en window que maneja el arrastre del sello
-      // (endDrag se engancha ahí precisamente para detectar la suelta sobre
-      // el mapa, que vive dentro de este mismo Shadow Root). Detenerlos aquí
-      // rompía el drag-and-drop: el mouseup nunca llegaba a window y el
-      // sello quedaba pegado al cursor.
       ["click"].forEach(type=>{
         this.addEventListener(type, e=>e.stopPropagation());
       });
@@ -685,7 +690,6 @@
     const lonTiles = lonLine.querySelectorAll(".tile");
     const allCorrect = [...latTiles,...lonTiles].every(t=>t.classList.contains("correct"));
     const readout = root.getElementById("readout");
-    const seal = root.getElementById("sealSource");
 
     if(allCorrect){
       const latDeg = groupValue(city.lat.deg);
@@ -694,11 +698,11 @@
       const lonMin = groupValue(city.lon.min);
       readout.innerHTML = `${latDeg}°${String(latMin).padStart(2,"0")}′ ${DIR[city.lat.dir]},
         ${lonDeg}°${String(lonMin).padStart(2,"0")}′ ${DIR[city.lon.dir]}`;
-      seal.classList.add("active");
+      setSealReady(city.id, true);
       if(typeof switchView === "function") switchView("map");
     } else {
       readout.innerHTML = '<span class="waiting">Elige el valor de cada runa consultando la clave…</span>';
-      seal.classList.remove("active");
+      setSealReady(city.id, false);
     }
   }
 
@@ -706,16 +710,9 @@
     const city = CITIES.find(c=>c.id===activeId);
     const idx = CITIES.findIndex(c=>c.id===activeId);
     root.getElementById("scrollTitle").textContent = "Coordenada " + (idx+1);
-    root.getElementById("feedback").textContent = "";
-    root.getElementById("feedback").className = "feedback";
     renderCoordLine(root.getElementById("latLine"), "Latitud", city.lat);
     renderCoordLine(root.getElementById("lonLine"), "Longitud", city.lon);
     updateReadout();
-    if(solved[city.id]){
-      root.getElementById("sealSource").style.visibility = "hidden";
-    } else {
-      root.getElementById("sealSource").style.visibility = "visible";
-    }
   }
 
   // ---------- Map ----------
@@ -757,6 +754,17 @@
 
     g.addEventListener("mouseenter", ()=>g.classList.add("hover"));
     g.addEventListener("mouseleave", ()=>g.classList.remove("hover"));
+    g.addEventListener("click", ()=>{
+      if(!selectedSeal){
+        const feedback = root.getElementById("feedback");
+        if(feedback){
+          feedback.textContent = "Primero toca un sello activo (se ilumina cuando la coordenada está lista).";
+          feedback.className = "feedback bad";
+        }
+        return;
+      }
+      checkAnswer(selectedSeal, cfg.id);
+    });
 
     svg.appendChild(g);
     return g;
@@ -766,104 +774,67 @@
   CITIES.forEach(c=>makeCityNode(c, {showLabel:false}));
   DECOYS.forEach(c=>makeCityNode(c, {showLabel:false}));
 
-  // ---------- Drag the wax seal onto the map (same movement pattern as the inventory) ----------
-  const sealSource = root.getElementById("sealSource");
-  let dragClone = null;
-  let dragging = false;
+  // ---------- Seals placed directly over the map (tap-to-select, tap-to-place) ----------
+  // Replaces the old single draggable seal: dragging across the clue/map split
+  // was unreliable on phones. Now each coordinate gets its own seal button that
+  // sits on the map itself — disabled until that coordinate's runes are all
+  // correct, tappable to "arm" it, then tap the correct city pin to place it,
+  // after which it's disabled again (solved).
+  const sealTray = root.getElementById("sealTray");
+  const seals = {};
+  let selectedSeal = null;
 
-  function startDrag(clientX, clientY){
-    if(dragging || !sealSource.classList.contains("active")) return;
-    dragging = true;
-    dragClone = sealSource.cloneNode(true);
-    dragClone.classList.add("dragging");
-    dragClone.style.left = (clientX-27)+"px";
-    dragClone.style.top = (clientY-27)+"px";
-    dragClone.style.pointerEvents = "none"; // let elementFromPoint see what's underneath, not the clone itself
-    // IMPORTANT: append inside the shadow root (not document.body) — the component's
-    // CSS is scoped to its Shadow Root and does not leak into the light DOM, so a
-    // clone appended to document.body would render unstyled/invisible.
-    root.appendChild(dragClone);
-  }
-
-  function moveDrag(clientX, clientY){
-    if(!dragClone) return;
-    dragClone.style.left = (clientX-27)+"px";
-    dragClone.style.top = (clientY-27)+"px";
-  }
-
-  function cleanupDragClone(){
-    // Class-based sweep, in case a previous clone was ever left orphaned.
-    root.querySelectorAll(".seal.dragging").forEach(el=>el.remove());
-    dragClone = null;
-    dragging = false;
-  }
-
-  function endDrag(clientX, clientY){
-    if(!dragClone){ dragging = false; return; }
-    const el = (root.elementFromPoint ? root.elementFromPoint(clientX, clientY) : document.elementFromPoint(clientX, clientY));
-    const node = el && el.closest ? el.closest(".city-node") : null;
-
-    if(!node){
-      cleanupDragClone();
-      return;
-    }
-
-    // ---- Smooth "snap into place" animation, same idea as dropIconAt() in the inventory ----
-    const pin = node.querySelector("circle.pin");
-    const targetRect = (pin || node).getBoundingClientRect();
-    const targetX = targetRect.left + targetRect.width/2 - 27;
-    const targetY = targetRect.top + targetRect.height/2 - 27;
-    const cityId = node.getAttribute("data-id");
-    const clone = dragClone;
-
-    let finished = false;
-    const finish = ()=>{
-      if(finished) return;
-      finished = true;
-      cleanupDragClone();
-      checkAnswer(cityId);
-    };
-
-    clone.style.pointerEvents = "none";
-    clone.style.transition = "left .35s ease, top .35s ease, transform .35s ease";
-    clone.style.transform = "scale(0.8)";
-    void clone.offsetWidth; // force reflow so the transition runs from the current position
-    clone.style.left = targetX + "px";
-    clone.style.top = targetY + "px";
-
-    clone.addEventListener("transitionend", finish, { once:true });
-    setTimeout(finish, 450); // safety net in case transitionend doesn't fire
-  }
-
-  sealSource.addEventListener("mousedown", e=>{ startDrag(e.clientX,e.clientY); e.preventDefault(); });
-  window.addEventListener("mousemove", e=>moveDrag(e.clientX,e.clientY));
-  window.addEventListener("mouseup", e=>endDrag(e.clientX,e.clientY));
-
-  sealSource.addEventListener("touchstart", e=>{
-    const t=e.touches[0]; startDrag(t.clientX,t.clientY);
-  }, {passive:true});
-  window.addEventListener("touchmove", e=>{
-    if(!dragClone) return;
-    const t=e.touches[0]; moveDrag(t.clientX,t.clientY);
-  }, {passive:true});
-  window.addEventListener("touchend", e=>{
-    const t=e.changedTouches[0]; endDrag(t.clientX,t.clientY);
+  CITIES.forEach((c,i)=>{
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "map-seal";
+    btn.dataset.id = c.id;
+    btn.title = "Sello coordenada " + (i+1);
+    btn.innerHTML = `<span class="map-seal-num">${i+1}</span>`;
+    btn.addEventListener("click", (e)=>{
+      e.stopPropagation();
+      if(!btn.classList.contains("ready") || btn.classList.contains("solved")) return;
+      selectedSeal = (selectedSeal === c.id) ? null : c.id;
+      renderSealStates();
+    });
+    sealTray.appendChild(btn);
+    seals[c.id] = btn;
   });
 
-  function checkAnswer(droppedId){
-    const city = CITIES.find(c=>c.id===activeId);
+  function renderSealStates(){
+    CITIES.forEach(c=>{
+      seals[c.id].classList.toggle("selected", selectedSeal === c.id);
+    });
+  }
+
+  function setSealReady(cityId, ready){
+    const btn = seals[cityId];
+    if(!btn || btn.classList.contains("solved")) return;
+    btn.classList.toggle("ready", ready);
+    if(!ready && selectedSeal === cityId){
+      selectedSeal = null;
+      renderSealStates();
+    }
+  }
+
+  function checkAnswer(sealCityId, droppedOnId){
+    const city = CITIES.find(c=>c.id===sealCityId);
+    if(!city) return;
     const feedback = root.getElementById("feedback");
     const scroll = root.getElementById("scrollCard");
 
-    if(droppedId === city.id){
+    if(droppedOnId === city.id){
       solved[city.id] = true;
       feedback.textContent = "Correcto — el sello reposa sobre " + city.name + ".";
       feedback.className = "feedback ok";
       const node = svg.querySelector(`.city-node[data-id="${city.id}"]`);
       node.classList.add("solved");
       node.querySelector("text").textContent = city.name;
+      seals[city.id].classList.remove("ready","selected");
+      seals[city.id].classList.add("solved");
+      selectedSeal = null;
       renderTabs();
-      renderScroll();
+      if(activeId === city.id) renderScroll();
       checkVictory();
     } else {
       feedback.textContent = "No es ese lugar. Vuelve a leer las runas con calma.";
