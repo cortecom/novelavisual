@@ -1869,7 +1869,7 @@ monogatari.script({
 			if (hasItem('mapa')) {
 			monogatari.run('jump Escena11_DecisionEstrategica');
 			} else {
-					   monogatari.run('jump Escena4_LabEscaneo');
+			monogatari.run('jump Escena4_LabEscaneo');
 			}
 		}
 	],
@@ -1881,7 +1881,7 @@ monogatari.script({
 			if (hasItem('mapa')) {
 			monogatari.run('jump Escena11_DecisionEstrategica');
 			} else {
-					   monogatari.run('jump Escena4_LabEscaneo');
+			monogatari.run('jump Escena4_LabEscaneo');
 			}
 		}
 	],
@@ -1894,7 +1894,7 @@ monogatari.script({
 			if (hasItem('mapa')) {
 			monogatari.run('jump Escena11_DecisionEstrategica');
 			} else {
-					   monogatari.run('jump Escena4_LabEscaneo');
+			monogatari.run('jump Escena4_LabEscaneo');
 			}
 		}
 	],
