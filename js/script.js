@@ -1637,8 +1637,9 @@ monogatari.script({
 		'gabriel Nada es imposible. Solo no comprendido... aún.',
 		'isidora Si la mesa directiva se entera de que cuestionamos el origen de esta pieza sin evidencia sólida, nos van a quitar los permisos de investigación.',
 		'gabriel Por eso debemos examinarla nosotros mismos antes de que la envíen a los depósitos subterráneos.',
-		'isidora De acuerdo, cuenta conmigo, conozco un guía que nos puede ayudar.',
+		'isidora De acuerdo, cuenta conmigo.',
 		() => addItem('contacto_isidora'),
+		'isidora Conozco un guía de la Patagonia que nos puede ayudar.',
 		() => addItem('contacto_erik'),
 		// Interacción con Objeto e Inventario
 		'[INTERACCIÓN DE INVENTARIO]',
