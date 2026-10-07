@@ -1591,7 +1591,7 @@ monogatari.script({
         showInventoryBar();
     },
 
-     'jump Capitulo3'
+     'jump Capitulo1'
     ],
 
 /* =====================================================
