@@ -1,9 +1,3 @@
-/*!
- * coloso-puzzle.js (fusionado)
- * Union de coloso-puzzle.js (componente) + coloso-action.js (Accion de Monogatari)
- * en un solo archivo -- misma logica, sin cambios de comportamiento.
- * index.html ya no necesita cargar coloso-action.js por separado.
- */
 (function () {
   'use strict';
 
@@ -339,7 +333,18 @@
     .token .token-label { font-size:10px; line-height:1.15; text-align:center; }
     .drag-clone { position:absolute; pointer-events:none; z-index:50; opacity:.9; width:50px; height:50px; object-fit:contain; }
 
-    .victory-panel { display:flex; flex-direction:column; align-items:center; gap:12px; text-align:center; }
+    /* Barra final de la Etapa 3: el Coloso se queda a la vista hasta que el jugador decida volver. */
+    .final-bar {
+      position:absolute; left:0; right:0; bottom:0; z-index:10; display:none;
+      flex-direction:column; align-items:center; gap:6px; padding:26px 20px 14px; text-align:center;
+      background:linear-gradient(0deg, rgba(8,14,10,.92) 55%, rgba(8,14,10,0));
+    }
+    .final-bar h2 { font-size:20px; color:#d8c27c; margin:0; }
+    .final-bar p { font-size:13.5px; max-width:560px; margin:0 0 4px 0; opacity:.92; }
+    .assembly.done .tray-bar { display:none; }
+    .assembly.done .final-bar { display:flex; }
+    /* Al completar, las casillas guía se desvanecen para que el Coloso se vea limpio. */
+    .assembly.done .zone, .assembly.done .zone-deco { opacity:0; transition:opacity .9s ease; }
   `;
 
   function _build(root, self) {
@@ -400,15 +405,11 @@
               <div class="glow-spot"></div>
             </div>
             <div class="tray-bar"></div>
-          </div>
-        </div>
-
-        <!-- VICTORIA -->
-        <div class="stage stage-victory" data-stage="victory">
-          <div class="victory-panel" style="margin:auto;">
-            <h2>El Coloso reconstruido</h2>
-            <p style="max-width:440px;">Lo que el mar se negó a entregar, lo entregó el mercado negro. Los 9 fragmentos —6 recuperados bajo el agua y 3 identificados entre los registros ilegales— completan la silueta. El símbolo helenístico de doble espiral brilla en el pectoral y en el brazo de la antorcha.</p>
-            <button class="cbtn victory-continue">Continuar</button>
+            <div class="final-bar">
+              <h2>El Coloso reconstruido</h2>
+              <p>Lo que el mar se negó a entregar, lo entregó el mercado negro. Los 9 fragmentos completan la silueta y el símbolo helenístico de doble espiral brilla en el pectoral y en el brazo de la antorcha.</p>
+              <button class="cbtn final-continue">Volver a la novela</button>
+            </div>
           </div>
         </div>
 
@@ -863,13 +864,20 @@
       const allDone = Object.keys(ASSEMBLY_ZONES).every((id) => state.placed.has(id));
       if (!allDone) return;
       statueFrame.classList.add('revealed');
-      setTimeout(() => showStage('victory'), 1400);
+      root.querySelector('.assembly').classList.add('done');
+      root.querySelector('.stage-3 .instr').textContent = 'Reconstrucción completa. Observa el Coloso todo el tiempo que quieras.';
     }
 
-    root.querySelector('.victory-continue').addEventListener('click', () => {
-      self.dispatchEvent(new CustomEvent('coloso:completado', { bubbles: true, composed: true }));
+    // El componente se cierra solo cuando el jugador pulsa el botón (sin temporizadores).
+    // Se cierra ANTES de avisar a Monogatari, para que el overlay no quede sobre la escena siguiente.
+    root.querySelector('.final-continue').addEventListener('click', () => {
       self.close();
+      self.dispatchEvent(new CustomEvent('coloso:completado', { bubbles: true, composed: true }));
     });
+
+    // Los clics dentro del minijuego no deben llegar al "clic para avanzar" de Monogatari
+    // (solo 'click', no 'mouseup', para no romper el arrastre).
+    self.addEventListener('click', (e) => e.stopPropagation());
 
     /* ==========================================================
        LIMPIEZA AL SALIR POR EL BOTÓN DE SALIR DE MONOGATARI
@@ -911,7 +919,6 @@
   customElements.define('coloso-puzzle', ColosoPuzzle);
 })();
 
-/* ---- coloso-action.js fusionado a continuacion ---- */
 (function () {
   'use strict';
 

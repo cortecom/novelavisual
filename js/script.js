@@ -289,7 +289,6 @@ const itemIcons = {
         name: 'Espectrómetro Portátil',
         description: 'Dispositivo para medir trazos químicos, sulfatos y residuos de aceites antiguos.'
     },
-    // [REVISION 2026-09-22] SIN USO EN ESCENAS: no se detectaron llamadas a addItem/hasItem/removeItem ni otras referencias a 'lampara_uv' fuera de itemIcons. Revisar si falta implementarlo o si puede eliminarse.
     'lampara_uv': {
         icon: 'assets/icons/lampara_uv.png',
         name: 'Lámpara Ultravioleta',
@@ -926,6 +925,8 @@ monogatari.assets ('images', {
 	'lupa_filologo': 'lupa_filologo.png',
 	'simbolo_babilonico': 'simbolo_babilonico.png',
 	'reactivo_acido': 'reactivo_acido.png',
+	'lampara_uv': 'lampara_uv.png',
+	'piedra_ngenechen': 'piedra.png',
 	'epigrama_antipatro': 'epigrama_antipatro.png',
 	'paleta': 'paleta.png'
 });
@@ -968,6 +969,7 @@ monogatari.assets ('scenes', {
 	'alejandria_ciudad': 'alejandria_ciudad.png',
 	'alejandria_archivo': 'alejandria_archivo.png',   
 	'alejandria_archivo_oculto': 'alejandria_archivo_oculto.png', 
+	'piramide_giza': 'piramide_giza.png',
     'bg_babilonia': 'babilonia_ruins.png',
 	'bg_hallazgo_babilonico': 'babilonian_hallazgo.png',
 	'bg_minijuego_jardin': 'bg_minijuego_jardin.png',
@@ -1011,6 +1013,8 @@ const hotspotInfo = {
 	'idolo': 'Un idolo muy antiguo de la edad precolombina.',
 	'llave_antigua': 'Una llave propiedad del museo',
 	'escaner': 'Terminal de procesamiento gráfico de traducción lingüística',
+	'piedra_ngenechen': 'Piedra ceremonial de origen mapuche, con inscripciones aparentemente en lengua mapudungun.',
+	'lampara_uv': 'Una lámpara de luz ultravioleta para revelar inscripciones ocultas.',
 	'planetario': 'El planetario USACH. Un lugar de investigación astronómica y cultural.',
 	'tubo': 'Tubo de terracota sellado con resina, con un papiro en su interior',
 	'amuleto': 'Un amuleto pequeño con un grabado protector.',
@@ -1587,7 +1591,7 @@ monogatari.script({
         showInventoryBar();
     },
 
-     'jump Capitulo1'
+     'jump Capitulo3'
     ],
 
 /* =====================================================
@@ -1624,7 +1628,6 @@ monogatari.script({
 
 	'Escena1_Sala': [
     	'show scene museo_sala_precolombina with fadeIn',
-		//'show image panuelo with fadeIn item-panuelo',
 		'En la sala de culturas precolombinas, la luz tenue revela piezas que han sobrevivido siglos.',
 		'Pero hoy, entre cerámicas diaguitas y textiles mapuches, descansa un objeto que no debería existir.',
 		'show character gabriel serious at left with fadeIn',
@@ -1646,7 +1649,6 @@ monogatari.script({
 		'Objeto en escena: Vitrina de exhibición de seguridad.',
 		'Acción requerida: Utilizar la Llave de Acceso Académico de la USACH + Pañuelo de Microfibra.',
 		'[INVENTARIO USADO]: Llave de Acceso Académico + Pañuelo de Microfibra.',
-
 		'jump Escena1_Abrir'
 	],	
 
@@ -1811,8 +1813,11 @@ monogatari.script({
 		'show scene laboratorio with fadeIn',
 		'show character gabriel normal at right with fadeIn',
 		'show character lucia normal at center with fadeIn',
-
-		'El laboratorio es un caos organizado: lámparas articuladas, herramientas de excavación, cajas con fragmentos y pizarras llenas de notas.',
+		'El laboratorio de ingenieria quimica de la USACH es un caos organizado: lámparas articuladas, herramientas de excavación, cajas con fragmentos y pizarras llenas de notas.',
+		'En este laboratorio se analizan artefactos arqueológicos y se realizan pruebas de datación y composición química.',
+		'narrator Gabriel y Lucía se preparan para examinar la piedra de Ngenechén, buscando pistas sobre su origen y significado.',
+		'narrator Le han pedido ayuda a la Dra. Lucía Fernández, especialista en análisis de materiales y química arqueológica, para determinar la composición y antigüedad de la piedra.',
+		'narrator La piedra de Ngenechén es un artefacto que desafía la comprensión histórica, y su análisis podría revelar conexiones culturales inesperadas.',
 		'jump Escena3_Laboratorio_piedra', 
 	],
 
@@ -1820,26 +1825,48 @@ monogatari.script({
 		'show scene laboratorio with fadeIn',
 		'show character gabriel pensativo at right with fadeIn',
 		'show character lucia analitica at center with fadeIn',
-
 		'La piedra descansa sobre un paño azul, iluminada por una luz blanca que revela detalles invisibles a simple vista.',
-
 		'lucia La espiral es idéntica a la del Mausoleo. No es coincidencia. El ángulo de corte de la herramienta de sílex coincide con el tallado en mármol dórico.',
-
 		'lucia (Observando con una lupa binocular y ajustando la intensidad de la luz) El símbolo mapuche del Ngenechén está grabado con una técnica que no corresponde al período prehispánico tardío. Es más antigua. Mucho más.',
-	
 		'show character tomas normal at left',
 		'tomas ¿Más antigua que la cultura mapuche registrada?',
 		'gabriel Más antigua que cualquier registro en Chile. Esto... es un mensaje cifrado que duró milenios.',
-
 		'lucia Hay caracteres minúsculos pulidos en las incisiones. Usaron algún tipo de ácido orgánico o resina vegetal para sellar las grietas y evitar la erosión del agua.',
+		'jump Escena3_Laboratorio_piedra_interaccion'
+	],
 
+	'Escena3_Laboratorio_piedra_interaccion': [
+		'show scene laboratorio with fadeIn',
+		() => showInventoryBar(),
 		// Interacción con Objeto
 		'[INTERACCIÓN DE INVENTARIO]',
 		'Objeto en escena: Piedra de Ngenechén sobre la mesa de análisis.',
 		'Acción requerida: Aplicar el Reactivo de Contraste Luminol y encender la Lámpara UV Táctica.',
 		'[INVENTARIO USADO]: Lámpara UV Táctica + Reactivo de Luminol.',
-		'[EFECTO]: Revela en fluorescencia verdosa las letras griegas ocultas: "φῶς νότου" (Luz del Sur).',
+		//() => VerObjeto('piedra_ngenechen'),
+		//() => ImagenEnHotspot('piedra_ngenechen', { escala: 0.2 }),
+		() => TomarObjeto('reactivo_acido'),
+		() => ImagenEnHotspot('reactivo_acido', { escala: 0.2 }),
+		() => TomarObjeto('lampara_uv'),
+		() => ImagenEnHotspot('lampara_uv', { escala: 0.2 }),
+		() => UsarObjetoSobreObjeto('piedra_ngenechen','reactivo_acido','jump Escena3_Laboratorio_piedra_lampara','Piedra de Ngenechén con reactivo de luminol aplicado'),
+		() => UsarObjetoSobreObjeto('piedra_ngenechen','lampara_uv','No pasa nada. Necesitas aplicar primero el reactivo de luminol.'),
+		() => VerObjeto('planetario'),
+		() => VerObjeto('escaner'),
+		'narrator Necesitas descubir el mensaje oculto.'
+	],
 
+	'Escena3_Laboratorio_piedra_lampara': [
+		'show scene laboratorio with fadeIn',
+		() => limpiarCombosObjeto(),
+		() => UsarObjetoSobreObjeto('piedra_ngenechen','reactivo_acido','No pasa nada, necesitas la lámpara UV.'),
+			   () => UsarObjetoSobreObjeto('piedra_ngenechen','lampara_uv','jump Escena3_Laboratorio_piedra_decision'),
+		'narrator Necesitas descubir el mensaje oculto.'
+	],
+
+	'Escena3_Laboratorio_piedra_decision': [
+		'show scene laboratorio_escaneo with fadeIn',
+		'[EFECTO]: Revela en fluorescencia verdosa las letras griegas ocultas: "φῶς νότου" (Luz del Sur).',
 		() => monogatari.setting('AllowRollback', false),
 		{
 			'Choice': {
@@ -1904,7 +1931,7 @@ monogatari.script({
 	// ESCENA 4 — Laboratorio de Análisis Digital y Escaneo 3D, USACH
 	// -------------------------------------------------------------------------
 	'Escena4_LabEscaneo': [
-		'show scene lab_escaneo with fadeIn',
+		'show scene laboratorio_escaneo with fadeIn',
 		() => showInventoryBar(),
 		//'show character gabriel normal at left with fadeIn',
 		//'show character lucia concentrada at center with fadeIn',
@@ -1987,6 +2014,7 @@ monogatari.script({
 		'La Carretera Austral serpentina entre montañas colosales cubiertas de nieve.',
 		'El glaciar Pio XI es el glaciar más grande de Sudamérica y uno de los pocos en el mundo que, de forma excepcional, sigue avanzando en lugar de retroceder debido al cambio climático',
 		'El viento patagónico ruge contra el vehículo de expedición mientras la lluvia helada golpea el parabrisas.',
+		'Al equipo se les ha unido Erik, un guía local con experiencia en la región de Magallanes, quien conoce los caminos más seguros y los peligros ocultos de la Carretera Austral.',
 		'erik (Sujetando firmemente el volante del jeep modificado mientras las ruedas giran sobre el barro helado) La tormenta se está cerrando rápido, doctor. En Magallanes el clima no perdona los errores de cálculo. Si nos quedamos atrapados en esta quebrada antes del anochecer, la temperatura bajará a diez bajo cero.',
 		'gabriel (Revisando los mapas topográficos sobre sus rodillas) No podemos dar la vuelta ahora, Erik. Las coordenadas nos sitúan a menos de tres kilómetros de la boca del fiordo.',
 		'erik (Mirando por el retrovisor) Hay algo más que me preocupa... Un camión pesado nos ha estado siguiendo desde el cruce de Puerto Cenicero. Sin luces de identificación. En esta época del año nadie hace esta ruta por turismo.',
@@ -2024,6 +2052,10 @@ monogatari.script({
 		'Acción requerida: El jugador debe sacar la Brújula de Marinos Antiguos y combinarla con la Libreta con Diagrama de Espiral para calcular la declinación magnética.',
 		'[INVENTARIO USADO]: Brújula de Marinos Antiguos + Libreta con Diagrama de Espiral.',
 		'[EFECTO]: Corrige el rumbo de la expedición y revela la ruta de acceso oculta tras la cascada congelada.',
+		'El equipo se abre paso entre la niebla y el hielo, siguiendo la ruta secreta que conduce a la caverna donde se oculta el misterio de la espiral doble.',
+		'narrator La cascada congelada se alza como un muro de cristal, reflejando la luz de la tormenta y ocultando la entrada a la caverna.',
+		'narrator La combinación de la brújula y el diagrama de espiral permite al equipo encontrar un sendero seguro a través del hielo, evitando grietas y desprendimientos.',
+		'narrator Con cada paso, el sonido del agua atrapada en el hielo resuena como un eco de los secretos que esperan ser descubiertos en la caverna.',
 		'jump Escena6_Caverna'
 	],
 
@@ -2033,8 +2065,12 @@ monogatari.script({
 	'Escena6_Caverna': [
 		'show scene caverna with fadeIn',
 		'show character isidora sorprendida at right with fadeIn',
-		'El interior de la caverna es un templo natural esculpido por el agua y el tiempo.',
+		'narrator El interior de la caverna es un templo natural esculpido por el agua y el tiempo.',
 		'Las linternas de alta potencia iluminan estalactitas gigantescas y paredes de basalto pulido.',
+		'narrator La humedad es intensa y el eco de las gotas de agua resuena en la bóveda, creando un ambiente casi místico.',
+		'narrator El equipo avanza con cautela, observando cada detalle de las paredes y el suelo, buscando pistas sobre la presencia de antiguos constructores.',
+		'narrator La caverna parece haber sido utilizada como un santuario o lugar de reunión por culturas antiguas, y los grabados en las paredes sugieren un conocimiento avanzado de geometría y astronomía.',
+		'narrator La luz de las linternas revela inscripciones y símbolos que parecen combinar elementos de diferentes culturas, lo que indica un posible intercambio de conocimientos a lo largo de los siglos.',
 		'isidora (Alzando la antorcha halógena y rozando la piedra helada con la punta de sus dedos enguantados) Gabriel... ven a ver esto. Esto desafía todo lo que enseñamos en la universidad. ¿Cómo es posible que constructores en la Patagonia conocieran la estructura exacta del Faro de Alejandría?',
 		'isidora Mira esa torre escalonada, la sección octogonal intermedia, la linterna superior y el espejo cóncavo esculpido en alto relieve...',
 		'gabriel (Acercándose e inspeccionando el trazo) No lo sé con certeza aún, Isidora... pero la escala es matemáticamente idéntica a las descripciones de Estrabón y Plinio el Viejo.',
@@ -2045,7 +2081,6 @@ monogatari.script({
 		'Acción requerida: Sacar el Cincel de Polímero Liviano y el Cepillo de Cerdas Suaves para remover el musgo mineralizado.',
 		'[INVENTARIO USADO]: Cepillo de Cerdas + Cincel de Polímero.',
 		'[EFECTO]: Expone un mecanismo de encaje geométrico con la forma de la espiral doble.',
-
 		'jump Escena7_Derrumbe'
 	],
 
@@ -2055,12 +2090,9 @@ monogatari.script({
 	'Escena7_Derrumbe': [
 		'show scene caverna with shake infinite',
 		'¡UN ESTRUENDO RETUMBA EN LA CAVERNA! El suelo tiembla con violencia mientras bloques de basalto caen desde la bóveda.',
-
 		'show character isidora sorprendida at right',
 		'isidora ¡GABRIEL! ¡EL TECHO CEDE! ¡LA SALIDA ESTÁ QUEDANDO BLOQUEADA!',
-
 		'gabriel (Mantiene la calma bajo la lluvia de polvo y fragmentos) ¡Tomas, Isidora, cubran los equipos! ¡Erik, busca un punto de apoyo estructural!',
-
 		// Interacción con Objeto
 		'[INTERACCIÓN DE INVENTARIO - ACCIÓN RÁPIDA]',
 		'Objeto en escena: Bloque rocoso de gran tonelaje aprisionando la vía.',
@@ -2068,7 +2100,6 @@ monogatari.script({
 		'[INVENTARIO USADO]: Barra de Palanca de Titanio.',
 		'show scene derrumbe with fadeIn',
 		'[EFECTO]: Desplaza la roca colapsada a tiempo, abriendo un hueco que permite al equipo acceder a la Cámara Profunda.',
-
 		'jump Escena8_CamaraProfunda'
 	],
 
@@ -2079,8 +2110,10 @@ monogatari.script({
 		'show scene camara_profunda with fadeIn',
 		'show character gabriel serio at left with fadeIn',
 		'show character isidora analitica at right with fadeIn',
-		'Tras atravesar el pasaje derrumbado, el grupo ingresa a una sala totalmente sellada al vacío.',
-		'El aire es seco y conserva un olor a resinas aromáticas e incienso antiguo.',
+		'narrator Tras atravesar el pasaje derrumbado, el grupo ingresa a una sala totalmente sellada al vacío.',
+		'narrator La cámara está construida con bloques de basalto perfectamente alineados, formando un patrón de espiral doble que se repite en el suelo y las paredes.',
+		'narrator La iluminación proviene de un sistema de espejos que refleja la luz natural desde una abertura oculta en el techo, creando un efecto de iluminación cenital.',
+		'narrator El aire es seco y conserva un olor a resinas aromáticas e incienso antiguo.',
 		'isidora La temperatura y la humedad aquí se han mantenido constantes durante dos mil años. Este recinto fue construido deliberadamente como una cámara acorazada.',
 		'gabriel Observa los frisos laterales. No solo está el Faro de Alejandría y el Mausoleo de Halicarnaso... Están representadas las Siete Maravillas del Mundo Antiguo alineadas en orden astronómico.',
 		'isidora Los Jardines Colgantes, la Estatua de Zeus, el Templo de Artemisa, el Coloso de Rodas y las Pirámides de Giza... Y en el centro de todas ellas, la figura de la espiral doble uniendo los dos hemisferios.',
@@ -2094,9 +2127,9 @@ monogatari.script({
 		'show scene altar with fadeIn',
 		() => showInventoryBar(),
 		() => addItem('bisturi_termico'),
-		'En el centro exacto de la estancia reposa un altar de piedra volcánica pulida.',
-		'Tiene un conjunto de ranuras, no hay información para poder descifrarlo ahora',
-		'Sobre él descansa un tubo de terracota helénica sellado con resina y cera de abejas.',
+		'narrator En el centro exacto de la estancia reposa un altar de piedra volcánica pulida.',
+		'narrator Tiene un conjunto de ranuras, no hay información para poder descifrarlo ahora',
+		'narrator Sobre él descansa un tubo de terracota helénica sellado con resina y cera de abejas.',
 		'isidora (Analizando el sello con cuidado) La resina está cristalizada. Si intentamos forzar el cilindro manualmente, las vibraciones romperán el contenido interior.',
 		// Interacción de Inventario
 		'[INTERACCIÓN DE INVENTARIO]',
@@ -2118,9 +2151,7 @@ monogatari.script({
 		'[INVENTARIO USADO]: Bisturí Térmico de Campo.',
 		'[EFECTO]: Abre el estuche intacto, permitiendo extraer el manuscrito sin que la fibra vegetal se desintegre.',
 		() => addItem('coordenadas_antiguas'),
-
  		'play sound wind-echo',
-
     	'isidora Este pergamino... son coordenadas. Tres ubicaciones marcadas con runas.',
 		'isidora Si logro descifrarlas, sabré hacia dónde viajar después de esto.',
 
@@ -2152,8 +2183,10 @@ monogatari.script({
 		'show scene fogon with fadeIn',
 		'show character gabriel pensativo at left with fadeIn',
 		'show character isidora normal at right with fadeIn',
-		'La fogata crepita en el refugio de montaña. Afuera, la tormenta patagónica golpea las paredes de madera.',
-		'Las tazas de café caliente despiden vapor mientras las copias digitales del pergamino brillan en la pantalla de la laptop.',
+		'narrator La fogata crepita en el refugio de montaña. Afuera, el viento aúlla entre los picos nevados, mientras el cielo despejado revela las estrellas.',
+		'narrator Las montañas de Magallanes se alzan como guardianes silenciosos, y el equipo se siente pequeño ante la inmensidad del paisaje.',
+		'narrator El equipo se reúne alrededor del fuego, revisando los hallazgos del día y planificando la siguiente fase de la expedición.',
+		'narrator Las tazas de café caliente despiden vapor mientras las copias digitales del pergamino brillan en la pantalla de la laptop.',
 		'isidora Gabriel... si publicamos esto ahora, la comunidad científica nos destruirá o nos llamará locos. Necesitamos las pruebas de los tres puntos mediterráneos indicados en las coordenadas.',
 		'gabriel Entonces iremos a buscar esas pruebas, una por una.',
 		// Interacción con Objeto
@@ -2222,6 +2255,9 @@ monogatari.script({
 	// -------------------------------------------------------------------------
 	'Escena12_Grecia': [
 		'show scene embarque with fadeIn',
+		'narrator El equipo de expedición se prepara para embarcar en un vuelo internacional hacia Grecia y Turquía, llevando consigo los hallazgos del Capítulo 1.',
+		'narrator Los pasaportes están listos, los visados confirmados y el equipaje cuidadosamente revisado para cumplir con las regulaciones de seguridad internacional.',
+		'narrator El ambiente es tenso pero lleno de emoción, mientras el equipo se prepara para su próxima aventura.',
 		'show character tomas entusiasmado at right with fadeIn',
 		'tomas Todo el equipo de escaneo térmico y las copias 3D van en el equipaje de mano, profesor. Volamos directo a Atenas.',
 		'[INTERACCIÓN Y SELLADO DE SEGURIDAD FINAL]',
@@ -2290,7 +2326,8 @@ monogatari.script({
 
 'Escena13': [
 		'show scene atenas_atardecer with fadeIn',
-		'Atenas recibe al equipo con un atardecer dorado. El Partenón se recorta contra el cielo como un recordatorio de la grandeza antigua. Las calles vibran con vida: cafés, turistas, estudiantes, arqueólogos. Pero para Gabriel, Atenas no es un destino turístico. Es el primer paso para entender por qué una piedra mapuche contiene símbolos helenísticos.',
+		'narrator Atenas recibe al equipo con un atardecer dorado. El Partenón se recorta contra el cielo como un recordatorio de la grandeza antigua. Las calles vibran con vida: cafés, turistas, estudiantes, arqueólogos. Pero para Gabriel, Atenas no es un destino turístico. Es el primer paso para entender por qué una piedra mapuche contiene símbolos helenísticos.',
+		'narrator La aventura en Europa comienza aquí. Sin saber a dónde la lleva el destino...',
 		'show character helena normal at right with fadeIn',
 		'show character gabriel serio at left with fadeIn',
 		'helena (Estrecha la mano de Gabriel) Dr. Arancibia, su mensaje me dejó sin dormir. Una piedra mapuche con un símbolo exclusivo de Halicarnaso... Eso es imposible.',
@@ -2330,7 +2367,7 @@ monogatari.script({
 	// -------------------------------------------------------------
 	'Escena14': [
 		'show scene biblioteca_atenas with fadeIn',
-		'La biblioteca es un templo moderno del conocimiento. Entre estantes infinitos, Helena guía al equipo hacia una sección restringida donde se guardan copias de epigramas helenísticos.',
+		'narrator La biblioteca es un templo moderno del conocimiento. Entre estantes infinitos, Helena guía al equipo hacia una sección restringida donde se guardan copias de epigramas helenísticos.',
 		'show character helena normal at right with fadeIn',
 		'show character gabriel normal at left with fadeIn',
 		'helena Antípatro escribió varios epigramas sobre las maravillas. Pero uno de ellos... nunca fue incluido en la lista oficial.',
@@ -2386,7 +2423,7 @@ monogatari.script({
 	],
 
 	'Escena14_Poema': [
-		'"La Bibliotheca historica", es un conjunto de 40 libros (sobreviven completos los libros 1-5 y 11-20), fué escrita entre el 60 y el 30 a.C.',
+		'narrator "La Bibliotheca historica", es un conjunto de 40 libros (sobreviven completos los libros 1-5 y 11-20), fué escrita entre el 60 y el 30 a.C.',
 		() => addItem('contacto_diodoro'),
 		'helena Diodoro Sículo recopiló información de fuentes más antiguas, muchas de las cuales se han perdido. Sus libros contienen referencias a las Siete Maravillas y a otras construcciones notables del mundo antiguo.',
 		'helena Si quieres investigar más sobre las Siete Maravillas y su relación con la piedra mapuche, te recomiendo que busques a un experto en Diodoro Sículo. Él podría ayudarte a entender mejor el contexto histórico y cultural de los libros perdidos.',
@@ -2394,14 +2431,16 @@ monogatari.script({
 	],
 
 	'Escena14_Mausoleo': [
-		'Desbloqueas en la libreta el paralelismo directo con los frisos del Mausoleo de Halicarnaso.',
+		'narrator Desbloqueas en la libreta el paralelismo directo con los frisos del Mausoleo de Halicarnaso.',
+		'helena El Mausoleo de Halicarnaso fue una de las Siete Maravillas del Mundo Antiguo, construido en el siglo IV a.C. en la ciudad de Halicarnaso (actual Bodrum, Turquía). Fue un monumento funerario para Mausolo, un sátrapa persa, y su esposa Artemisia II.',
+		'helena El relieve que mencionas es único porque representa a Mausolo y Artemisia en un estilo artístico que combina elementos griegos y persas. Es un ejemplo excepcional de la fusión cultural en la arquitectura y el arte helenístico.',
 		() => addItem('relieve_halicarnaso'),
 		'jump Escena20'
 	],
 
 	'Escena14_Antipatro': [
-		'El "Epigrama de Antípatro" es un libro que enumera las Siete Maravillas del Mundo Antiguo (Antología Palatina IX.58, c. 140 a.C.). Es una de las listas más tempranas conocidas de las Siete Maravillas.',
-		'Trazar el mapa de asentamientos helenísticos vinculados con las 3 divinidades griegas, mencionadas en los libros: Zeus, Artemisa y Helios',
+		'helena El "Epigrama de Antípatro" es un libro que enumera las Siete Maravillas del Mundo Antiguo (Antología Palatina IX.58, c. 140 a.C.). Es una de las listas más tempranas conocidas de las Siete Maravillas.',
+		'narrator Trazar el mapa de asentamientos helenísticos vinculados con las 3 divinidades griegas, mencionadas en los libros: Zeus, Artemisa y Helios',
 		() => addItem('contacto_antipatro'),
 
 		() => monogatari.setting('AllowRollback', false),
@@ -2440,7 +2479,15 @@ monogatari.script({
 	// -------------------------------------------------------------
 	'Escena15': [
 		'show scene olimpia_ruinas with fadeIn',
-		'Olimpia es un santuario de ruinas y silencio. El templo donde se alzaba la Estatua de Zeus está reducido a columnas rotas y fragmentos de mármol. Pero el aire parece aún cargado de la presencia del dios.',
+		'narrator Olimpia es un santuario de ruinas y silencio. El templo donde se alzaba la Estatua de Zeus está reducido a columnas rotas y fragmentos de mármol. Pero el aire parece aún cargado de la presencia del dios.',
+		'narrator Mientras el equipo recorre el sitio arqueológico, se percibe un eco de la magnificencia que una vez tuvo este lugar. La historia de la estatua y su creador, Fidias, resuena en la mente de los exploradores.',
+		'narrator Gabriel y su equipo se detienen frente a los restos del templo, contemplando la grandeza perdida y reflexionando sobre el legado de la civilización griega.',
+		'show character gabriel pensativo at left with fadeIn',
+		'gabriel La Estatua de Zeus era una obra maestra. Oro, marfil, proporciones perfectas. ¿Cómo pudo desaparecer sin dejar rastro?',
+		'show character isidora normal at center with fadeIn',
+		'isidora Y fue destruida... ¿por qué?',
+		'show character helena normal at right with fadeIn',
+		'helena Por la expansión cristiana. Las maravillas eran vistas como símbolos paganos.',
 		'jump Escena_Narrador_ZeusOlimpia'
 	],
 
@@ -2525,8 +2572,8 @@ monogatari.script({
 	// ESCENA 16 - Objeto oculto: Fragmento de marfil carbonizado
 	// -------------------------------------------------------------
 	'Escena16': [
-		'Entre los restos del templo, el jugador encuentra un pequeño fragmento de marfil quemado.',
-
+		'narrator Entre los restos del templo, el jugador encuentra un pequeño fragmento de marfil quemado.',
+		() => addItem('fragmento_marfil'),
 		// Interacción con Objeto Oculto: Fragmento de Marfil Carbonizado
 		() => monogatari.setting('AllowRollback', false),
 		{
@@ -2544,7 +2591,7 @@ monogatari.script({
 				}
 			}
 		},
-		() => addItem('fragmento_marfil'),
+
 		'Material: marfil original de la estatua. | Estado: carbonizado por incendio. | Edad: ~2400 años. | Inscripción microscópica: símbolo idéntico al de la piedra mapuche.',
 		'show character tomas entusiasmado at center with fadeIn',
 		'tomas Profesor... ¡el mismo símbolo!',
@@ -2581,7 +2628,12 @@ monogatari.script({
 	// -------------------------------------------------------------
 	'Escena17': [
 		'show scene efeso_ruinas with fadeIn',
-		'El Templo de Artemisa fue una de las maravillas más grandes jamás construidas. Hoy solo quedan columnas rotas y un silencio que parece eterno.',
+		'narrator El Templo de Artemisa fue una de las maravillas más grandes jamás construidas. Hoy solo quedan columnas rotas y un silencio que parece eterno.',
+		'narrator Mientras el equipo recorre las ruinas, se percibe un eco de la magnificencia que una vez tuvo este lugar. La historia del templo y su destrucción resuena en la mente de los exploradores.',
+		'show character gabriel pensativo at left with fadeIn',
+		'gabriel La historia de este templo es fascinante. Fue destruido y reconstruido varias veces, y aún así, su legado perdura.',
+		'show character isidora normal at center with fadeIn',
+		'isidora Y alguien lo llevó a Chile.',
 		'jump Escena_Narrador_TemploArtemisa'
 	],
 
@@ -2743,8 +2795,13 @@ monogatari.script({
 	// -------------------------------------------------------------
 	'Escena19': [
 		'show scene efeso_subterraneo with fadeIn',
-		'En una cámara oculta, el jugador encuentra una inscripción: “La luz del sur preservará lo que el norte destruye.”',
-
+		'narrator Tras descender por el pasaje subterráneo, el equipo se encuentra en una cámara oculta. La luz tenue revela un muro grabado con inscripciones en griego koiné.',
+		'narrator En una cámara oculta, el jugador encuentra una inscripción: “La luz del sur preservará lo que el norte destruye.”',
+		'narrator El grabado es un mensaje críptico que parece conectar la historia de las Siete Maravillas con un destino lejano, posiblemente en el hemisferio sur.',
+		'show character gabriel pensativo at left with fadeIn',
+		'gabriel Este mensaje es un enigma. ¿Qué significa “la luz del sur”?',
+		'show character helena asombrada at right with fadeIn',
+		'helena Podría referirse a un lugar en el hemisferio sur, tal vez incluso a Chile, donde la piedra mapuche fue encontrada.',
 		// Interacción con Objeto: Kit de Calco & Papel Carbón
 		() => monogatari.setting('AllowRollback', false),
 		{
@@ -2766,7 +2823,6 @@ monogatari.script({
 	
 		'show character gabriel serio at left with fadeIn',
 		'gabriel La misma frase... La misma idea.',
-
 		'show character helena asombrada at right with fadeIn',
 		'helena Esto no es coincidencia. Es un mensaje.',
 
@@ -2799,6 +2855,12 @@ monogatari.script({
 	'Escena20': [
 		'show scene halicarnaso_ruinas with fadeIn',
 		'El Mausoleo de Halicarnaso fue una mezcla de culturas: griega, egipcia, persa. Hoy solo quedan fragmentos dispersos.',
+		'narrator Mientras el equipo recorre las ruinas, se percibe un eco de la magnificencia que una vez tuvo este lugar. La historia del mausoleo y su destrucción resuena en la mente de los exploradores.',
+		'narrator Gabriel y su equipo se detienen frente a los restos del mausoleo, contemplando la grandeza perdida y reflexionando sobre el legado de la civilización helenística.',
+		'show character gabriel pensativo at left with fadeIn',
+		'gabriel La espiral de la piedra proviene de aquí. Es un símbolo de transición entre mundos.',
+		'show character isidora normal at right with fadeIn',
+		'isidora Como la piedra misma.',
 		'jump Escena_Narrador_MausoleoHalicarnaso'
 	],
 
@@ -2879,7 +2941,7 @@ monogatari.script({
 	// ESCENA 21 - Objeto oculto: Miniatura de la cuadriga
 	// -------------------------------------------------------------
 	'Escena21': [
-		'El jugador encuentra una miniatura de la cuadriga que coronaba el Mausoleo.',
+		'narrator El jugador encuentra una miniatura de la cuadriga que coronaba el Mausoleo.',
 
 		// Interacción con Objeto Oculto: Miniatura de la Cuadriga de Bronce
 		() => addItem('miniatura_cuadriga'),
@@ -2901,10 +2963,8 @@ monogatari.script({
 		},
 
 		'Material: bronce. | Inscripción: símbolo helenístico + marca mapuche. | Estado: sorprendentemente intacto.',
-
 		'show character tomas entusiasmado at center with fadeIn',
 		'tomas ¿Cómo llegó esto aquí?',
-
 		'show character gabriel serio at left with fadeIn',
 		'gabriel No llegó aquí. Fue traído desde aquí... hacia Chile.',
 
@@ -2937,6 +2997,13 @@ monogatari.script({
 	'Escena22': [
 		'show scene rodas_puerto with fadeIn',
 		'El puerto de Rodas es tranquilo. El Coloso ya no existe, pero su sombra parece seguir presente.',
+		'narrator Mientras el equipo recorre las ruinas, se percibe un eco de la magnificencia que una vez tuvo este lugar.',
+		'show character gabriel pensativo at left with fadeIn',
+		'gabriel Dicen que cayó por un terremoto. Pero... ¿y si no fue natural?',
+		'show character helena normal at right with fadeIn',
+		'helena La destrucción de símbolos paganos fue sistemática.',
+		'show character tomas entusiasmado at center with fadeIn',
+		'tomas ¿Y si el terremoto no fue natural? ¿Y si fue causado por una fuerza más grande?',
 		'jump Escena_Narrador_ColosoRodas'
 	],
 
@@ -2968,9 +3035,11 @@ monogatari.script({
 	'Escena22_Rodas': [
 		'show scene rodas_puerto with fadeIn',
 		'show character gabriel pensativo at left with fadeIn',
-		'gabriel Dicen que cayó por un terremoto. Pero... ¿y si no fue natural?',
+		'gabriel Debemos inspeccionar el fondo del puerto para encontrar los restos del Coloso.',
 		'show character helena normal at right with fadeIn',
-		'helena La destrucción de símbolos paganos fue sistemática.',
+		'helena Podemos usar el dron subacuático para explorar sin riesgo.',
+		'show character tomas entusiasmado at center with fadeIn',
+		'tomas ¡Perfecto! ¡Vamos a sumergirnos en la historia!',
 		// Interacción con Objeto: Dron Subacuático de Exploración
 		() => monogatari.setting('AllowRollback', false),
 		{
@@ -3092,6 +3161,10 @@ monogatari.script({
 	'Escena24': [
 		'show scene alejandria_ciudad with fadeIn',
 		'Alejandría es una mezcla de modernidad y ruinas antiguas. El Faro ya no existe, pero sus cimientos permanecen bajo el agua.',
+		'narrator Mientras el equipo recorre la ciudad, se percibe un eco de la magnificencia que una vez tuvo el Faro.',
+		'narrator Gabriel y su equipo se detienen frente a los restos del puerto, contemplando la grandeza perdida y reflexionando sobre el legado de la civilización helenística.',
+		'show character gabriel pensativo at left with fadeIn',
+		'gabriel El Faro de Alejandría fue una maravilla de la ingeniería. Debemos investigar sus restos y buscar pistas sobre su historia.',
 		'jump Escena_Narrador_FaroAlejandria'
 	],
 		
@@ -3138,8 +3211,8 @@ monogatari.script({
 	'Escena24_Archivo': [
 		'show scene alejandria_archivo with fadeIn',
 		'show character omar erudito at right',
-		'omar Bienvenido a la nueva Biblioteca de Alejandría. Aquí se guardan los secretos que el mundo ha olvidado.',
-		'omar Los archivos del Faro contienen secretos que pocos conocen.',
+		'omar Bienvenido a la nueva Biblioteca de Alejandría. Es un refugio de conocimiento y sabiduría, que intenta preservar los secretos del pasado, de la misma manera que la antigua Biblioteca de Alejandría.',
+		'omar Sin embargo, los archivos del Faro contienen secretos que pocos conocen.',
 		'show gabriel sorprendido at left with fadeIn',
 		'grabriel ¿Secretos? ¿Qué tipo de secretos?',
 		'omar Documentos que mencionan contactos culturales desconocidos entre el Mediterráneo y el Pacífico Sur. Algunos de estos documentos fueron escritos por Diodoro Sículo.',
@@ -3207,7 +3280,12 @@ monogatari.script({
 	// -------------------------------------------------------------
 	'Escena25': [
 		'show scene alejandria_archivo_oculto with fadeIn',
-		'Omar revela pergaminos que mencionan los libros perdidos VI-X de Diodoro Sículo. Estos libros describían contactos culturales desconocidos.',
+		'narrator Omar conduce al equipo a una cámara subterránea.',
+		'narrator Allí, entre estanterías de bronce y vitrinas de cristal, se encuentran pergaminos antiguos que datan del siglo I a.C.',
+		'narrator Los pergaminos están protegidos por un sistema de control de humedad y temperatura, asegurando su preservación.',
+		'narrator Los pergaminos contienen información valiosa sobre la historia y la cultura de Alejandría.',
+		'narrator Entre los documentos, se encuentran referencias a los libros perdidos VI-X de Diodoro Sículo, que describen contactos culturales desconocidos entre el Mediterráneo y el Pacífico Sur.',
+		'narrator Omar revela pergaminos que mencionan los libros perdidos VI-X de Diodoro Sículo. Estos libros describían contactos culturales desconocidos.',
 
 		// Interacción con Objeto: Pincel de Conservación & Luz Fría
 		() => monogatari.setting('AllowRollback', false),
@@ -3382,12 +3460,12 @@ monogatari.script({
 	// -------------------------------------------------------------
 	'Escena28': [
 		'show scene alejandria_ciudad with fadeIn',
+		'narrator Tras el atentado, el equipo logra escapar con los pergaminos y los datos digitalizados.',
+		'narrator Los pergaminos contienen información valiosa sobre la historia y la cultura de Alejandría.',
 		'show character gabriel serio at left with fadeIn',
 		'gabriel La octava luz... La que guía a las siete...',
-
 		'show character isidora sorprendida at center with fadeIn',
 		'isidora Está en Chile.',
-
 		'show character tomas entusiasmado at right with fadeIn',
 		'tomas Y nosotros debemos encontrarla.',
 
@@ -3406,7 +3484,6 @@ monogatari.script({
 
 		'El eco del Mediterráneo ha hablado. Y su voz apunta hacia el sur del mundo.',
 		'CAPÍTULO 2 COMPLETO - FINALIZADO',
-
 		'jump Capitulo3'
 	],
 
@@ -3418,18 +3495,67 @@ monogatari.script({
 		'show scene negro with fadeIn duration 1s',
 		'centered <h1>Capítulo III</h1><p>Sombras del Imperio</p>',
 		//'play music capitulo1 with loop fade 2',
-		'jump Escena29_Babilonia'   
+			   'jump Escena29_Elcairo'
 	],
 
 // -------------------------------------------------------------
 	// ESCENA 29: Babilonia, Irak (Jardines Colgantes)
 	// -------------------------------------------------------------
+
+
+	'Escena29_Elcairo': [
+		'show scene piramide_giza with fadeIn',
+		'narrator El Cairo, Egipto',
+		'narrator La Gran Pirámide de Guiza, la única maravilla de la antigüedad que menciona Antipatro de Sidón que esta aún en pie.',
+		'narrator Nos demuestra la ingenuidad humana en la búsqueda de la inmortalidad.',
+		'narrator Sin embargo, ya no tenemos la certeza que esta maravilla fuese solo una gran tumba, sino que es parte de algo mucho mas grande.',
+		'jump Escena_Narrador_Piramide'
+	],
+
+	'Escena_Narrador_Piramide': [
+		'show scene bg_narrador_piramide_giza with fadeIn',
+		'show image overlay_vignette_sepia with fadeIn',
+		'show image overlay_grano with fadeIn',
+		'show image overlay_letterbox with fadeIn',
+		//'play sound sfx_pergamino',
+		//'play sound sfx_viento_desierto',
+
+		'show character hemiunu normal at center with fadeIn',
+		'hemiunu Yo soy Hemiunu, visir y arquitecto real de Su Majestad Keops, cuarto faraón de la cuarta dinastía.',
+		'hemiunu Bajo mis órdenes se alzaron los bloques de piedra caliza que hoy contemplas en Guiza.',
+		'hemiunu La obra comenzó hacia el año 2560 antes de tu era, y en apenas veinte años movimos más de dos millones de bloques, traídos de canteras cercanas y de Asuán, río abajo.',
+		'hemiunu Construimos esta tumba en honor al propio faraón Keops, para asegurar su ascenso eterno junto a Ra, dios del sol.',
+		'hemiunu A diferencia de sus hermanas de Babilonia, Rodas o Éfeso, esta maravilla nunca conoció la destrucción.',
+		'hemiunu Ha resistido más de cuatro mil quinientos años de arena, de guerra y de olvido, y sigue en pie hasta el día en que tú caminas sobre ella.',
+
+		'hide character hemiunu with fadeOut',
+		//'play sound sfx_pergamino',
+		'hide image overlay_letterbox with fadeOut',
+		'hide image overlay_grano with fadeOut',
+		'hide image overlay_vignette_sepia with fadeOut',
+		//'hide scene bg_narrador_piramide_giza with fadeOut',
+		'jump Escena29_Elcairo_Final'
+	],
+
+	'Escena29_Elcairo_Final': [
+		'show scene piramide_giza with fadeIn',
+		'narrator El desierto y el Nilo aún guardan secretos.',
+		'narrator La arena cubre los vestigios de civilizaciones que florecieron y cayeron.',
+		'narrator Entre estas dunas, el equipo busca pistas que conecten las maravillas del mundo antiguo con la octava luz.',
+		'narrator La historia es un río que fluye, y nosotros somos sus testigos.',
+		'narrator Cada piedra, cada inscripción, cada ruina tiene una historia que contar.',
+		'narrator Y nosotros estamos aquí para escucharla, para desenterrar los secretos que el tiempo ha querido ocultar.',
+		'narrator La búsqueda de la octava luz nos lleva a través de los vestigios de imperios que una vez dominaron el mundo.',
+		'narrator Desde las arenas de Egipto hasta las ruinas de Babilonia, seguimos el rastro de la historia y la cultura.',
+		'jump Escena29_Babilonia'
+	],
+
 	'Escena29_Babilonia': [
 		'show scene bg_babilonia with fadeIn',
-		'El calor del desierto envuelve a Babilonia como un velo antiguo.',
-		'El Éufrates serpentea silencioso, cargando siglos de historia.',
-		'Las ruinas se extienden como cicatrices de un imperio que ya no existe.',
-		'Aquí, donde los Jardines Colgantes pudieron haber florecido, el equipo busca respuestas.',
+		'narrator El calor del desierto envuelve a Babilonia como un velo antiguo.',
+		'narrator El Éufrates serpentea silencioso, cargando siglos de historia.',
+		'narrator Las ruinas se extienden como cicatrices de un imperio que ya no existe.',
+		'narrator Aquí, donde los Jardines Colgantes pudieron haber florecido, el equipo busca respuestas.',
 		'jump Escena_Narrador_JardinesColgantes'
 	],
 
@@ -3460,9 +3586,9 @@ monogatari.script({
 
 	'Escena29_Babilonia_Bienvenida': [
 		'show scene bg_babilonia with fadeIn',
+		'narrator El equipo es recibido por Layla, una arqueóloga local que ha dedicado su vida a estudiar la historia de Babilonia.',
 		'show character layla normal at center with fadeIn',
 		'layla Bienvenidos a Babilonia. Aquí, cada piedra tiene una historia... y cada silencio, un secreto.',
-
 		'show character gabriel normal at left with fadeIn',
 		'gabriel Buscamos símbolos helenísticos. Algo que conecte este lugar con la «octava luz».',
 		'jump Escena30_PuzzleJardin'
@@ -3486,13 +3612,10 @@ monogatari.script({
 
 		'tomas No puedo creer que lo hayamos logrado. Están completos otra vez, aunque sea en una pantalla.',
 		()=> addItem('jardines_reconstruidos'),
-
 		'El jugador reconstruye digitalmente los Jardines Colgantes.',
-
 		'[ACCIÓN DE INVENTARIO] Operas la Tablet de Escaneo y Modelado Arquitectónico 3D para alinear los bloques virtuales.',
 		'[EFECTO]: Encaja la terraza hidráulica con los frisos fragmentados.',
 		'Al completarlo, aparece el símbolo helenístico.',
-
 		'show character gabriel talk at left with fadeIn',
 		'gabriel El símbolo está en todas partes. Es un mapa. Un mapa hacia la octava luz.',
 
@@ -3551,11 +3674,15 @@ monogatari.script({
 		'layla Pero antes de ir al Vaticano, entonces deben ver esto.',
 		'show scene bg_hallazgo_babilonico with fadeIn',
 		'Layla guía al equipo hacia una estructura derruida.',
+		'show character layla normal at center with fadeIn',
 		'layla Los Jardines no desaparecieron por el tiempo. Hay registros de una intervención humana... cristiana.',
-
-		'show character isidora sorprendida at right with fadeIn',
-		'isidora ¿Cristiana? ¿Aquí?',
+		'show character gabriel worried at right with fadeIn',
+		'show character isidora sorprendida at left with fadeIn',
+		'isidora ¿Intervención cristiana en Babilonia? Eso es inesperado.',
 		'layla Sí. Los primeros cristianos destruyeron símbolos que consideraban idolátricos.',
+		'gabriel Debemos examinar los restos del palacio. Podría haber evidencia de esta intervención.',
+		'isidora Estoy de acuerdo. Debemos buscar cualquier indicio que nos lleve a la verdad.',
+		'isidora Si encontramos algo, podría cambiar nuestra comprensión de la historia de Babilonia y su relación con el cristianismo primitivo.',
 		'jump Escena31_Ruinas'
 	],
  
@@ -3592,21 +3719,15 @@ monogatari.script({
 		'Entre los restos del palacio, el jugador encuentra un sello de arcilla:',
 		'[ACCIÓN DE INVENTARIO] Aplicas la Lupa de luz UV de 365nm sobre la superficie de arcilla.',
 		'[EFECTO]: Revela trazos de pigmento vegetal oculto que confirman la datación del grabado de la cruz en el siglo IV d.C.',
-
-
 		'• Símbolo babilónico de fertilidad',
 		'• Superpuesto: una cruz cristiana primitiva',
 		'• Inscripción en griego arcaico: φῶς νότου («luz del sur»)',
-
 		'show character tomas talk at right with fadeIn',
 		'tomas Profesor... ¡la misma frase que en la piedra mapuche!',
-
 		'show character gabriel thought at left with fadeIn',
 		'gabriel Esto confirma que los cristianos primitivos estuvieron aquí. Y que dejaron mensajes vinculados a la octava luz.',
-
 		'show character layla normal at center with fadeIn',
 		'layla Mensajes que apuntan al sur del mundo.',
-
 		'TRANSICIÓN HACIA EL VATICANO: El equipo concluye: «Si los cristianos destruyeron las maravillas y dejaron símbolos, debemos ir al lugar donde se originó esa decisión.»',
 		'Ese lugar es el Vaticano, centro histórico del cristianismo.',
 
@@ -3711,17 +3832,17 @@ monogatari.script({
 	// -------------------------------------------------------------
 	'Escena32_Vaticano': [
 		'show scene bg_plaza_vaticano with fadeIn',
+		'narrator El equipo llega a la Ciudad del Vaticano, buscando respuestas.',
 		'show character gabriel talk at left with fadeIn',
 		'gabriel La Ciudad del Vaticano es un enclave de poder y misterio. Cada piedra parece susurrar secretos de siglos pasados.',
 		'show character isidora talk at right with fadeIn',
 		'isidora Debemos ser cautelosos. No todos los documentos están disponibles para el público.',
 		'show character tomas talk at center with fadeIn',
 		'tomas debemos ubicar al contacto de layla dentro del Vaticano que nos permita acceder a los archivos históricos.',
-
 		'show scene bg_vaticano with fadeIn',
 		'El Vaticano es un laberinto de mármol, silencio y secretos.',
 		'Los pasillos parecen observar a quienes los recorren.',
-		'Aquí, la historia fue escrita... y también borrada.',
+		'Aquí, la historia fue escrita... y también reescrita.',
 
 		async() => { 
 			if (!monogatari.storage('player').laberintoVaticano) { 
@@ -3735,17 +3856,12 @@ monogatari.script({
 		'show scene bg_documentos_vaticano with fadeIn',
 		'show character marcus normal at center with fadeIn',
 		'marcus Han venido buscando respuestas... pero algunas verdades deben permanecer ocultas.',
-
 		'show character gabriel talk at left with fadeIn',
 		'gabriel La historia no es propiedad de nadie.',
-
 		'marcus La historia es peligrosa cuando se revela sin control.',
-
 		'show character isidora talk at right with fadeIn',
 		'isidora ¿La Iglesia destruyó las maravillas?',
-
 		'marcus La Iglesia protegió al mundo de la idolatría.',
-
 		'El jugador decide presionar a Marcus por documentos antiguos.',
 		'[ACCIÓN DE INVENTARIO] Usas la Linterna Forense de Luz Incidente sobre los anaqueles del archivo.',
 		'[EFECTO]: Revela un compartimento secreto tras el lomo de un códice de decretos papales.',
@@ -3797,10 +3913,9 @@ monogatari.script({
 // -------------------------------------------------------------
 'Escena33_BibliotecaVaticana': [
 	'show scene bg_manuscrito with fadeIn',
-
+	'narrator El equipo accede a la Biblioteca Vaticana, donde se resguardan documentos antiguos y secretos.',
 	'show character marcus normal at center with fadeIn',
 	'marcus Está bien. Les abriré los anaqueles que nadie fuera de Roma ha visto. Pero lo que lean aquí no sale de estos muros.',
-
 	'show character gabriel talk at left with fadeIn',
 	'gabriel Cada maravilla tiene su historia, Marcus. Déjenos encontrarlas.',
 
@@ -3815,14 +3930,9 @@ monogatari.script({
 
 	'show character marcus normal at center with fadeIn',
 	'marcus Ahora ya lo saben. Seis maravillas, seis silencios distintos: obispos, incendios, saqueos, invasores, terremotos.',
-
 	'show character isidora talk at right with fadeIn',
 	'isidora ¿Y la séptima? La Gran Pirámide sigue en pie.',
-
 	'marcus Por eso mismo. Lo que resiste incomoda más que lo que desaparece.',
-
-
-
 	'jump Escena33_DocumentosVaticano'
 ],
 
@@ -3831,7 +3941,7 @@ monogatari.script({
 	// -------------------------------------------------------------
 	'Escena33_DocumentosVaticano': [
 		'show scene bg_manuscrito with fadeIn',
-		'Marcus revela documentos que explican:',
+		'narrator Marcus revela documentos que explican:',
 		'• La Estatua de Zeus fue destruida por obispos locales.',
 		'• El Templo de Artemisa fue quemado por cristianos.',
 		'• El Coloso fue desmantelado y vendido como metal.',
@@ -3843,7 +3953,6 @@ monogatari.script({
 
 		'[ACCIÓN DE INVENTARIO] Utilizas la Cámara Fotográfica Multiespectral para capturar el pergamino raspado.',
 		'[EFECTO]: Desvela el texto palimpsesto subyacente escrito en latín eclesiástico.',
-
 		'TRANSICIÓN HACIA SIRIA',
 		'marcus Algunos textos fueron enviados a Siria para ser copiados y preservados. Si buscan fragmentos de los libros perdidos... deben ir allí.',
 		'El equipo concluye: «Siria contiene fragmentos que explican el viaje hacia la octava luz.»',
@@ -3873,19 +3982,19 @@ monogatari.script({
 
 	'Escena33_CopiaDigital': [
 		'Almacenas los datos en el servidor seguro cifrado de la expedición.',
-		'show storage decision_33 1',
+		//'show storage decision_33 1',
 		'jump Escena34_ObjetoOcultoVaticano'
 	],
 
 	'Escena33_Cuestionar': [
 		'marcus Porque la octava luz no era un ídolo, sino un repositorio primigenio de fe y ciencia.',
-		'show storage decision_33 2',
+		//'show storage decision_33 2',
 		'jump Escena34_ObjetoOcultoVaticano'
 	],
 
 	'Escena33_ExigirLista': [
 		'marcus Los envíos fueron dirigidos al Archivo de Diodoro Sículo en territorio sirio.',
-		'show storage decision_33 3',
+		//'show storage decision_33 3',
 		'jump Escena34_ObjetoOcultoVaticano'
 	],
 
@@ -3894,21 +4003,22 @@ monogatari.script({
 	// -------------------------------------------------------------
 	'Escena34_ObjetoOcultoVaticano': [
 
+		'narrator Entre los documentos, el jugador encuentra un manuscrito del siglo IV que menciona la octava luz.',
+		'narrator El manuscrito contiene información sobre la ubicación de la octava luz.',
+		'narrator El manuscrito es un pergamino antiguo, con inscripciones en latín y griego, que detalla la historia de las maravillas del mundo y su destrucción.',
 		'show character gabriel talk at left with fadeIn',
 		'gabriel Pero hay algo más en estos documentos. Un texto distinto a los demás...',
 		'marcus Eso... no debería estar ahí.',
-		'show scene bg_manuscrito with fadeIn',
+		//'show scene bg_manuscrito with fadeIn',
 		'El manuscrito menciona:',
 		'• «Las montañas del fin del mundo»',
 		'• «Guardianes del sur»',
 		'• «La octava luz»',
-
 		'[ACCIÓN DE INVENTARIO] Te colocas los Guantes Químicamente Neutros de Nitrilo para desplegar el documento sin degradarlo.',
 		'[EFECTO]: Permite la apertura del folio pergaminado de casi dos milenios sin causar daño destructivo.',
 		() => addItem('manuscrito_vaticano'),
 		'show character gabriel talk at left with fadeIn',
 		'gabriel Es Chile. Es la Patagonia.',
-
 		'show character marcus nervous at center with fadeIn',
 		'marcus No deberían haber encontrado eso.',
 
@@ -3937,19 +4047,19 @@ monogatari.script({
 
 	'Escena34_Confrontar': [
 		'marcus No fue ocultamiento por malicia, sino un pacto para evitar que la luz fuera profanada.',
-		'show storage decision_34 1',
+		//'show storage decision_34 1',
 		'jump Escena35_SiriaArchivo'
 	],
 
 	'Escena34_Tinta': [
 		'El análisis arrojó trazas minerales de hematita idénticas a las cuevas patagónicas.',
-		'show storage decision_34 2',
+		//'show storage decision_34 2',
 		'jump Escena35_SiriaArchivo'
 	],
 
 	'Escena34_Partida': [
 		'Recoges tus instrumentos y te organizas con el equipo para dejar Roma inmediatamente.',
-		'show storage decision_34 3',
+		//'show storage decision_34 3',
 		'jump Escena35_SiriaArchivo'
 	],
 
@@ -3959,39 +4069,19 @@ monogatari.script({
 	'Escena35_SiriaArchivo': [
 		'show scene bg_siria_archivo with fadeIn',
 		'En Siria, entre ruinas y edificios modernos, se encuentra un archivo que guarda fragmentos de textos antiguos.',
+		'narrator El equipo se prepara para explorar el Archivo de Diodoro Sículo, donde esperan encontrar fragmentos que revelen más sobre la octava luz.',
 		'Layla Nasser se une nuevamente al equipo.',
-
+		'narrator Layla esta trabajando en la catalogación de los fragmentos y les ofrece su ayuda.',
 		'show character layla normal at center with fadeIn',
 		'layla Aquí guardamos fragmentos de Diodoro Sículo. Algunos... nunca fueron catalogados.',
 		'layla Uno de estos, representa un grabado de la gran piramide Giza',
+		'layla Si lo deseas, puedes tomarlo para tu colección de hallazgos.',
+		'layla Pero recuerda, no todos los fragmentos están a la vista. Algunos requieren investigación y paciencia.',
+		'layla ¿Deseas tomar el grabado de la pirámide de Giza?',
+		'gabriel Es un hallazgo valioso. Podría ofrecer pistas sobre la octava luz.',
 		() => addItem('grabado_piramide_giza'),	
-		'jump Escena_Narrador_Piramide'
+		'jump Escena35_Archivos'
 	],
-
-'Escena_Narrador_Piramide': [
-    'show scene bg_narrador_piramide_giza with fadeIn',
-    'show image overlay_vignette_sepia with fadeIn',
-    'show image overlay_grano with fadeIn',
-    'show image overlay_letterbox with fadeIn',
-    //'play sound sfx_pergamino',
-    //'play sound sfx_viento_desierto',
-
-    'show character hemiunu normal at center with fadeIn',
-    'hemiunu Yo soy Hemiunu, visir y arquitecto real de Su Majestad Keops, cuarto faraón de la cuarta dinastía.',
-    'hemiunu Bajo mis órdenes se alzaron los bloques de piedra caliza que hoy contemplas en Guiza.',
-    'hemiunu La obra comenzó hacia el año 2560 antes de tu era, y en apenas veinte años movimos más de dos millones de bloques, traídos de canteras cercanas y de Asuán, río abajo.',
-    'hemiunu Construimos esta tumba en honor al propio faraón Keops, para asegurar su ascenso eterno junto a Ra, dios del sol.',
-    'hemiunu A diferencia de sus hermanas de Babilonia, Rodas o Éfeso, esta maravilla nunca conoció la destrucción.',
-    'hemiunu Ha resistido más de cuatro mil quinientos años de arena, de guerra y de olvido, y sigue en pie hasta el día en que tú caminas sobre ella.',
-
-    'hide character hemiunu with fadeOut',
-    //'play sound sfx_pergamino',
-    'hide image overlay_letterbox with fadeOut',
-    'hide image overlay_grano with fadeOut',
-    'hide image overlay_vignette_sepia with fadeOut',
-    //'hide scene bg_narrador_piramide_giza with fadeOut',
-    'jump Escena35_Archivos'
-],
 
 	'Escena35_Archivos': [
 		'show scene bg_siria_archivo with fadeIn',
@@ -3999,12 +4089,9 @@ monogatari.script({
 		'gabriel ¿Tienes los libros perdidos de Diodoro Sículo?',
 		'show character layla normal at center with fadeIn',
 		'layla Fragmentos. Pero suficientes para entender su contenido.',
-
 		() => addItem('fragmento_diodoro'),
-
 		'[ACCIÓN DE INVENTARIO] Utilizas el Escáner Óptico de Micro-Papiro para leer los papiros carbonizados.',
 		'[EFECTO]: Recoge las capas de tinta de carbón recuperando la caligrafía sepultada.',
-
 		'TRANSICIÓN HACIA SIDÓN: Uno de los fragmentos menciona: «Antípatro escribió sobre la luz que guía a las siete.»',
 		'El equipo concluye: «Si Antípatro escribió sobre la octava luz, debemos ir a su ciudad natal.»',
 
@@ -4033,19 +4120,19 @@ monogatari.script({
 
 	'Escena35_Antipatro': [
 		'Descubres referencias a los viajes secretos del poeta más allá del mar conocido.',
-		'show storage decision_35 1',
+	    //'show storage decision_35 1',
 		'jump Escena36_SaqueoSiria'
 	],
 
 	'Escena35_Catalogo': [
 		'layla Gracias por la ayuda, archivaremos esto en servidores seguros fuera del país.',
-		'show storage decision_35 2',
+		//'show storage decision_35 2',
 		'jump Escena36_SaqueoSiria'
 	],
 
 	'Escena35_Rutas': [
 		'Los textos confirman naves preparadas para travesías oceánicas de larga duración.',
-		'show storage decision_35 3',
+		//'show storage decision_35 3',
 		'jump Escena36_SaqueoSiria'
 	],
 
@@ -4095,19 +4182,19 @@ monogatari.script({
 
 	'Escena36_ProtegerMaletin': [
 		'Logras resguardar todo el material digitalizado e impreso sin bajas ni pérdidas.',
-		'show storage decision_36 1',
+		//'show storage decision_36 1',
 		'jump Escena36_Salida'
 	],
 
 	'Escena36_Bloquear': [
 		'Ganas valiosos minutos mientras los agresores intentan despejar la entrada.',
-		'show storage decision_36 2',
+		//'show storage decision_36 2',
 		'jump Escena36_Salida'
 	],
 
 	'Escena36_Subterrano': [
 		'El paso subterráneo los conduce de forma segura hacia el vehículo de evacuación.',
-		'show storage decision_36 3',
+		//'show storage decision_36 3',
 		'jump Escena36_Salida'
 	],
 
