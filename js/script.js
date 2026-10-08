@@ -658,6 +658,7 @@ function hideHotspot(item) {
 function hideAllHotspots() {
     Array.from(hotspotsAbiertos).forEach(hideHotspot);
 	quitarTodasLasImagenes();
+	limpiarCombosObjeto();
 }
 
 /* ===== Imágenes sobre la grilla de hotspots (5x5) ===== */
@@ -1591,7 +1592,7 @@ monogatari.script({
         showInventoryBar();
     },
 
-     'jump Capitulo1'
+     'jump Escena1_QuintaNormal'
     ],
 
 /* =====================================================
@@ -1599,12 +1600,7 @@ monogatari.script({
    Versión ampliada — Listo para pegar en script.js
 ===================================================== */
 
-	'Capitulo1': [
-		'show scene negro with fadeIn duration 1s',
-		//'play sound capitulo1 with loop fade 2',
-		'centered <h1>Capítulo I</h1><p>El Origen Oculto</p>',
-		'jump Escena1_QuintaNormal'   // primera escena real del capítulo
-	],
+
 
 // -------------------------------------------------------------------------
 	// ESCENA 1 — Museo Nacional de Historia Natural (Santiago)
@@ -1669,11 +1665,11 @@ monogatari.script({
 
 	'Escena1_Tomar': [
 		'show scene museo_sala_precolombina_vitrina_abierta with fadeIn',
-		() => UsarObjeto('vitrina','panuelo','jump Escena1_Decidir'),
+		() => UsarObjeto('vitrina','panuelo','jump Escena1_Piedra'),
 		'narrator Necesitas la piedra de Ngenechén. La vitrina está abierta.'
 	],	
 
-	'Escena1_Decidir': [
+	'Escena1_Piedra': [
 		'show scene museo_sala_precolombina_sin_piedra with fadeIn',
 		() => hideAllHotspots(),
 		() => addItem('piedra_ngenechen'),
@@ -1681,7 +1677,11 @@ monogatari.script({
         //() => stopIconFollow(),
 		'narrator Toma la piedra de Ngenechén.',
 		'[EFECTO]: Desarma los sellos de seguridad y permite deslizar el cristal sin activar la alarma del museo.',
+		'jump Escena1_Decidir'
+	],
 
+	'Escena1_Decidir': [
+		'show scene museo_sala_precolombina_sin_piedra with fadeIn',
 		// Decisiones del jugador
 		() => monogatari.setting('AllowRollback', false),
 		{
@@ -1712,7 +1712,13 @@ monogatari.script({
 		'show storage Dato_Microescritura true',
         () => addItem('escritura'),
 		'[DATO AÑADIDO]: Microescritura Arcaica registrada en el diario.',
-		'jump Escena2_Usach'
+		() => {
+			if (hasItem('reactivo_acido')) {
+			monogatari.run('jump Escena4_Decision');
+			} else {
+			monogatari.run('jump Capitulo1');
+			}
+		},
 	],
 
 	'Escena1_Origen': [
@@ -1720,7 +1726,13 @@ monogatari.script({
 		'show storage Coordenadas_Aysen true',
         () => addItem('fichas_cartograficas'),
 		'[INFORMACIÓN DESBLOQUEADA]: Antecedentes de excavaciones históricas y coordenadas de Aysén.',
-		'jump Escena2_Usach'
+		() => {
+			if (hasItem('reactivo_acido')) {
+			monogatari.run('jump Escena4_Decision');
+			} else {
+			monogatari.run('jump Capitulo1');
+			}
+		},
 	],
 
 	'Escena1_Notas': [
@@ -1728,7 +1740,20 @@ monogatari.script({
 		'show storage Objeto_Libreta true',
         () => addItem('diagrama_espiral'),
 		'[OBJETO OBTENIDO]: Libreta con Diagrama de Espiral (+Precisión en puzles posteriores).',
-		'jump Escena2_Usach'
+		() => {
+			if (hasItem('reactivo_acido')) {
+			monogatari.run('jump Escena4_Decision');
+			} else {
+			monogatari.run('jump Capitulo1');
+			}
+		},
+	],
+
+	'Capitulo1': [
+		'show scene negro with fadeIn duration 1s',
+		//'play sound capitulo1 with loop fade 2',
+		'centered <h1>Capítulo I</h1><p>El Origen Oculto</p>',
+		'jump Escena2_Usach'   // primera escena real del capítulo
 	],
 
 	// -------------------------------------------------------------------------
@@ -1745,7 +1770,6 @@ monogatari.script({
 	'Escena2_AulaMagna': [
 		'show scene bg_usach_aula_magna with fadeIn',
 		'show character gabriel normal at left with fadeIn',
-
 		// Interacción con Objeto
 		'[INTERACCIÓN DE INVENTARIO]',
 		'Objeto en escena: Proyector de Diapositivas de Alta Definición.',
@@ -1761,7 +1785,11 @@ monogatari.script({
 		'gabriel (Lo mira fijamente) Entonces tendríamos que encontrarlos. Y asumir la responsabilidad de lo que revelen.',
 		'show character gabriel pensativo at left with fadeIn',
 		'show character tomas normal at right with fadeIn',
+		'jump Escena2_Decidir'
+	],
 
+	'Escena2_Decidir': [
+		'show scene bg_usach_aula_magna with fadeIn',
 		() => monogatari.setting('AllowRollback', false),
 		{
 			'Choice': {
@@ -1788,7 +1816,13 @@ monogatari.script({
 	'Escena2_Cautela': [
 		'gabriel Debemos mantener el rigor científico y no especular sin pruebas contundentes.',
 		'Mantiene la tensión institucional, pero Tomás se muestra más reservado.',
-		'jump Escena3_Laboratorio'
+		() => {
+			if (hasItem('reactivo_acido')) {
+			monogatari.run('jump Escena4_Decision');
+			} else {
+			monogatari.run('jump Escena3_Laboratorio');
+			}
+		},
 	],
 
 	'Escena2_Confesar': [
@@ -1797,13 +1831,25 @@ monogatari.script({
 		'tomas ¡Cuente con mi apoyo absoluto para investigar lo que sea necesario, profesor!',
 		() => addItem('contacto_tomas'),
 		'[RESULTADO]: Tomás gana confianza total en Gabriel y se ofrece como asistente personal de la travesía.',
-		'jump Escena3_Laboratorio'
+		() => {
+			if (hasItem('reactivo_acido')) {
+			monogatari.run('jump Escena4_Decision');
+			} else {
+			monogatari.run('jump Escena3_Laboratorio');
+			}
+		},
 	],
 
 	'Escena2_Ignorar': [
 		'gabriel Esa pregunta está fuera del programa de la asignatura. Sigamos.',
 		'Tomás se frustra, pero no pierde su entusiasmo.',
-		'jump Escena3_Laboratorio'
+		() => {
+			if (hasItem('reactivo_acido')) {
+			monogatari.run('jump Escena4_Decision');
+			} else {
+			monogatari.run('jump Escena3_Laboratorio');
+			}
+		},
 	],
 
 	// -------------------------------------------------------------------------
@@ -1857,20 +1903,29 @@ monogatari.script({
 	],
 
 	'Escena3_Laboratorio_piedra_lampara': [
-		'show scene laboratorio with fadeIn',
+		'show scene laboratorio',
 		() => limpiarCombosObjeto(),
 		() => UsarObjetoSobreObjeto('piedra_ngenechen','reactivo_acido','No pasa nada, necesitas la lámpara UV.'),
-			   () => UsarObjetoSobreObjeto('piedra_ngenechen','lampara_uv','jump Escena3_Laboratorio_piedra_decision'),
+		() => UsarObjetoSobreObjeto('piedra_ngenechen','lampara_uv','jump Escena3_Laboratorio_piedra_mensaje'),
 		'narrator Necesitas descubir el mensaje oculto.'
 	],
 
-	'Escena3_Laboratorio_piedra_decision': [
+	'Escena3_Laboratorio_piedra_mensaje': [
 		'show scene laboratorio_escaneo with fadeIn',
-		'[EFECTO]: Revela en fluorescencia verdosa las letras griegas ocultas: "φῶς νότου" (Luz del Sur).',
+		() => hideAllHotspots(),
+		() => limpiarCombosObjeto(),
+		'[EFECTO]: Revela en fluorescencia verdosa las letras griegas ocultas bajo la pátina volcánica de la piedra.',
+		'narrator El mensaje oculto en la piedra de Ngenechén es un enigma que combina símbolos mapuches y caracteres griegos arcaicos, sugiriendo un contacto cultural inesperado.',
+		'narrator Gabriel y Lucía deben decidir el siguiente paso en su investigación para descifrar el significado completo del mensaje y su implicancia histórica.',
+		'narrator La decisión que tomen afectará la dirección de su investigación y las posibles colaboraciones internacionales.',
+		'jump Escena3_Laboratorio_piedra_decision'
+	],
+	'Escena3_Laboratorio_piedra_decision': [
+		'show scene laboratorio_escaneo',
 		() => monogatari.setting('AllowRollback', false),
 		{
 			'Choice': {
-				'Dialog': 'lucia ¿Qué procedimiento técnico debemos aplicar a continuación?',
+				'Dialog': 'lucia ¿Qué acciones debemos aplicar a continuación?',
 				'Opcion_Espectral': {
 					'onChosen': () => monogatari.setting('AllowRollback', true),
 					'Text': 'Solicitar un análisis espectral mineral de la roca',
@@ -1931,7 +1986,7 @@ monogatari.script({
 	// ESCENA 4 — Laboratorio de Análisis Digital y Escaneo 3D, USACH
 	// -------------------------------------------------------------------------
 	'Escena4_LabEscaneo': [
-		'show scene laboratorio_escaneo with fadeIn',
+		'show scene laboratorio_escaneo',
 		() => showInventoryBar(),
 		//'show character gabriel normal at left with fadeIn',
 		//'show character lucia concentrada at center with fadeIn',
@@ -1994,7 +2049,7 @@ monogatari.script({
 			if (!hasItem('contacto_tomas')) {
 				choice.Choice.Opcion_Clases = {
 					'Text': 'Volver con Tomas, necesitamos su apoyo para el viaje',
-					'Do': 'jump Escena2_AulaMagna',
+					'Do': 'jump Escena2_Decidir',
 					'onChosen': () => monogatari.setting('AllowRollback', true)
 				};
 			}
@@ -3940,7 +3995,6 @@ monogatari.script({
 	// ESCENA 33: Documentos del siglo IV
 	// -------------------------------------------------------------
 	'Escena33_DocumentosVaticano': [
-		'show scene bg_manuscrito with fadeIn',
 		'narrator Marcus revela documentos que explican:',
 		'• La Estatua de Zeus fue destruida por obispos locales.',
 		'• El Templo de Artemisa fue quemado por cristianos.',
@@ -4002,7 +4056,6 @@ monogatari.script({
 	// ESCENA 34: Objeto oculto - Manuscrito del siglo IV
 	// -------------------------------------------------------------
 	'Escena34_ObjetoOcultoVaticano': [
-
 		'narrator Entre los documentos, el jugador encuentra un manuscrito del siglo IV que menciona la octava luz.',
 		'narrator El manuscrito contiene información sobre la ubicación de la octava luz.',
 		'narrator El manuscrito es un pergamino antiguo, con inscripciones en latín y griego, que detalla la historia de las maravillas del mundo y su destrucción.',
