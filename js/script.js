@@ -868,7 +868,8 @@ monogatari.assets ('gallery', {
 
 // Define the music used in the game.
 monogatari.assets ('music', {
-	'sting_inicio_capitulo': 'sting_inicio_capitulo.ogg'
+	'tema_principal': 'tema_principal.mp3',
+	'creditos': 'creditos.ogg'
 });
 
 // Define the voice files used in the game.
@@ -878,25 +879,9 @@ monogatari.assets ('voices', {
 
 // Define the sounds used in the game.
 monogatari.assets ('sounds', {
-
-    'ambience_museum': 'ambience_museum.ogg',
-    'ambience_university': 'ambience_university.ogg',
-    'ambience_lab': 'ambience_lab.ogg',
-    'ambience_airport': 'ambience_airport.ogg',
-    'wind_soft': 'wind_soft.ogg',
-    'wind_strong': 'wind_strong.ogg',
-    'glacier_echo': 'glacier_echo.ogg',
-    'cave_echo': 'cave_echo.ogg',
-    'fire_crackle': 'fire_crackle.ogg',
-    'rocks_falling': 'rocks_falling.ogg',
-    'low_vibration': 'low_vibration.ogg',
-    // Minijuego Guardianes
-    'eco': 'eco.ogg',
-	'capitulo1': 'sting_inicio_capitulo.ogg',
-    'viento': 'viento.ogg',
-    'vibracion': 'vibracion.ogg',
+	'sting_inicio_capitulo': 'sting_inicio_capitulo.ogg',
+	'sting_final_capitulo': 'sting_final_capitulo.ogg',
 	// Las 7 maravillas
-
 	'sfx_pergamino': 'sfx_pergamino.ogg',
 	'sfx_viento_desierto': 'sfx_viento_desierto.ogg',
 	'sfx_agua_norias': 'sfx_agua_norias.ogg',
@@ -1610,7 +1595,7 @@ monogatari.script({
 	// -------------------------------------------------------------------------
 	'Escena1_QuintaNormal': [
 		'show scene quinta_normal with fadeIn',
-        //'play sound sfx_viento_desierto with loop fade 4',
+        'play music tema_principal with loop fade 4',
 		'La Quinta Normal, ubicada en Santiago, nació en el siglo XIX como un espacio dedicado a la experimentación agrícola y la educación pública. Con el tiempo se transformó en uno de los parques más emblemáticos de la ciudad, albergando instituciones culturales clave.',
 		'show scene museo_historico_nacional with fadeIn',
 		'Su edificio más destacado es el Museo Nacional de Historia Natural, fundado en 1830, uno de los más antiguos de América Latina. Este museo ha sido fundamental para la investigación científica y la divulgación del patrimonio natural chileno, convirtiéndose en un símbolo histórico dentro del parque y en un referente cultural para generaciones de visitantes.',
@@ -1755,9 +1740,10 @@ monogatari.script({
 
 	'Capitulo1': [
 		'show scene negro with fadeIn duration 1s',
-		'play music sting_inicio_capitulo with loop volume 60 fade 3',
+		'play sound sting_inicio_capitulo with loop fade 3',
 		//'play music sting_inicio_capitulo with loop fade 2',
 		'centered <h1>Capítulo I</h1><p>El Origen Oculto</p>',
+		'stop sound sting_inicio_capitulo with fade 3',
 		'jump Escena2_Usach'   // primera escena real del capítulo
 	],
 
@@ -1766,7 +1752,7 @@ monogatari.script({
 	// -------------------------------------------------------------------------
 	'Escena2_Usach': [
 		'show scene usach with fadeIn',
-		'stop music sting_inicio_capitulo with fade 3',
+
 		'La USACH vibra con vida académica. En el Aula Magna, los murales históricos observan desde las paredes.',
 		'Estudiantes conversan, laptops abiertas, cuadernos llenos de anotaciones.',
 		'Gabriel prepara una clase que, sin saberlo, será el inicio de una aventura global.',
@@ -2369,13 +2355,15 @@ monogatari.script({
 	],
 
 	'Capitulo2': [
-		'stop music with fade 3',
+		'play sound sting_fin_capitulo with loop fade 3',
 		'show scene negro with fadeIn duration 2s',
 		'centered <h1>Fin del Capítulo I</h1><p>El Origen Oculto</p>',
 		'wait 1500',
+		'stop sound sting_fin_capitulo with fade 3',
+		'play sound sting_inicio_capitulo with loop fade 3',
 		'show scene negro with fadeIn duration 1s',
 		'centered <h1>Capítulo II</h1><p>El Eco del Mediterraneo</p>',
-		//'play music capitulo1 with loop fade 2',
+		'stop sound sting_inicio_capitulo with fade 3',
 		'jump Escena13'   
 	],
 
@@ -3539,14 +3527,16 @@ monogatari.script({
 	],
 
 	'Capitulo3': [
-		'stop music with fade 3',
+		'play sound sting_fin_capitulo with loop fade 3',
 		'show scene negro with fadeIn duration 2s',
 		'centered <h1>Fin del Capítulo II</h1><p>El Eco del Mediterraneo</p>',
 		'wait 1500',
+		'stop sound sting_fin_capitulo with fade 3',
+		'play sound sting_inicio_capitulo with loop fade 3',
 		'show scene negro with fadeIn duration 1s',
 		'centered <h1>Capítulo III</h1><p>Sombras del Imperio</p>',
-		//'play music capitulo1 with loop fade 2',
-			   'jump Escena29_Elcairo'
+		'stop sound sting_inicio_capitulo with fade 3',
+		'jump Escena29_Elcairo'
 	],
 
 // -------------------------------------------------------------
@@ -4560,13 +4550,15 @@ monogatari.script({
    ============================================================ */
 
    	'Capitulo4': [
-		'stop music with fade 3',
+		'play sound sting_fin_capitulo with loop fade 3',
 		'show scene negro with fadeIn duration 2s',
 		'centered <h1>Fin del Capítulo III</h1><p>Sombras del Imperio</p>',
 		'wait 1500',
+		'stop sound sting_fin_capitulo with fade 3',
+		'play sound sting_inicio_capitulo with loop fade 3',
 		'show scene negro with fadeIn duration 1s',
 		'centered <h1>Capítulo IV</h1><p>La Octava Luz</p>',
-		//'play music capitulo1 with loop fade 2',
+		'stop sound sting_inicio_capitulo with fade 3',
 		'jump Escena41'   
 	],
 
@@ -5325,9 +5317,9 @@ monogatari.script({
 	],
 
 	'Creditos': [
-		'stop music with fade 3',
+		'stop music tema_principal with fade 3',
 		'show scene negro with fadeIn duration 2s',
-		//'play music creditos with loop fade 2',
+		'play music creditos with loop fade 2',
 		'centered <h2>Maravillas de la Antigüedad</h2>',
 		'wait 3000',
 		'centered <h3>Guion y diseño</h3><p>Cortecom</p>',
@@ -5336,6 +5328,7 @@ monogatari.script({
 		'wait 3000',
 		'centered <h3>Gracias por jugar</h3>',
 		'wait 3000',
+		'stop music creditos with fade 2',
 		'end'     // termina la partida y vuelve al menú principal
 	]
 
