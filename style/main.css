@@ -17,6 +17,11 @@
  * ===========================
 **/
 
+/* Fondo de la pantalla de inicio (estilo nativo) */
+main-screen {
+	background: url('../assets/scenes/portada.png') center / cover no-repeat;
+}
+
 /* General Style */
 body {
 
