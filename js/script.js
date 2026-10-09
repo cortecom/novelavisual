@@ -8,6 +8,7 @@ function addItem(item) {
             inv.push(item);
             monogatari.storage('player').inventory = inv;
             updateInventoryIcons();
+			showInventoryBar();
         }
     } catch (e) {
         // Si esto lanza una excepción sin atrapar, Monogatari deja el flag
@@ -28,6 +29,7 @@ function removeItem(item) {
         monogatari.storage('player').selectedItem = null;
     }
     updateInventoryIcons();
+	showInventoryBar();
 }
 
 // Verificar si el jugador tiene un objeto
@@ -866,7 +868,7 @@ monogatari.assets ('gallery', {
 
 // Define the music used in the game.
 monogatari.assets ('music', {
-
+	'sting_inicio_capitulo': 'sting_inicio_capitulo.ogg'
 });
 
 // Define the voice files used in the game.
@@ -894,6 +896,7 @@ monogatari.assets ('sounds', {
     'viento': 'viento.ogg',
     'vibracion': 'vibracion.ogg',
 	// Las 7 maravillas
+
 	'sfx_pergamino': 'sfx_pergamino.ogg',
 	'sfx_viento_desierto': 'sfx_viento_desierto.ogg',
 	'sfx_agua_norias': 'sfx_agua_norias.ogg',
@@ -1515,6 +1518,7 @@ function UsarObjeto(item, objeto, exito, fracaso) {
 		if (selectedItem === objeto) {
 			hideHotspot(item);
 			stopIconFollow();
+			removeItem(objeto);
 			monogatari.run(exito);
 		} else {
 			if (fracaso) {
@@ -1568,7 +1572,6 @@ function usarObjetoSobreObjeto(destino) {
         if (combo.nuevaDescripcion && itemIcons[destino]) {
             itemIcons[destino].description = combo.nuevaDescripcion;
         }
- 
         monogatari.run(combo.salto);
     });
  
@@ -1592,7 +1595,7 @@ monogatari.script({
         showInventoryBar();
     },
 
-     'jump Escena1_QuintaNormal'
+     'jump Escena15'
     ],
 
 /* =====================================================
@@ -1607,6 +1610,7 @@ monogatari.script({
 	// -------------------------------------------------------------------------
 	'Escena1_QuintaNormal': [
 		'show scene quinta_normal with fadeIn',
+        'play sound sfx_viento_desierto with loop fade 4',
 		'La Quinta Normal, ubicada en Santiago, nació en el siglo XIX como un espacio dedicado a la experimentación agrícola y la educación pública. Con el tiempo se transformó en uno de los parques más emblemáticos de la ciudad, albergando instituciones culturales clave.',
 		'show scene museo_historico_nacional with fadeIn',
 		'Su edificio más destacado es el Museo Nacional de Historia Natural, fundado en 1830, uno de los más antiguos de América Latina. Este museo ha sido fundamental para la investigación científica y la divulgación del patrimonio natural chileno, convirtiéndose en un símbolo histórico dentro del parque y en un referente cultural para generaciones de visitantes.',
@@ -1751,7 +1755,8 @@ monogatari.script({
 
 	'Capitulo1': [
 		'show scene negro with fadeIn duration 1s',
-		//'play sound capitulo1 with loop fade 2',
+		'play music sting_inicio_capitulo with loop volume 60 fade 3',
+		//'play music sting_inicio_capitulo with loop fade 2',
 		'centered <h1>Capítulo I</h1><p>El Origen Oculto</p>',
 		'jump Escena2_Usach'   // primera escena real del capítulo
 	],
@@ -1761,6 +1766,7 @@ monogatari.script({
 	// -------------------------------------------------------------------------
 	'Escena2_Usach': [
 		'show scene usach with fadeIn',
+		'stop music sting_inicio_capitulo with fade 3',
 		'La USACH vibra con vida académica. En el Aula Magna, los murales históricos observan desde las paredes.',
 		'Estudiantes conversan, laptops abiertas, cuadernos llenos de anotaciones.',
 		'Gabriel prepara una clase que, sin saberlo, será el inicio de una aventura global.',
@@ -1896,7 +1902,6 @@ monogatari.script({
 		() => TomarObjeto('lampara_uv'),
 		() => ImagenEnHotspot('lampara_uv', { escala: 0.2 }),
 		() => UsarObjetoSobreObjeto('piedra_ngenechen','reactivo_acido','jump Escena3_Laboratorio_piedra_lampara','Piedra de Ngenechén con reactivo de luminol aplicado'),
-		() => UsarObjetoSobreObjeto('piedra_ngenechen','lampara_uv','No pasa nada. Necesitas aplicar primero el reactivo de luminol.'),
 		() => VerObjeto('planetario'),
 		() => VerObjeto('escaner'),
 		'narrator Necesitas descubir el mensaje oculto.'
@@ -1904,8 +1909,6 @@ monogatari.script({
 
 	'Escena3_Laboratorio_piedra_lampara': [
 		'show scene laboratorio',
-		() => limpiarCombosObjeto(),
-		() => UsarObjetoSobreObjeto('piedra_ngenechen','reactivo_acido','No pasa nada, necesitas la lámpara UV.'),
 		() => UsarObjetoSobreObjeto('piedra_ngenechen','lampara_uv','jump Escena3_Laboratorio_piedra_mensaje'),
 		'narrator Necesitas descubir el mensaje oculto.'
 	],
@@ -1913,7 +1916,6 @@ monogatari.script({
 	'Escena3_Laboratorio_piedra_mensaje': [
 		'show scene laboratorio_escaneo with fadeIn',
 		() => hideAllHotspots(),
-		() => limpiarCombosObjeto(),
 		'[EFECTO]: Revela en fluorescencia verdosa las letras griegas ocultas bajo la pátina volcánica de la piedra.',
 		'narrator El mensaje oculto en la piedra de Ngenechén es un enigma que combina símbolos mapuches y caracteres griegos arcaicos, sugiriendo un contacto cultural inesperado.',
 		'narrator Gabriel y Lucía deben decidir el siguiente paso en su investigación para descifrar el significado completo del mensaje y su implicancia histórica.',
@@ -2008,6 +2010,7 @@ monogatari.script({
 	'Escena4_Traduccion': [
 		'show scene laboratorio_escaneo with fadeIn',
 		() => hideAllHotspots(),
+		() => addItem('piedra_ngenechen'),
 		() => addItem('escritura_antigua'),
 		'narrator Los monitores del supercomputador muestran la nube de puntos tridimensional de la piedra.',
 		'narrator El láser azul recorre los surcos, digitalizando cada micra de la superficie volcánica.',
@@ -2086,7 +2089,7 @@ monogatari.script({
 		// Libreta con Diagrama de Espiral para corregir el rumbo justo antes de
 		// llegar a la cascada congelada (línea de narración ambiental integrada
 		// en la propia etapa, sin interacción de inventario aparte).
-
+		() => hideInventoryBar(),
 		async() => { 
 			if (!monogatari.storage('player').ruta7Race) { 
 				monogatari.distractionFree();
@@ -2260,10 +2263,7 @@ monogatari.script({
 	'Escena11_DecisionEstrategica': [
 		'show scene mapa_estrategico with fadeIn',
 		'show character gabriel serio at left with fadeIn',
-
 		'gabriel Hemos cruzado el punto de no retorno. Lo que descubrimos en la cueva confirma que la historia oficial está incompleta. Ahora debemos decidir dónde dar el primer paso en el extranjero.',
-
-
 		() => monogatari.setting('AllowRollback', false),
 		() => {
 			const choice = {
@@ -2379,7 +2379,7 @@ monogatari.script({
 		'jump Escena13'   
 	],
 
-'Escena13': [
+	'Escena13': [
 		'show scene atenas_atardecer with fadeIn',
 		'narrator Atenas recibe al equipo con un atardecer dorado. El Partenón se recorta contra el cielo como un recordatorio de la grandeza antigua. Las calles vibran con vida: cafés, turistas, estudiantes, arqueólogos. Pero para Gabriel, Atenas no es un destino turístico. Es el primer paso para entender por qué una piedra mapuche contiene símbolos helenísticos.',
 		'narrator La aventura en Europa comienza aquí. Sin saber a dónde la lleva el destino...',
@@ -2410,7 +2410,6 @@ monogatari.script({
 
 		'show character helena asombrada at right',
 		'helena (Se queda en silencio) Este símbolo... aparece en un único relieve del Mausoleo. Y en un poema de Antípatro de Sidón que casi nadie conoce.',
-
 		'show character tomas entusiasmado at center with fadeIn',
 		'tomas ¿Un poema oculto?',
 		'helena Más bien... olvidado.',
@@ -2428,7 +2427,7 @@ monogatari.script({
 		'helena Antípatro escribió varios epigramas sobre las maravillas. Pero uno de ellos... nunca fue incluido en la lista oficial.',
 		'gabriel ¿Y por qué?',
 		'helena Porque menciona una “octava luz”. Algo que no encajaba en la visión clásica del mundo.',
-
+		() => hideInventoryBar(),
 		async() => { 
 			if (!monogatari.storage('player').epigramaAntipatro) { 
 				monogatari.distractionFree();
@@ -2444,7 +2443,7 @@ monogatari.script({
 		'jump Escena14_Decision'
 	],
 
-'Escena14_Decision': [
+	'Escena14_Decision': [
 		'show scene biblioteca_atenas with fadeIn',
 		() => monogatari.setting('AllowRollback', false),
 		{
@@ -2497,7 +2496,6 @@ monogatari.script({
 		'helena El "Epigrama de Antípatro" es un libro que enumera las Siete Maravillas del Mundo Antiguo (Antología Palatina IX.58, c. 140 a.C.). Es una de las listas más tempranas conocidas de las Siete Maravillas.',
 		'narrator Trazar el mapa de asentamientos helenísticos vinculados con las 3 divinidades griegas, mencionadas en los libros: Zeus, Artemisa y Helios',
 		() => addItem('contacto_antipatro'),
-
 		() => monogatari.setting('AllowRollback', false),
 		{
 			'Choice': {
@@ -2538,7 +2536,7 @@ monogatari.script({
 		'narrator Mientras el equipo recorre el sitio arqueológico, se percibe un eco de la magnificencia que una vez tuvo este lugar. La historia de la estatua y su creador, Fidias, resuena en la mente de los exploradores.',
 		'narrator Gabriel y su equipo se detienen frente a los restos del templo, contemplando la grandeza perdida y reflexionando sobre el legado de la civilización griega.',
 		'show character gabriel pensativo at left with fadeIn',
-		'gabriel La Estatua de Zeus era una obra maestra. Oro, marfil, proporciones perfectas. ¿Cómo pudo desaparecer sin dejar rastro?',
+		'gabriel La Estatua de Zeus era una obra maestra. Oro, marfil, proporciones perfectas.',
 		'show character isidora normal at center with fadeIn',
 		'isidora Y fue destruida... ¿por qué?',
 		'show character helena normal at right with fadeIn',
@@ -2551,8 +2549,8 @@ monogatari.script({
 		'show image overlay_vignette_sepia with fadeIn',
 		'show image overlay_grano with fadeIn',
 		'show image overlay_letterbox with fadeIn',
-		//'play sound sfx_pergamino',
-		//'play sound sfx_templo_eco',
+		'play sound sfx_pergamino',
+		'play sound sfx_templo_eco',
 
 		'show character fidias normal at right with fadeIn',
 		'fidias Soy Fidias, escultor ateniense, el mismo que talló a Atenea Partenos para el Partenón.',
@@ -2563,25 +2561,25 @@ monogatari.script({
 		'fidias Se cuenta que la trasladaron a Constantinopla, y que un incendio en el año 462 de tu era finalmente la redujo a cenizas, junto con tantas otras maravillas de un mundo que ya se apagaba.',
 
 		'hide character fidias with fadeOut',
-		//'play sound sfx_pergamino',
+		'play sound sfx_pergamino',
 		'hide image overlay_letterbox with fadeOut',
 		'hide image overlay_grano with fadeOut',
 		'hide image overlay_vignette_sepia with fadeOut',
 		//'hide scene bg_narrador_zeus_olimpia with fadeOut',
+		//'show scene #000000 with fadeIn',
+		//'stop sound sfx_templo_eco',
+		//'stop sound sfx_pergamino',
 		'jump Escena15_Olimpia'
 	],
 
 	'Escena15_Olimpia': [
 		'show scene olimpia_ruinas with fadeIn',
 		'show character gabriel pensativo at left with fadeIn',
-		'gabriel La Estatua de Zeus era una obra maestra. Oro, marfil, proporciones perfectas.',
-
-		'show character isidora normal at center with fadeIn',
-		'isidora Y fue destruida... ¿por qué?',
-
-		'show character helena normal at right with fadeIn',
-		'helena Por la expansión cristiana. Las maravillas eran vistas como símbolos paganos.',
-
+		'narrator Gabriel observa los restos del templo, reflexionando sobre la historia y el arte que una vez adornaron este lugar.',
+		'show character isidora analitica at right with fadeIn',
+		'isidora La estatua de Zeus era una obra maestra de Fidias. Es una pena que no haya sobrevivido.',
+		'show character helena normal at center with fadeIn',
+		'helena Pero aún podemos aprender mucho de los restos y de los registros históricos. Debemos buscar cualquier pista que nos lleve a entender la conexión con la piedra mapuche.',
 		// Interacción con Objeto: Georradar Portátil
 		() => monogatari.setting('AllowRollback', false),
 		{
@@ -2697,8 +2695,8 @@ monogatari.script({
 		'show image overlay_vignette_sepia with fadeIn',
 		'show image overlay_grano with fadeIn',
 		'show image overlay_letterbox with fadeIn',
-		//'play sound sfx_pergamino',
-		//'play sound sfx_templo_viento',
+		'play sound sfx_pergamino',
+		'play sound sfx_templo_viento',
 
 		'show character sacerdotisa normal at center with fadeIn',
 		'sacerdotisa Soy sacerdotisa de Ártemis en Éfeso, guardiana de su templo desde que era niña.',
@@ -2709,7 +2707,7 @@ monogatari.script({
 		'sacerdotisa Los godos lo saquearon definitivamente en el año 268 de tu era, y con ellos se apagó el culto que sostuvimos durante siglos.',
 
 		'hide character sacerdotisa with fadeOut',
-		//'play sound sfx_pergamino',
+		'play sound sfx_pergamino',
 		'hide image overlay_letterbox with fadeOut',
 		'hide image overlay_grano with fadeOut',
 		'hide image overlay_vignette_sepia with fadeOut',
@@ -2924,8 +2922,8 @@ monogatari.script({
 		'show image overlay_vignette_sepia with fadeIn',
 		'show image overlay_grano with fadeIn',
 		'show image overlay_letterbox with fadeIn',
-		//'play sound sfx_pergamino',
-		//'play sound sfx_martillo_piedra',
+		'play sound sfx_pergamino',
+		'play sound sfx_martillo_piedra',
 
 		'show character artemisia normal at center with fadeIn',
 		'artemisia Soy Artemisia, reina de Caria, hermana y esposa de Mausolo, sátrapa de estas tierras bajo el dominio persa.',
@@ -2936,7 +2934,7 @@ monogatari.script({
 		'artemisia Sobrevivió intacto más de mil quinientos años, hasta que una serie de terremotos entre los siglos doce y quince de tu era lo derrumbó piedra a piedra.',
 
 		'hide character artemisia with fadeOut',
-		//'play sound sfx_pergamino',
+		'play sound sfx_pergamino',
 		'hide image overlay_letterbox with fadeOut',
 		'hide image overlay_grano with fadeOut',
 		'hide image overlay_vignette_sepia with fadeOut',
@@ -2997,7 +2995,6 @@ monogatari.script({
 	// -------------------------------------------------------------
 	'Escena21': [
 		'narrator El jugador encuentra una miniatura de la cuadriga que coronaba el Mausoleo.',
-
 		// Interacción con Objeto Oculto: Miniatura de la Cuadriga de Bronce
 		() => addItem('miniatura_cuadriga'),
 		() => monogatari.setting('AllowRollback', false),
@@ -3022,7 +3019,6 @@ monogatari.script({
 		'tomas ¿Cómo llegó esto aquí?',
 		'show character gabriel serio at left with fadeIn',
 		'gabriel No llegó aquí. Fue traído desde aquí... hacia Chile.',
-
 		() => monogatari.setting('AllowRollback', false),
 		{
 			'Choice': {
@@ -3067,8 +3063,8 @@ monogatari.script({
 		'show image overlay_vignette_sepia with fadeIn',
 		'show image overlay_grano with fadeIn',
 		'show image overlay_letterbox with fadeIn',
-		//'play sound sfx_pergamino',
-		//'play sound sfx_puerto_olas',
+		'play sound sfx_pergamino',
+		'play sound sfx_puerto_olas',
 
 		'show character cares normal at right with fadeIn',
 		'cares Soy Cares de Lindos, discípulo del gran Lisipo, y fui yo quien fundió en bronce al dios Helios para coronar el puerto de Rodas.',
@@ -3079,7 +3075,7 @@ monogatari.script({
 		'cares Allí quedaron sus restos de bronce durante ochocientos años más, hasta que fueron vendidos como chatarra.',
 
 		'hide character cares with fadeOut',
-		//'play sound sfx_pergamino',
+		'play sound sfx_pergamino',
 		'hide image overlay_letterbox with fadeOut',
 		'hide image overlay_grano with fadeOut',
 		'hide image overlay_vignette_sepia with fadeOut',
@@ -3158,7 +3154,7 @@ monogatari.script({
 		'show scene rodas_puerto',
 		'[MINIJUGO PUZZLE: RECONSTRUCCIÓN DEL COLOSO]',
 		'Debemos encontrar las piezas correctas y ensamblarlas en el orden adecuado para reconstruir digitalmente la estatua.',
- 
+		() => hideInventoryBar(),
 		async() => { 
 			if (!monogatari.storage('player').colosoRodas) { 
 				monogatari.distractionFree();
@@ -3228,8 +3224,8 @@ monogatari.script({
 		'show image overlay_vignette_sepia with fadeIn',
 		'show image overlay_grano with fadeIn',
 		'show image overlay_letterbox with fadeIn',
-		//'play sound sfx_pergamino',
-		//'play sound sfx_faro_olas',
+		'play sound sfx_pergamino',
+		'play sound sfx_faro_olas',
 
 		'show character sostrato normal at right with fadeIn',
 		'sostrato Soy Sóstrato de Cnido, arquitecto al servicio de los reyes Ptolomeos de Egipto.',
@@ -3240,7 +3236,7 @@ monogatari.script({
 		'sostrato Una serie de terremotos entre los años 956 y 1323 de tu era la fueron debilitando hasta derrumbarla por completo, y sus piedras terminaron reutilizadas en la fortaleza que hoy ocupa su lugar.',
 
 		'hide character sostrato with fadeOut',
-		//'play sound sfx_pergamino',
+		'play sound sfx_pergamino',
 		'hide image overlay_letterbox with fadeOut',
 		'hide image overlay_grano with fadeOut',
 		'hide image overlay_vignette_sepia with fadeOut',
@@ -3455,7 +3451,7 @@ monogatari.script({
     'atentado archivoOculto',             // abre <archivo-oculto id="archivoOculto"> y espera a que termine
     () => monogatari.distractionFree(),   // vuelve a mostrar la interfaz
 */
-
+		() => hideInventoryBar(),
 		async() => { 
 			if (!monogatari.storage('player').archivoOculto) { 
 				monogatari.distractionFree();
@@ -3572,8 +3568,8 @@ monogatari.script({
 		'show image overlay_vignette_sepia with fadeIn',
 		'show image overlay_grano with fadeIn',
 		'show image overlay_letterbox with fadeIn',
-		//'play sound sfx_pergamino',
-		//'play sound sfx_viento_desierto',
+		'play sound sfx_pergamino',
+		'play sound sfx_viento_desierto',
 
 		'show character hemiunu normal at center with fadeIn',
 		'hemiunu Yo soy Hemiunu, visir y arquitecto real de Su Majestad Keops, cuarto faraón de la cuarta dinastía.',
@@ -3584,7 +3580,7 @@ monogatari.script({
 		'hemiunu Ha resistido más de cuatro mil quinientos años de arena, de guerra y de olvido, y sigue en pie hasta el día en que tú caminas sobre ella.',
 
 		'hide character hemiunu with fadeOut',
-		//'play sound sfx_pergamino',
+		'play sound sfx_pergamino',
 		'hide image overlay_letterbox with fadeOut',
 		'hide image overlay_grano with fadeOut',
 		'hide image overlay_vignette_sepia with fadeOut',
@@ -3619,8 +3615,8 @@ monogatari.script({
 		'show image overlay_vignette_sepia with fadeIn',
 		'show image overlay_grano with fadeIn',
 		'show image overlay_letterbox with fadeIn',
-		//'play sound sfx_pergamino',
-		//'play sound sfx_agua_norias',
+		'play sound sfx_pergamino',
+		'play sound sfx_agua_norias',
 
 		'show character amitis normal at center with fadeIn',
 		'amitis Me llaman Amitis, princesa de Media y esposa del rey Nabucodonosor II de Babilonia.',
@@ -3631,7 +3627,7 @@ monogatari.script({
 		'amitis Se cree que un terremoto los derribó hacia el siglo I antes de tu era, tras siglos de esplendor junto al gran río.',
 
 		'hide character amitis with fadeOut',
-		//'play sound sfx_pergamino',
+		'play sound sfx_pergamino',
 		'hide image overlay_letterbox with fadeOut',
 		'hide image overlay_grano with fadeOut',
 		'hide image overlay_vignette_sepia with fadeOut',
@@ -3656,6 +3652,7 @@ monogatari.script({
 		'gabriel Si las crónicas no mienten, aquí es donde deberían estar los restos de los Jardines Colgantes.',
 		'isidora Todo esto está enterrado bajo siglos de arena... esto va a tomar tiempo.',
 		'gabriel Empecemos por esta zona. Yo te ayudo a buscar.',
+		() => hideInventoryBar(),
 		async() => { 
 			if (!monogatari.storage('player').jardinesColgantes) { 
 				monogatari.distractionFree();
@@ -3764,8 +3761,6 @@ monogatari.script({
 		() => ImagenEnHotspot('simbolo_babilonico', { escala: 0.2 }),
 		'narrator Necesitas revisar el lugar en busca de alguna pista. Después debes analizar la pista'
 	],
-
-
 
 	'Escena31_ObjetoOcultoBabilonia': [
 		() => hideAllHotspots(),
@@ -3898,7 +3893,7 @@ monogatari.script({
 		'El Vaticano es un laberinto de mármol, silencio y secretos.',
 		'Los pasillos parecen observar a quienes los recorren.',
 		'Aquí, la historia fue escrita... y también reescrita.',
-
+		() => hideInventoryBar(),
 		async() => { 
 			if (!monogatari.storage('player').laberintoVaticano) { 
 				monogatari.distractionFree();
@@ -3907,7 +3902,6 @@ monogatari.script({
 				monogatari.storage('player').laberintoVaticano = true;
 			}
 		}, 
-
 		'show scene bg_documentos_vaticano with fadeIn',
 		'show character marcus normal at center with fadeIn',
 		'marcus Han venido buscando respuestas... pero algunas verdades deben permanecer ocultas.',
@@ -3920,7 +3914,6 @@ monogatari.script({
 		'El jugador decide presionar a Marcus por documentos antiguos.',
 		'[ACCIÓN DE INVENTARIO] Usas la Linterna Forense de Luz Incidente sobre los anaqueles del archivo.',
 		'[EFECTO]: Revela un compartimento secreto tras el lomo de un códice de decretos papales.',
-
 		() => monogatari.setting('AllowRollback', false),
 		{
 			'Choice': {
@@ -3973,7 +3966,7 @@ monogatari.script({
 	'marcus Está bien. Les abriré los anaqueles que nadie fuera de Roma ha visto. Pero lo que lean aquí no sale de estos muros.',
 	'show character gabriel talk at left with fadeIn',
 	'gabriel Cada maravilla tiene su historia, Marcus. Déjenos encontrarlas.',
-
+	() => hideInventoryBar(),
 		async() => { 
 			if (!monogatari.storage('player').bibliotecaVaticana) { 
 				monogatari.distractionFree();
@@ -4198,7 +4191,7 @@ monogatari.script({
 
 		'[ACCIÓN DE INVENTARIO] Accionas un Extintor de Polvo Químico de la pared para sofocar un incendio provocado y crear una cortina de humo.',
 		'[EFECTO]: Ciega temporalmente a los atacantes y apaga el fuego cerca de los códices.',
-
+		() => hideInventoryBar(),
 		async() => { 
 			if (!monogatari.storage('player').archivoEscape) { 
 				monogatari.distractionFree();
@@ -4581,780 +4574,769 @@ monogatari.script({
    ESCENA 41 — Regreso a la Patagonia (Glaciar Pío XI)
    ============================================================ */
 
-'Escena41': [
+	'Escena41': [
 
-    'show scene bg_patagonia_glaciar with fadeIn duration 3s',
-    'narrator El avión desciende sobre la Patagonia como si atravesara un velo de silencio.',
-    'narrator Las montañas se alzan como gigantes dormidos, cubiertas por un manto blanco que parece respirar.',
-    'narrator El glaciar Pío XI brilla con un azul imposible, como si guardara secretos bajo su hielo.',
-    'narrator El equipo regresa al mismo punto donde comenzó todo. Pero ahora no vienen con preguntas.',
-    'narrator Vienen con respuestas... y con la certeza de que la octava luz está aquí.',
-	'show scene cascada_congelada with fadeIn',
-    'show character gabriel normal at center',
-    'gabriel Todo nos trajo de vuelta. Antípatro, Diodoro, los cristianos primitivos... todos apuntaban a este lugar.',
+		'show scene bg_patagonia_glaciar with fadeIn duration 3s',
+		'narrator El avión desciende sobre la Patagonia como si atravesara un velo de silencio.',
+		'narrator Las montañas se alzan como gigantes dormidos, cubiertas por un manto blanco que parece respirar.',
+		'narrator El glaciar Pío XI brilla con un azul imposible, como si guardara secretos bajo su hielo.',
+		'narrator El equipo regresa al mismo punto donde comenzó todo. Pero ahora no vienen con preguntas.',
+		'narrator Vienen con respuestas... y con la certeza de que la octava luz está aquí.',
+		'show scene cascada_congelada with fadeIn',
+		'show character gabriel normal at center',
+		'gabriel Todo nos trajo de vuelta. Antípatro, Diodoro, los cristianos primitivos... todos apuntaban a este lugar.',
 
-    'show character isidora normal at right',
-    'isidora La octava luz está aquí. Y debemos encontrarla.',
+		'show character isidora normal at right',
+		'isidora La octava luz está aquí. Y debemos encontrarla.',
 
-    'show character erik normal at left',
-    'erik Hay una cueva más profunda. Nunca la exploré... pero las coordenadas que encontraron coinciden con su entrada.',
+		'show character erik normal at left',
+		'erik Hay una cueva más profunda. Nunca la exploré... pero las coordenadas que encontraron coinciden con su entrada.',
 
-    /* Interacción con objeto: GPS antiguo */
-    'narrator Gabriel revisa el GPS antiguo encontrado en el Capítulo 1.',
-    () => addItem('gps_antiguo'),
-    'narrator El GPS antiguo se ha añadido al inventario.',
-    () => monogatari.setting('AllowRollback', false),
-    {
-        'Choice': {
-            'coordenadas': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Seguir las coordenadas exactas.',
-                'Do': 'jump Escena41_Coordenadas'
-            },
-            'glaciar': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Explorar el glaciar antes de entrar.',
-                'Do': 'jump Escena41_Glaciar'
-            },
-            'erik': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Interrogar a Erik sobre expediciones previas.',
-                'Do': 'jump Escena41_Erik'
-            }
-        }
-    }
-],
-
-'Escena41_Coordenadas': [
-    'narrator Sigues las coordenadas exactas reveladas en el Capítulo 1.',
-    'narrator La entrada a la cueva final se activa.',
-    'jump Escena42'
-],
-
-'Escena41_Glaciar': [
-    'narrator Exploras el glaciar y encuentras un fragmento de hielo fósil con marcas geométricas.',
-    () => addItem('hielo_fosil'),
-    'narrator El objeto ha sido añadido al inventario.',
-    'jump Escena42'
-],
-
-'Escena41_Erik': [
-    'erik Hubo una expedición hace años... pero desaparecieron. Nunca supe por qué.',
-    'narrator La ruta se vuelve más peligrosa.',
-    'jump Escena42'
-],
-
-
-/* ============================================================
-   ESCENA 42 — Minijuego Puzzle: Ensamblaje de los 10 objetos
-   ============================================================ */
-
-'Escena42': [
-
-    'show scene camara_profunda with fadeIn duration 3s',
-    'narrator En la entrada de la cueva, el equipo llega nuevamente a la camara con el altar circular con ranuras.',
-    'narrator Ocho ranuras. Una por cada maravilla que Antípatro y Diodoro documentaron... y una octava, la que las precede a todas.',
-    /* Mostrar objetos */
-    'narrator La Gran Pirámide de Giza, los Jardines Colgantes de Babilonia, el Templo de Artemisa en Éfeso...',
-    'narrator La Estatua de Zeus en Olimpia, el Mausoleo de Halicarnaso, el Coloso de Rodas, el Faro de Alejandría...',
-    'narrator Y la octava luz: el epigrama de Antípatro, el que la reveló.',
-
-    /* Interacción con altar */
-    'show scene altar with fadeIn',
-    'narrator El altar espera ser activado.',
-
-		async() => { 
-			if (!monogatari.storage('player').ensamblajeAltar) { 
-				monogatari.distractionFree();
-				await monogatari.run('ensamblaje ensamblajePuzzle');
-				monogatari.distractionFree();
-				monogatari.storage('player').ensamblajeAltar = true;
+		/* Interacción con objeto: GPS antiguo */
+		'narrator Gabriel revisa el GPS antiguo encontrado en el Capítulo 1.',
+		() => addItem('gps_antiguo'),
+		'narrator El GPS antiguo se ha añadido al inventario.',
+		() => monogatari.setting('AllowRollback', false),
+		{
+			'Choice': {
+				'coordenadas': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Seguir las coordenadas exactas.',
+					'Do': 'jump Escena41_Coordenadas'
+				},
+				'glaciar': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Explorar el glaciar antes de entrar.',
+					'Do': 'jump Escena41_Glaciar'
+				},
+				'erik': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Interrogar a Erik sobre expediciones previas.',
+					'Do': 'jump Escena41_Erik'
+				}
 			}
-		}, 
+		}
+	],
 
-	'narrator El altar se ilumina con una luz azul.',
-    'narrator La cueva se abre lentamente.',
-    'jump Escena43'
-],
+	'Escena41_Coordenadas': [
+		'narrator Sigues las coordenadas exactas reveladas en el Capítulo 1.',
+		'narrator La entrada a la cueva final se activa.',
+		'jump Escena42'
+	],
 
-/* ============================================================
-   ESCENA 43 — Cámara subterránea (La Octava Luz)
-   ============================================================ */
+	'Escena41_Glaciar': [
+		'narrator Exploras el glaciar y encuentras un fragmento de hielo fósil con marcas geométricas.',
+		() => addItem('hielo_fosil'),
+		'narrator El objeto ha sido añadido al inventario.',
+		'jump Escena42'
+	],
 
-'Escena43': [
-	'show scene camara_secreta with fadeIn',
-    'narrator Se abren las puertas del fondo.',
-    'narrator Se puede apreciar un camara de grandes proporciones y algo increible...',
-    'show scene bg_camara_subterranea with fadeIn duration 3s',
-    'narrator La cámara es gigantesca.',
-    'narrator Las paredes están cubiertas de símbolos mapuches y helenísticos entrelazados.',
-    'narrator En el centro, una estructura geométrica idéntica a la Gran Pirámide de Giza... pero más pequeña, más antigua, más perfecta.',
-    'narrator La octava luz no es un objeto. Es una estructura. Una maravilla perdida.',
-
-    'show character tomas normal at left',
-    'tomas Es... una pirámide. Una pirámide mapuche.',
-
-    'show character isidora normal at right',
-    'isidora No. Es anterior a los mapuches. Anterior a los griegos. Anterior a todo lo que conocemos.',
-
-    'show character gabriel normal at center',
-    'gabriel La octava luz... la maravilla original.',
-
-    /* Interacción con estructura */
-    'narrator Gabriel toca la superficie de la pirámide.',
-    () => addItem('medicion_geometrica'),
-    'narrator Se registra una medición geométrica en el inventario.',
-
-    () => monogatari.setting('AllowRollback', false),
-    {
-        'Choice': {
-            'examinar': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Examinar la estructura.',
-                'Do': 'jump Escena43_Examinar'
-            },
-            'medir': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Medir la geometría.',
-                'Do': 'jump Escena43_Medir'
-            },
-            'buscar': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Buscar cámaras secundarias.',
-                'Do': 'jump Escena43_Buscar'
-            }
-        }
-    }
-],
-
-'Escena43_Examinar': [
-    'narrator Encuentras un panel oculto con símbolos mixtos.',
-    () => addItem('panel_simbolos'),
-    'jump Escena44'
-],
-
-'Escena43_Medir': [
-    'narrator Las medidas coinciden con proporciones de Giza.',
-    'jump Escena44'
-],
-
-'Escena43_Buscar': [
-    'narrator Un pasadizo opcional se activa.',
-    () => addItem('pasadizo_oculto'),
-    'jump Escena44'
-],
+	'Escena41_Erik': [
+		'erik Hubo una expedición hace años... pero desaparecieron. Nunca supe por qué.',
+		'narrator La ruta se vuelve más peligrosa.',
+		'jump Escena42'
+	],
 
 
-/* ============================================================
-   ESCENA 44 — Narración histórica: La verdad detrás de las maravillas
-   ============================================================ */
+	/* ============================================================
+	ESCENA 42 — Minijuego Puzzle: Ensamblaje de los 10 objetos
+	============================================================ */
 
-'Escena44': [
+	'Escena42': [
 
-    'show scene bg_historia_luz with fadeIn duration 3s',
-    'narrator La octava luz es la primera maravilla del mundo antiguo.',
-    'narrator La única construida antes de la expansión de las civilizaciones mediterráneas.',
-    'narrator Un monumento que representa la unión entre ciencia, fe y humanidad.',
-    'narrator Las otras siete maravillas fueron construidas como réplicas simbólicas de esta estructura original.',
-    'narrator Pero cuando la lucha contra la idolatría comenzó, las réplicas fueron destruidas... y la original fue ocultada en el fin del mundo.',
-    'narrator La única réplica que sobrevivió fue la Gran Pirámide de Giza.',
+		'show scene camara_profunda with fadeIn duration 3s',
+		'narrator En la entrada de la cueva, el equipo llega nuevamente a la camara con el altar circular con ranuras.',
+		'narrator Ocho ranuras. Una por cada maravilla que Antípatro y Diodoro documentaron... y una octava, la que las precede a todas.',
+		/* Mostrar objetos */
+		'narrator La Gran Pirámide de Giza, los Jardines Colgantes de Babilonia, el Templo de Artemisa en Éfeso...',
+		'narrator La Estatua de Zeus en Olimpia, el Mausoleo de Halicarnaso, el Coloso de Rodas, el Faro de Alejandría...',
+		'narrator Y la octava luz: el epigrama de Antípatro, el que la reveló.',
+		/* Interacción con altar */
+		'show scene altar with fadeIn',
+		'narrator El altar espera ser activado.',
+		() => showInventoryBar(),
+			       async() => {
+				       if (!monogatari.storage('player').ensamblajeAltar) {
+					monogatari.distractionFree();
+					await monogatari.run('ensamblaje ensamblajePuzzle');
+					monogatari.distractionFree();
+					monogatari.storage('player').ensamblajeAltar = true;
+				}
+					   },
+		'narrator El altar se ilumina con una luz azul.',
+		'narrator La cueva se abre lentamente.',
+		'jump Escena43'
+	],
 
-    () => monogatari.setting('AllowRollback', false),
-    {
-        'Choice': {
-            'aceptar': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Aceptar la revelación.',
-                'Do': 'jump Escena44_Aceptar'
-            },
-            'cuestionar': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Cuestionar la narrativa.',
-                'Do': 'jump Escena44_Cuestionar'
-            },
-            'pruebas': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Buscar pruebas físicas.',
-                'Do': 'jump Escena44_Pruebas'
-            }
-        }
-    }
-],
+	/* ============================================================
+	ESCENA 43 — Cámara subterránea (La Octava Luz)
+	============================================================ */
 
-'Escena44_Aceptar': [
-    'gabriel Esto cambia la historia humana.',
-    'jump Escena45'
-],
-
-'Escena44_Cuestionar': [
-    'isidora ¿Y si esta narrativa fue manipulada por siglos?',
-    'jump Escena45'
-],
-
-'Escena44_Pruebas': [
-    'narrator Analizas el material de la estructura.',
-    () => addItem('material_octava_luz'),
-    'jump Escena45'
-],
-
-/* ============================================================
-   CAPÍTULO 4 — LA ÚLTIMA LUZ
-   PARTE 2 — ESCENAS 45 a 47
-   Formato Monogatari — Narración ampliada + diálogos + objetos
-   ============================================================ */
-
-/* ============================================================
-   Escena 45 — reemplazo del bloque Choice por el minijuego
-   `derrumbe derrumbeFinal` (verbo `derrumbe`)
-
-   Reemplaza en tu Escena45 real todo desde
-   "narrator Debes decidir cómo actuar mientras el derrumbe avanza."
-   () => monogatari.setting('AllowRollback', false),
-   hasta el cierre del bloque `{ 'Choice': {...} }` (inclusive) por
-   el fragmento de abajo. Las 3 ramas viejas (Escena45_Proteger /
-   Escena45_Escapar / Escena45_Salvar) ya no se usan y pueden borrarse
-   una vez migres — las 3 quedan cubiertas por las 3 etapas del
-   minijuego (proteger la estructura ≈ etapa 1 sin golpes, escapar ≈
-   etapas 1 y 3, salvar a Isidora ≈ etapa 2, que ahora es obligatoria).
-   ============================================================ */
-
-'Escena45': [
-
-    'show scene bg_camara_subterranea with shake infinite',
-    'narrator Un estruendo sacude la cámara subterránea.',
-    'narrator El suelo vibra como si la tierra quisiera expulsar la estructura.',
-    'narrator Fragmentos de roca comienzan a desprenderse del techo, cayendo con violencia.',
-    'narrator La octava luz tiembla, pero permanece firme, como si se defendiera a sí misma.',
-
-    'show character gabriel worried at center',
-    'gabriel ¡La cámara se está derrumbando! ¡Debemos movernos ahora!',
-
-    'show character isidora scared at right',
-    'isidora ¡La estructura! ¡Si se destruye, perdemos todo!',
-
-    'show character tomas scared at left',
-    'tomas ¡Las rocas vienen hacia nosotros! ¡Rápido!',
-
-    'narrator Corres hacia la salida mientras el techo cede a tu espalda.',
-
-    // TODO: reemplaza esta línea por la llamada que ya usas en tus otros
-    // minijuegos para ocultar text-box/quick-menu ANTES del verbo
-    // (crítico: debe ir antes, no después — ver notas de integración).
-    // 'distractionFree' o el helper equivalente que ya tengas en script.js,
-
-		async() => { 
-			if (!monogatari.storage('player').derrumbeFinal) { 
-				monogatari.distractionFree();
-				await monogatari.run('derrumbe derrumbeFinal');
-				monogatari.distractionFree();
-				monogatari.storage('player').derrumbeFinal = true;
+	'Escena43': [
+		'show scene camara_secreta with fadeIn',
+		'narrator Se abren las puertas del fondo.',
+		'narrator Se puede apreciar un camara de grandes proporciones y algo increible...',
+		'show scene bg_camara_subterranea with fadeIn duration 3s',
+		'narrator La cámara es gigantesca.',
+		'narrator Las paredes están cubiertas de símbolos mapuches y helenísticos entrelazados.',
+		'narrator En el centro, una estructura geométrica idéntica a la Gran Pirámide de Giza... pero más pequeña, más antigua, más perfecta.',
+		'narrator La octava luz no es un objeto. Es una estructura. Una maravilla perdida.',
+		'show character tomas normal at left',
+		'tomas Es... una pirámide. Una pirámide mapuche.',
+		'show character isidora normal at right',
+		'isidora No. Es anterior a los mapuches. Anterior a los griegos. Anterior a todo lo que conocemos.',
+		'show character gabriel normal at center',
+		'gabriel La octava luz... la maravilla original.',
+		/* Interacción con estructura */
+		'narrator Gabriel toca la superficie de la pirámide.',
+		() => addItem('medicion_geometrica'),
+		'narrator Se registra una medición geométrica en el inventario.',
+		() => monogatari.setting('AllowRollback', false),
+		{
+			'Choice': {
+				'examinar': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Examinar la estructura.',
+					'Do': 'jump Escena43_Examinar'
+				},
+				'medir': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Medir la geometría.',
+					'Do': 'jump Escena43_Medir'
+				},
+				'buscar': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Buscar cámaras secundarias.',
+					'Do': 'jump Escena43_Buscar'
+				}
 			}
-		}, 
+		}
+	],
 
-    // El componente ya dejó dos banderas en monogatari.storage():
-    //   - derrumbeMuroIntacto   → true si la Etapa 1 se completó sin
-    //     recibir ningún golpe (equivalente a la vieja rama "Proteger").
-    //   - derrumbeIsidoraSalvada → true siempre que se llega a este
-    //     punto (la Etapa 2 es obligatoria: no hay forma de avanzar sin
-    //     rescatar a Isidora).
-	/*
-    () => {
-        if (monogatari.storage().derrumbeMuroIntacto) {
-            addItem('mural_intacto');
-        }
-    },
-	*/
-    //() => addItem('relacion_isidora_mejorada'),
-	'show character isidora normal at right',
-    'narrator El polvo se asienta. Isidora, a salvo, mira hacia atrás.',
-    
-    'isidora Gracias por no dejarme atrás.',
+	'Escena43_Examinar': [
+		'narrator Encuentras un panel oculto con símbolos mixtos.',
+		() => addItem('panel_simbolos'),
+		'jump Escena44'
+	],
 
-    'narrator Ante ustedes, la cámara oculta que el propio derrumbe acaba de revelar.',
+	'Escena43_Medir': [
+		'narrator Las medidas coinciden con proporciones de Giza.',
+		'jump Escena44'
+	],
 
-    'jump Escena46'
-],
+	'Escena43_Buscar': [
+		'narrator Un pasadizo opcional se activa.',
+		() => addItem('pasadizo_oculto'),
+		'jump Escena44'
+	],
 
-/* ============================================================
-   ESCENA 45 — Minijuego Acción: Derrumbe final
-   ============================================================ */
-/*
+
+	/* ============================================================
+	ESCENA 44 — Narración histórica: La verdad detrás de las maravillas
+	============================================================ */
+
+	'Escena44': [
+
+		'show scene bg_historia_luz with fadeIn duration 3s',
+		'narrator La octava luz es la primera maravilla del mundo antiguo.',
+		'narrator La única construida antes de la expansión de las civilizaciones mediterráneas.',
+		'narrator Un monumento que representa la unión entre ciencia, fe y humanidad.',
+		'narrator Las otras siete maravillas fueron construidas como réplicas simbólicas de esta estructura original.',
+		'narrator Pero cuando la lucha contra la idolatría comenzó, las réplicas fueron destruidas... y la original fue ocultada en el fin del mundo.',
+		'narrator La única réplica que sobrevivió fue la Gran Pirámide de Giza.',
+
+		() => monogatari.setting('AllowRollback', false),
+		{
+			'Choice': {
+				'aceptar': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Aceptar la revelación.',
+					'Do': 'jump Escena44_Aceptar'
+				},
+				'cuestionar': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Cuestionar la narrativa.',
+					'Do': 'jump Escena44_Cuestionar'
+				},
+				'pruebas': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Buscar pruebas físicas.',
+					'Do': 'jump Escena44_Pruebas'
+				}
+			}
+		}
+	],
+
+	'Escena44_Aceptar': [
+		'gabriel Esto cambia la historia humana.',
+		'jump Escena45'
+	],
+
+	'Escena44_Cuestionar': [
+		'isidora ¿Y si esta narrativa fue manipulada por siglos?',
+		'jump Escena45'
+	],
+
+	'Escena44_Pruebas': [
+		'narrator Analizas el material de la estructura.',
+		() => addItem('material_octava_luz'),
+		'jump Escena45'
+	],
+
+	/* ============================================================
+	CAPÍTULO 4 — LA ÚLTIMA LUZ
+	PARTE 2 — ESCENAS 45 a 47
+	Formato Monogatari — Narración ampliada + diálogos + objetos
+	============================================================ */
+
+	/* ============================================================
+	Escena 45 — reemplazo del bloque Choice por el minijuego
+	`derrumbe derrumbeFinal` (verbo `derrumbe`)
+
+	Reemplaza en tu Escena45 real todo desde
+	"narrator Debes decidir cómo actuar mientras el derrumbe avanza."
+	() => monogatari.setting('AllowRollback', false),
+	hasta el cierre del bloque `{ 'Choice': {...} }` (inclusive) por
+	el fragmento de abajo. Las 3 ramas viejas (Escena45_Proteger /
+	Escena45_Escapar / Escena45_Salvar) ya no se usan y pueden borrarse
+	una vez migres — las 3 quedan cubiertas por las 3 etapas del
+	minijuego (proteger la estructura ≈ etapa 1 sin golpes, escapar ≈
+	etapas 1 y 3, salvar a Isidora ≈ etapa 2, que ahora es obligatoria).
+	============================================================ */
+
 	'Escena45': [
 
-	'show scene bg_camara_subterranea with shake infinite',
-    //'show scene bg_camara_temblor with fadeIn duration 2s',
-    'narrator Un estruendo sacude la cámara subterránea.',
-    'narrator El suelo vibra como si la tierra quisiera expulsar la estructura.',
-    'narrator Fragmentos de roca comienzan a desprenderse del techo, cayendo con violencia.',
-    'narrator La octava luz tiembla, pero permanece firme, como si se defendiera a sí misma.',
+		'show scene bg_camara_subterranea with shake infinite',
+		'narrator Un estruendo sacude la cámara subterránea.',
+		'narrator El suelo vibra como si la tierra quisiera expulsar la estructura.',
+		'narrator Fragmentos de roca comienzan a desprenderse del techo, cayendo con violencia.',
+		'narrator La octava luz tiembla, pero permanece firme, como si se defendiera a sí misma.',
+		'show character gabriel worried at center',
+		'gabriel ¡La cámara se está derrumbando! ¡Debemos movernos ahora!',
+		'show character isidora scared at right',
+		'isidora ¡La estructura! ¡Si se destruye, perdemos todo!',
+		'show character tomas scared at left',
+		'tomas ¡Las rocas vienen hacia nosotros! ¡Rápido!',
+		'narrator Corres hacia la salida mientras el techo cede a tu espalda.',
 
-    'show character gabriel worried at center',
-    'gabriel ¡La cámara se está derrumbando! ¡Debemos movernos ahora!',
+		// TODO: reemplaza esta línea por la llamada que ya usas en tus otros
+		// minijuegos para ocultar text-box/quick-menu ANTES del verbo
+		// (crítico: debe ir antes, no después — ver notas de integración).
+		// 'distractionFree' o el helper equivalente que ya tengas en script.js,
+		() => hideinventoryBar(),
+			       async() => {
+				       if (!monogatari.storage('player').derrumbeFinal) {
+					monogatari.distractionFree();
+					await monogatari.run('derrumbe derrumbeFinal');
+					monogatari.distractionFree();
+					monogatari.storage('player').derrumbeFinal = true;
+				}
+					   },
 
-    'show character isidora scared at right',
-    'isidora ¡La estructura! ¡Si se destruye, perdemos todo!',
+		// El componente ya dejó dos banderas en monogatari.storage():
+		//   - derrumbeMuroIntacto   → true si la Etapa 1 se completó sin
+		//     recibir ningún golpe (equivalente a la vieja rama "Proteger").
+		//   - derrumbeIsidoraSalvada → true siempre que se llega a este
+		//     punto (la Etapa 2 es obligatoria: no hay forma de avanzar sin
+		//     rescatar a Isidora).
+		/*
+		() => {
+			if (monogatari.storage().derrumbeMuroIntacto) {
+				addItem('mural_intacto');
+			}
+		},
+		*/
+		//() => addItem('relacion_isidora_mejorada'),
+		'show character isidora normal at right',
+		'narrator El polvo se asienta. Isidora, a salvo, mira hacia atrás.',
 
-    'show character tomas scared at left',
-    'tomas ¡Las rocas vienen hacia nosotros! ¡Rápido!',
-*/
-    /* Minijuego: acción */
-   /* 'narrator Debes decidir cómo actuar mientras el derrumbe avanza.',
+		'isidora Gracias por no dejarme atrás.',
 
-    () => monogatari.setting('AllowRollback', false),
-    {
-        'Choice': {
-            'proteger': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Proteger la estructura.',
-                'Do': 'jump Escena45_Proteger'
-            },
-            'escapar': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Escapar primero.',
-                'Do': 'jump Escena45_Escapar'
-            },
-            'salvar': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Salvar a un compañero.',
-                'Do': 'jump Escena45_Salvar'
-            }
-        }
-    }
-],
+		'narrator Ante ustedes, la cámara oculta que el propio derrumbe acaba de revelar.',
 
-'Escena45_Proteger': [
-    'narrator Te lanzas hacia la estructura, levantando los brazos para desviar las rocas.',
-    'narrator Una roca golpea tu hombro, pero logras evitar que el impacto dañe la pirámide.',
-    () => addItem('mural_intacto'),
-    'narrator Un mural oculto queda protegido y se revela tras el polvo.',
-    'jump Escena46'
-],
-
-'Escena45_Escapar': [
-    'narrator Corres hacia la salida mientras las rocas caen detrás de ti.',
-    'narrator El equipo te sigue y logran evitar heridas graves.',
-    'jump Escena46'
-],
-
-'Escena45_Salvar': [
-    'narrator Ves a Isidora atrapada bajo una roca que bloquea su camino.',
-    'narrator Sin dudarlo, corres hacia ella.',
-    'show character isidora scared at center',
-    'isidora ¡No puedo moverme!',
-    'narrator Levantas la roca con esfuerzo y la liberas.',
-    () => addItem('relacion_isidora_mejorada'),
-    'narrator Tu relación con Lucía ha mejorado.',
-    'jump Escena46'
-],
-*/
-
-/* ============================================================
-   ESCENA 46 — Tesoro final: El Artefacto de la Luz
-   ============================================================ */
-
-'Escena46': [
-    'show scene bg_pedestal_luz with fadeIn',
-	() => showInventoryBar(),
-	() => ImagenEnHotspot('palo_antorcha', { escala: 0.2 }),
-    'narrator Tras escapar del derrumbe, el equipo llega a una cámara secundaria.',
-    'narrator En el centro, un pedestal iluminado por una luz suave revela un artefacto.',
-    'narrator El objeto parece tener energía propia.',
-    'narrator Material: una aleación desconocida, imposible de clasificar.',
-    'narrator Forma: un disco con símbolos mapuches y helenísticos entrelazados.',
-	() => VerObjeto('mapa1'),
-	() => VerObjeto('mapa2'),
-	() => VerObjeto('mapa3'),
-	() => VerObjeto('altar'),
-	() => VerObjeto('disco'),
-	() => VerObjeto('antorcha_pared1'),
-	() => VerObjeto('antorcha_pared2'),
-	() => TomarObjeto('palo_antorcha'),
-	() => UsarObjeto('antorcha_pared1','palo_antorcha','jump Escena46_antorcha'),
-	() => UsarObjeto('antorcha_pared2','palo_antorcha','jump Escena46_antorcha'),
-	'narrator Necesitas revisar el lugar en busca de alguna pista.'
+		'jump Escena46'
 	],
 
-'Escena46_antorcha': [
-    'show scene bg_pedestal_luz',
-	() => showInventoryBar(),
-	() => hideAllHotspots(),
-	() => removeItem('palo_antorcha'),
-	() => addItem('antorcha_encendida'), 
-	'narrator La antorcha se prende lentamente.',
-    'narrator El objeto del centro parece reaccionar ante la antorcha encencida.',
-	() => VerObjeto('mapa1'),
-	() => VerObjeto('mapa2'),
-	() => VerObjeto('mapa3'),
-	() => VerObjeto('altar'),
-	() => VerObjeto('disco'),
-	() => VerObjeto('antorcha_pared1'),
-	() => VerObjeto('antorcha_pared2'),		
-	() => UsarObjeto('disco','antorcha_encendida','jump Escena46_rutas','narrator El disco no hace nada diferente. Debes utilizar un objeto'),
-	'narrator Necesitas revisar el lugar en busca de alguna pista. Debes ocupar un objeto'
+	/* ============================================================
+	ESCENA 45 — Minijuego Acción: Derrumbe final
+	============================================================ */
+	/*
+		'Escena45': [
+
+		'show scene bg_camara_subterranea with shake infinite',
+		//'show scene bg_camara_temblor with fadeIn duration 2s',
+		'narrator Un estruendo sacude la cámara subterránea.',
+		'narrator El suelo vibra como si la tierra quisiera expulsar la estructura.',
+		'narrator Fragmentos de roca comienzan a desprenderse del techo, cayendo con violencia.',
+		'narrator La octava luz tiembla, pero permanece firme, como si se defendiera a sí misma.',
+
+		'show character gabriel worried at center',
+		'gabriel ¡La cámara se está derrumbando! ¡Debemos movernos ahora!',
+
+		'show character isidora scared at right',
+		'isidora ¡La estructura! ¡Si se destruye, perdemos todo!',
+
+		'show character tomas scared at left',
+		'tomas ¡Las rocas vienen hacia nosotros! ¡Rápido!',
+	*/
+		/* Minijuego: acción */
+	/* 'narrator Debes decidir cómo actuar mientras el derrumbe avanza.',
+
+		() => monogatari.setting('AllowRollback', false),
+		{
+			'Choice': {
+				'proteger': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Proteger la estructura.',
+					'Do': 'jump Escena45_Proteger'
+				},
+				'escapar': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Escapar primero.',
+					'Do': 'jump Escena45_Escapar'
+				},
+				'salvar': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Salvar a un compañero.',
+					'Do': 'jump Escena45_Salvar'
+				}
+			}
+		}
 	],
 
-'Escena46_rutas': [
-	'show scene bg_pedestal_rutas with fadeIn duration 3s',
-	() => hideAllHotspots(),
-    'narrator Función: proyecta un mapa tridimensional del mundo antiguo.',
-    'narrator Revelación: muestra rutas de viaje desde Alejandría hacia la Patagonia.',
-    'show character gabriel normal at left',
-    'gabriel Este artefacto... es la clave.',
-    'gabriel La prueba de que las maravillas fueron construidas siguiendo un patrón.',
-    'gabriel Un patrón basado en esta estructura.',
-
-    /* Interacción con el artefacto */
-    'narrator El disco emite un leve pulso cuando lo tocas.',
-
-    () => monogatari.setting('AllowRollback', false),
-    {
-        'Choice': {
-            'activar': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Activar el artefacto.',
-                'Do': 'jump Escena46_Activar'
-            },
-            'analizar': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Analizar la aleación.',
-                'Do': 'jump Escena46_Analizar'
-            },
-            'registrar': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Registrar los símbolos.',
-                'Do': 'jump Escena46_Registrar'
-            }
-        }
-    }
-],
-
-'Escena46_Activar': [
-    'narrator El artefacto se ilumina y proyecta un mapa tridimensional.',
-    'narrator La luz se desplaza desde la Patagonia hacia la Antártida.',
-    'jump Escena47'
-],
-
-'Escena46_Analizar': [
-    'narrator Tomas una muestra microscópica de la aleación.',
-    'narrator El material no coincide con ningún metal conocido.',
-    () => addItem('analisis_aleacion'),
-    'jump Escena47'
-],
-
-'Escena46_Registrar': [
-    'narrator Registras los símbolos en tu cuaderno digital.',
-    () => addItem('diccionario_simbolos'),
-    'jump Escena47'
-],
-
-
-/* ============================================================
-   ESCENA 47 — Diálogo final del equipo
-   ============================================================ */
-
-'Escena47': [
-
-    'show scene bg_camara_subterranea_derrumbe with fadeIn duration 3s',
-    () => addItem('artefacto_luz'),
-    'narrator El Artefacto de la Luz ha sido añadido al inventario.',
-    'narrator El equipo se reúne fuera de la cámara, aún con el eco del derrumbe resonando en sus oídos.',
-    'narrator La luz azul de la octava maravilla ilumina sus rostros, revelando una mezcla de asombro y temor.',
-    'show character isidora normal at right',
-    'isidora Gabriel... esto cambia la historia humana.',
-    'show character tomas normal at left',
-    'tomas La octava luz... la primera maravilla.',
-    'isidora Y estuvo aquí todo el tiempo.',
-    'show character gabriel normal at center',
-    'gabriel Oculta. Protegida. Esperando ser encontrada.',
-
-    () => monogatari.setting('AllowRollback', false),
-    {
-        'Choice': {
-            'celebrar': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Celebrar el hallazgo.',
-                'Do': 'jump Escena47_Celebrar'
-            },
-            'divulgacion': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Planear la divulgación científica.',
-                'Do': 'jump Escena47_Divulgacion'
-            },
-            'riesgos': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Advertir sobre los riesgos.',
-                'Do': 'jump Escena47_Riesgos'
-            }
-        }
-    }
-],
-
-'Escena47_Celebrar': [
-    'narrator El equipo sonríe, abrazándose brevemente.',
-    'narrator Por primera vez desde que comenzó el viaje, sienten que han logrado algo imposible.',
-    'jump Escena48'
-],
-
-'Escena47_Divulgacion': [
-    'gabriel Debemos preparar un informe. Esto no puede quedar oculto.',
-    'narrator El equipo asiente, consciente del impacto global.',
-    'jump Escena48'
-],
-
-'Escena47_Riesgos': [
-    'gabriel Si revelamos esto sin cuidado... podría desencadenar conflictos.',
-    'narrator El equipo guarda silencio, comprendiendo la gravedad.',
-    'jump Escena48'
-],
-
-/* ============================================================
-   CAPÍTULO 4 — LA ÚLTIMA LUZ
-   PARTE 3 — ESCENAS 48 a 50
-   Formato Monogatari — Narración ampliada + diálogos + objetos
-   ============================================================ */
-
-
-/* ============================================================
-   ESCENA 48 — Revelación inesperada (El giro final)
-   ============================================================ */
-
-'Escena48': [
-
-    //'show scene bg_cueva_silencio with fadeIn duration 3s',
-	'show scene bg_camara_subterranea_derrumbe',
-    'narrator El silencio dentro de la cámara es absoluto.',
-    'narrator El aire parece contener la respiración del mundo, como si la tierra misma esperara la próxima revelación.',
-    'narrator El Artefacto de la Luz descansa en las manos de Gabriel, vibrando con una energía que no pertenece a ninguna civilización conocida.',
-    'narrator De pronto, el disco se activa por sí solo.',
-
-    'show scene bg_artefacto_luz_glow with fadeIn',
-    'narrator Una luz intensa surge del artefacto, proyectando un mapa tridimensional del hemisferio sur.',
-    'narrator La proyección se mueve lentamente, como si buscara algo... o respondiera a una presencia.',
-
-    'show character tomas surprised at left',
-    'tomas ¿La octava luz... no es la única?',
-
-    'show character isidora shocked at right',
-    'isidora Gabriel... mira la proyección. La luz se está desplazando.',
-
-    'show character gabriel serious at center',
-    'gabriel No puede ser... está apuntando hacia el sur. Mucho más al sur.',
-
-    'narrator La luz abandona la Patagonia en la proyección y se dirige hacia un punto blanco y vasto.',
-    'narrator La Antártida.',
-
-    //'show character isidora thinking at center',
-    'isidora Si hay otra estructura... entonces la octava luz no era el final.',
-    'isidora Era solo el comienzo.',
-
-    /* Interacción con el artefacto */
-    'narrator El artefacto emite un pulso que golpea suavemente tu pecho.',
-    () => addItem('coordenadas_antartida'),
-    'narrator Las coordenadas de la Antártida han sido añadidas al inventario.',
-
-    () => monogatari.setting('AllowRollback', false),
-    {
-        'Choice': {
-            'aceptar': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Aceptar la existencia de la novena luz.',
-                'Do': 'jump Escena48_Aceptar'
-            },
-            'dudar': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Dudar del artefacto.',
-                'Do': 'jump Escena48_Dudar'
-            },
-            'viajar': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Proponer viajar inmediatamente.',
-                'Do': 'jump Escena48_Viajar'
-            }
-        }
-    }
-],
-
-'Escena48_Aceptar': [
-    'gabriel Si existe una novena luz... debemos encontrarla.',
-    'narrator El equipo asiente con solemnidad.',
-    'jump Escena49_Fogon'
-],
-
-'Escena48_Dudar': [
-    'tomas ¿Y si el artefacto está dañado? ¿O si interpreta mal la información?',
-    'isidora No. La precisión geométrica es perfecta. Esto no es un error.',
-    'jump Escena49_Fogon'
-],
-
-'Escena48_Viajar': [
-    'gabriel No podemos esperar. Si hay otra estructura, debemos llegar antes de que alguien más lo haga.',
-    'isidora ¿Estás diciendo que no somos los únicos que podrían estar buscando esto?',
-    'gabriel Exactamente.',
-    'jump Escena49_Fogon'
-],
-
-
-/* ============================================================
-   ESCENA 49 — Cliffhanger
-   ============================================================ */
-
-	'Escena49_Fogon': [
-		'show scene fogon with fadeIn',
-		'show character gabriel pensativo at left with fadeIn',
-		'show character isidora normal at right with fadeIn',
-		'gabriel Este artefacto parece que reacciona ante alguna luz cercana.',
-		'isidora Es una clase de astrolabio que indica la ruta que conecta a las maravillas.',
-		'jump Escena49'
+	'Escena45_Proteger': [
+		'narrator Te lanzas hacia la estructura, levantando los brazos para desviar las rocas.',
+		'narrator Una roca golpea tu hombro, pero logras evitar que el impacto dañe la pirámide.',
+		() => addItem('mural_intacto'),
+		'narrator Un mural oculto queda protegido y se revela tras el polvo.',
+		'jump Escena46'
 	],
 
-'Escena49': [
-	
-    'show scene bg_cueva_salida with fadeIn duration 3s',
-    'narrator De pronto, al igual que la vez anterior, el artefacto empieza a vibrar y proyecta una coordenada exacta en la Antártida.',
-    'narrator Una estructura enterrada bajo kilómetros de hielo.',
-    'narrator Una maravilla que nadie ha visto.',
-    'narrator Una maravilla que podría cambiarlo todo.',
+	'Escena45_Escapar': [
+		'narrator Corres hacia la salida mientras las rocas caen detrás de ti.',
+		'narrator El equipo te sigue y logran evitar heridas graves.',
+		'jump Escena46'
+	],
 
-    'show character gabriel serious at center',
-    'gabriel Nuestro viaje... no ha terminado.',
+	'Escena45_Salvar': [
+		'narrator Ves a Isidora atrapada bajo una roca que bloquea su camino.',
+		'narrator Sin dudarlo, corres hacia ella.',
+		'show character isidora scared at center',
+		'isidora ¡No puedo moverme!',
+		'narrator Levantas la roca con esfuerzo y la liberas.',
+		() => addItem('relacion_isidora_mejorada'),
+		'narrator Tu relación con Lucía ha mejorado.',
+		'jump Escena46'
+	],
+	*/
 
-    'show character isidora determined at right',
-    'isidora Entonces la pregunta es simple.',
-    'isidora ¿Cuándo partimos?',
+	/* ============================================================
+	ESCENA 46 — Tesoro final: El Artefacto de la Luz
+	============================================================ */
 
-    'show character tomas thought at left',
-    'tomas La Antártida no es un destino cualquiera. Necesitaremos preparación, permisos, equipo especializado...',
+	'Escena46': [
+		'show scene bg_pedestal_luz with fadeIn',
+		() => showInventoryBar(),
+		() => ImagenEnHotspot('palo_antorcha', { escala: 0.2 }),
+		'narrator Tras escapar del derrumbe, el equipo llega a una cámara secundaria.',
+		'narrator En el centro, un pedestal iluminado por una luz suave revela un artefacto.',
+		'narrator El objeto parece tener energía propia.',
+		'narrator Material: una aleación desconocida, imposible de clasificar.',
+		'narrator Forma: un disco con símbolos mapuches y helenísticos entrelazados.',
+		() => VerObjeto('mapa1'),
+		() => VerObjeto('mapa2'),
+		() => VerObjeto('mapa3'),
+		() => VerObjeto('altar'),
+		() => VerObjeto('disco'),
+		() => VerObjeto('antorcha_pared1'),
+		() => VerObjeto('antorcha_pared2'),
+		() => TomarObjeto('palo_antorcha'),
+		() => UsarObjeto('antorcha_pared1','palo_antorcha','jump Escena46_antorcha'),
+		() => UsarObjeto('antorcha_pared2','palo_antorcha','jump Escena46_antorcha'),
+		'narrator Necesitas revisar el lugar en busca de alguna pista.'
+		],
 
-    //'show character isidora calm at center',
-    'isidora Y discreción. Si revelamos esto demasiado pronto, podríamos perder el control de la información.',
+	'Escena46_antorcha': [
+		'show scene bg_pedestal_luz',
+		() => showInventoryBar(),
+		() => hideAllHotspots(),
+		() => removeItem('palo_antorcha'),
+		 () => addItem('antorcha_encendida'),
+		'narrator La antorcha se prende lentamente.',
+		'narrator El objeto del centro parece reaccionar ante la antorcha encencida.',
+		() => VerObjeto('mapa1'),
+		() => VerObjeto('mapa2'),
+		() => VerObjeto('mapa3'),
+		() => VerObjeto('altar'),
+		() => VerObjeto('disco'),
+		() => VerObjeto('antorcha_pared1'),
+		 () => VerObjeto('antorcha_pared2'),
+		() => UsarObjeto('disco','antorcha_encendida','jump Escena46_rutas','narrator El disco no hace nada diferente. Debes utilizar un objeto'),
+		'narrator Necesitas revisar el lugar en busca de alguna pista. Debes ocupar un objeto'
+		],
 
-    /* Interacción con el artefacto */
-    'narrator El artefacto vuelve a emitir un pulso.',
-    () => addItem('mapa_tridimensional'),
-    'narrator El mapa tridimensional ha sido añadido al inventario.',
+	'Escena46_rutas': [
+		'show scene bg_pedestal_rutas with fadeIn duration 3s',
+		() => hideAllHotspots(),
+		'narrator Función: proyecta un mapa tridimensional del mundo antiguo.',
+		'narrator Revelación: muestra rutas de viaje desde Alejandría hacia la Patagonia.',
+		'show character gabriel normal at left',
+		'gabriel Este artefacto... es la clave.',
+		'gabriel La prueba de que las maravillas fueron construidas siguiendo un patrón.',
+		'gabriel Un patrón basado en esta estructura.',
 
-    () => monogatari.setting('AllowRollback', false),
-    {
-        'Choice': {
-            'expedicion': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Preparar la expedición.',
-                'Do': 'jump Escena49_Expedicion'
-            },
-            'apoyo': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Buscar apoyo internacional.',
-                'Do': 'jump Escena49_Apoyo'
-            },
-            'investigar': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Investigar antes de viajar.',
-                'Do': 'jump Escena49_Investigar'
-            }
-        }
-    }
-],
+		/* Interacción con el artefacto */
+		'narrator El disco emite un leve pulso cuando lo tocas.',
 
-'Escena49_Expedicion': [
-    'gabriel Prepararemos todo. No podemos perder tiempo.',
-    'narrator El equipo comienza a organizar mentalmente los pasos.',
-    'jump Escena50'
-],
+		() => monogatari.setting('AllowRollback', false),
+		{
+			'Choice': {
+				'activar': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Activar el artefacto.',
+					'Do': 'jump Escena46_Activar'
+				},
+				'analizar': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Analizar la aleación.',
+					'Do': 'jump Escena46_Analizar'
+				},
+				'registrar': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Registrar los símbolos.',
+					'Do': 'jump Escena46_Registrar'
+				}
+			}
+		}
+	],
 
-'Escena49_Apoyo': [
-    'isidora Si buscamos apoyo internacional, podríamos obtener recursos... pero también atención no deseada.',
-    'gabriel Es un riesgo que debemos evaluar.',
-    'jump Escena50'
-],
+	'Escena46_Activar': [
+		'narrator El artefacto se ilumina y proyecta un mapa tridimensional.',
+		'narrator La luz se desplaza desde la Patagonia hacia la Antártida.',
+		'jump Escena47'
+	],
 
-'Escena49_Investigar': [
-    'isidora Antes de viajar, debemos entender qué estamos buscando.',
-    'narrator El equipo asiente, consciente de la importancia de la información.',
-    'jump Escena50'
-],
+	'Escena46_Analizar': [
+		'narrator Tomas una muestra microscópica de la aleación.',
+		'narrator El material no coincide con ningún metal conocido.',
+		() => addItem('analisis_aleacion'),
+		'jump Escena47'
+	],
+
+	'Escena46_Registrar': [
+		'narrator Registras los símbolos en tu cuaderno digital.',
+		() => addItem('diccionario_simbolos'),
+		'jump Escena47'
+	],
 
 
-/* ============================================================
-   ESCENA 50 — FIN DEL CAPÍTULO Y APERTURA DE LA SECUELA
-   ============================================================ */
+	/* ============================================================
+	ESCENA 47 — Diálogo final del equipo
+	============================================================ */
 
-'Escena50': [
+	'Escena47': [
 
-    'show scene bg_patagonia_amanecer with fadeIn duration 4s',
-    'narrator El sol comienza a asomarse detrás de las montañas patagónicas.',
-    'narrator La luz dorada ilumina el glaciar, reflejándose en miles de tonos que parecen despedirse del equipo.',
-    'narrator El viento frío acaricia sus rostros, como si la tierra misma reconociera la magnitud de lo descubierto.',
-    'narrator El capítulo termina con una certeza que resuena en cada uno de ellos:',
+		'show scene bg_camara_subterranea_derrumbe with fadeIn duration 3s',
+		() => addItem('artefacto_luz'),
+		'narrator El Artefacto de la Luz ha sido añadido al inventario.',
+		'narrator El equipo se reúne fuera de la cámara, aún con el eco del derrumbe resonando en sus oídos.',
+		'narrator La luz azul de la octava maravilla ilumina sus rostros, revelando una mezcla de asombro y temor.',
+		'show character isidora normal at right',
+		'isidora Gabriel... esto cambia la historia humana.',
+		'show character tomas normal at left',
+		'tomas La octava luz... la primera maravilla.',
+		'isidora Y estuvo aquí todo el tiempo.',
+		'show character gabriel normal at center',
+		'gabriel Oculta. Protegida. Esperando ser encontrada.',
 
-    'narrator "La octava luz fue solo el comienzo. La novena luz nos espera en el continente blanco."',
+		() => monogatari.setting('AllowRollback', false),
+		{
+			'Choice': {
+				'celebrar': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Celebrar el hallazgo.',
+					'Do': 'jump Escena47_Celebrar'
+				},
+				'divulgacion': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Planear la divulgación científica.',
+					'Do': 'jump Escena47_Divulgacion'
+				},
+				'riesgos': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Advertir sobre los riesgos.',
+					'Do': 'jump Escena47_Riesgos'
+				}
+			}
+		}
+	],
 
-    'show character gabriel normal at center',
-    'gabriel Lo que encontramos aquí... cambiará el mundo.',
-    'gabriel Pero lo que encontraremos allá... podría cambiar la historia de la humanidad.',
+	'Escena47_Celebrar': [
+		'narrator El equipo sonríe, abrazándose brevemente.',
+		'narrator Por primera vez desde que comenzó el viaje, sienten que han logrado algo imposible.',
+		'jump Escena48'
+	],
 
-    'show character isidora normal at right',
-    'isidora Entonces no es un final.',
-    'isidora Es un inicio.',
+	'Escena47_Divulgacion': [
+		'gabriel Debemos preparar un informe. Esto no puede quedar oculto.',
+		'narrator El equipo asiente, consciente del impacto global.',
+		'jump Escena48'
+	],
 
-    'show character tomas entusiasmado at left',
-    'tomas ¿Cómo llamaremos esta nueva etapa?',
-    'show character isidora smile at right',
-    'isidora Ya lo sabemos.',
-    'isidora "El Legado de la Luz".',
+	'Escena47_Riesgos': [
+		'gabriel Si revelamos esto sin cuidado... podría desencadenar conflictos.',
+		'narrator El equipo guarda silencio, comprendiendo la gravedad.',
+		'jump Escena48'
+	],
 
-    () => monogatari.setting('AllowRollback', false),
-    {
-        'Choice': {
-            'aceptar': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Aceptar la misión.',
-                'Do': 'jump FinCapitulo4_Aceptar'
-            },
-            'cuestionar': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Cuestionar el destino.',
-                'Do': 'jump FinCapitulo4_Cuestionar'
-            },
-            'reflexion': {
-                'onChosen': () => monogatari.setting('AllowRollback', true),
-                'Text': 'Cerrar el capítulo con reflexión.',
-                'Do': 'jump FinCapitulo4_Reflexion'
-            }
-        }
-    }
-],
+	/* ============================================================
+	CAPÍTULO 4 — LA ÚLTIMA LUZ
+	PARTE 3 — ESCENAS 48 a 50
+	Formato Monogatari — Narración ampliada + diálogos + objetos
+	============================================================ */
 
-'FinCapitulo4_Aceptar': [
-    'narrator Aceptas la misión con determinación.',
-    'narrator El viaje hacia la novena luz comenzará pronto.',
-    'jump Creditos'
-],
 
-'FinCapitulo4_Cuestionar': [
-    'gabriel ¿Estamos preparados para lo que viene?',
-    'narrator La duda se mezcla con esperanza.',
-    'jump Creditos'
-],
+	/* ============================================================
+	ESCENA 48 — Revelación inesperada (El giro final)
+	============================================================ */
 
-'FinCapitulo4_Reflexion': [
-    'narrator Cierras los ojos y respiras el aire frío de la Patagonia.',
-    'narrator Sabes que tu vida cambió para siempre.',
-    'jump Creditos'
-],
+	'Escena48': [
 
-'Creditos': [
-    'stop music with fade 3',
-    'show scene negro with fadeIn duration 2s',
-    //'play music creditos with loop fade 2',
-    'centered <h2>Maravillas de la Antigüedad</h2>',
-    'wait 3000',
-    'centered <h3>Guion y diseño</h3><p>Cortecom</p>',
-    'wait 3000',
-    'centered <h3>Música</h3><p>Cortecom</p>',
-    'wait 3000',
-    'centered <h3>Gracias por jugar</h3>',
-    'wait 3000',
-    'end'     // termina la partida y vuelve al menú principal
-]
+		//'show scene bg_cueva_silencio with fadeIn duration 3s',
+		'show scene bg_camara_subterranea_derrumbe',
+		'narrator El silencio dentro de la cámara es absoluto.',
+		'narrator El aire parece contener la respiración del mundo, como si la tierra misma esperara la próxima revelación.',
+		'narrator El Artefacto de la Luz descansa en las manos de Gabriel, vibrando con una energía que no pertenece a ninguna civilización conocida.',
+		'narrator De pronto, el disco se activa por sí solo.',
+
+		'show scene bg_artefacto_luz_glow with fadeIn',
+		'narrator Una luz intensa surge del artefacto, proyectando un mapa tridimensional del hemisferio sur.',
+		'narrator La proyección se mueve lentamente, como si buscara algo... o respondiera a una presencia.',
+
+		'show character tomas surprised at left',
+		'tomas ¿La octava luz... no es la única?',
+
+		'show character isidora shocked at right',
+		'isidora Gabriel... mira la proyección. La luz se está desplazando.',
+
+		'show character gabriel serious at center',
+		'gabriel No puede ser... está apuntando hacia el sur. Mucho más al sur.',
+
+		'narrator La luz abandona la Patagonia en la proyección y se dirige hacia un punto blanco y vasto.',
+		'narrator La Antártida.',
+
+		//'show character isidora thinking at center',
+		'isidora Si hay otra estructura... entonces la octava luz no era el final.',
+		'isidora Era solo el comienzo.',
+
+		/* Interacción con el artefacto */
+		'narrator El artefacto emite un pulso que golpea suavemente tu pecho.',
+		() => addItem('coordenadas_antartida'),
+		'narrator Las coordenadas de la Antártida han sido añadidas al inventario.',
+
+		() => monogatari.setting('AllowRollback', false),
+		{
+			'Choice': {
+				'aceptar': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Aceptar la existencia de la novena luz.',
+					'Do': 'jump Escena48_Aceptar'
+				},
+				'dudar': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Dudar del artefacto.',
+					'Do': 'jump Escena48_Dudar'
+				},
+				'viajar': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Proponer viajar inmediatamente.',
+					'Do': 'jump Escena48_Viajar'
+				}
+			}
+		}
+	],
+
+	'Escena48_Aceptar': [
+		'gabriel Si existe una novena luz... debemos encontrarla.',
+		'narrator El equipo asiente con solemnidad.',
+		'jump Escena49_Fogon'
+	],
+
+	'Escena48_Dudar': [
+		'tomas ¿Y si el artefacto está dañado? ¿O si interpreta mal la información?',
+		'isidora No. La precisión geométrica es perfecta. Esto no es un error.',
+		'jump Escena49_Fogon'
+	],
+
+	'Escena48_Viajar': [
+		'gabriel No podemos esperar. Si hay otra estructura, debemos llegar antes de que alguien más lo haga.',
+		'isidora ¿Estás diciendo que no somos los únicos que podrían estar buscando esto?',
+		'gabriel Exactamente.',
+		'jump Escena49_Fogon'
+	],
+
+
+	/* ============================================================
+	ESCENA 49 — Cliffhanger
+	============================================================ */
+
+		'Escena49_Fogon': [
+			'show scene fogon with fadeIn',
+			'show character gabriel pensativo at left with fadeIn',
+			'show character isidora normal at right with fadeIn',
+			'gabriel Este artefacto parece que reacciona ante alguna luz cercana.',
+			'isidora Es una clase de astrolabio que indica la ruta que conecta a las maravillas.',
+			'jump Escena49'
+		],
+
+	'Escena49': [
+
+		'show scene bg_cueva_salida with fadeIn duration 3s',
+		'narrator De pronto, al igual que la vez anterior, el artefacto empieza a vibrar y proyecta una coordenada exacta en la Antártida.',
+		'narrator Una estructura enterrada bajo kilómetros de hielo.',
+		'narrator Una maravilla que nadie ha visto.',
+		'narrator Una maravilla que podría cambiarlo todo.',
+
+		'show character gabriel serious at center',
+		'gabriel Nuestro viaje... no ha terminado.',
+
+		'show character isidora determined at right',
+		'isidora Entonces la pregunta es simple.',
+		'isidora ¿Cuándo partimos?',
+
+		'show character tomas thought at left',
+		'tomas La Antártida no es un destino cualquiera. Necesitaremos preparación, permisos, equipo especializado...',
+
+		//'show character isidora calm at center',
+		'isidora Y discreción. Si revelamos esto demasiado pronto, podríamos perder el control de la información.',
+
+		/* Interacción con el artefacto */
+		'narrator El artefacto vuelve a emitir un pulso.',
+		() => addItem('mapa_tridimensional'),
+		'narrator El mapa tridimensional ha sido añadido al inventario.',
+
+		() => monogatari.setting('AllowRollback', false),
+		{
+			'Choice': {
+				'expedicion': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Preparar la expedición.',
+					'Do': 'jump Escena49_Expedicion'
+				},
+				'apoyo': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Buscar apoyo internacional.',
+					'Do': 'jump Escena49_Apoyo'
+				},
+				'investigar': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Investigar antes de viajar.',
+					'Do': 'jump Escena49_Investigar'
+				}
+			}
+		}
+	],
+
+	'Escena49_Expedicion': [
+		'gabriel Prepararemos todo. No podemos perder tiempo.',
+		'narrator El equipo comienza a organizar mentalmente los pasos.',
+		'jump Escena50'
+	],
+
+	'Escena49_Apoyo': [
+		'isidora Si buscamos apoyo internacional, podríamos obtener recursos... pero también atención no deseada.',
+		'gabriel Es un riesgo que debemos evaluar.',
+		'jump Escena50'
+	],
+
+	'Escena49_Investigar': [
+		'isidora Antes de viajar, debemos entender qué estamos buscando.',
+		'narrator El equipo asiente, consciente de la importancia de la información.',
+		'jump Escena50'
+	],
+
+
+	/* ============================================================
+	ESCENA 50 — FIN DEL CAPÍTULO Y APERTURA DE LA SECUELA
+	============================================================ */
+
+	'Escena50': [
+
+		'show scene bg_patagonia_amanecer with fadeIn duration 4s',
+		'narrator El sol comienza a asomarse detrás de las montañas patagónicas.',
+		'narrator La luz dorada ilumina el glaciar, reflejándose en miles de tonos que parecen despedirse del equipo.',
+		'narrator El viento frío acaricia sus rostros, como si la tierra misma reconociera la magnitud de lo descubierto.',
+		'narrator El capítulo termina con una certeza que resuena en cada uno de ellos:',
+
+		'narrator "La octava luz fue solo el comienzo. La novena luz nos espera en el continente blanco."',
+
+		'show character gabriel normal at center',
+		'gabriel Lo que encontramos aquí... cambiará el mundo.',
+		'gabriel Pero lo que encontraremos allá... podría cambiar la historia de la humanidad.',
+
+		'show character isidora normal at right',
+		'isidora Entonces no es un final.',
+		'isidora Es un inicio.',
+
+		'show character tomas entusiasmado at left',
+		'tomas ¿Cómo llamaremos esta nueva etapa?',
+		'show character isidora smile at right',
+		'isidora Ya lo sabemos.',
+		'isidora "El Legado de la Luz".',
+
+		() => monogatari.setting('AllowRollback', false),
+		{
+			'Choice': {
+				'aceptar': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Aceptar la misión.',
+					'Do': 'jump FinCapitulo4_Aceptar'
+				},
+				'cuestionar': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Cuestionar el destino.',
+					'Do': 'jump FinCapitulo4_Cuestionar'
+				},
+				'reflexion': {
+					'onChosen': () => monogatari.setting('AllowRollback', true),
+					'Text': 'Cerrar el capítulo con reflexión.',
+					'Do': 'jump FinCapitulo4_Reflexion'
+				}
+			}
+		}
+	],
+
+	'FinCapitulo4_Aceptar': [
+		'narrator Aceptas la misión con determinación.',
+		'narrator El viaje hacia la novena luz comenzará pronto.',
+		'jump Creditos'
+	],
+
+	'FinCapitulo4_Cuestionar': [
+		'gabriel ¿Estamos preparados para lo que viene?',
+		'narrator La duda se mezcla con esperanza.',
+		'jump Creditos'
+	],
+
+	'FinCapitulo4_Reflexion': [
+		'narrator Cierras los ojos y respiras el aire frío de la Patagonia.',
+		'narrator Sabes que tu vida cambió para siempre.',
+		'jump Creditos'
+	],
+
+	'Creditos': [
+		'stop music with fade 3',
+		'show scene negro with fadeIn duration 2s',
+		//'play music creditos with loop fade 2',
+		'centered <h2>Maravillas de la Antigüedad</h2>',
+		'wait 3000',
+		'centered <h3>Guion y diseño</h3><p>Cortecom</p>',
+		'wait 3000',
+		'centered <h3>Música</h3><p>Cortecom</p>',
+		'wait 3000',
+		'centered <h3>Gracias por jugar</h3>',
+		'wait 3000',
+		'end'     // termina la partida y vuelve al menú principal
+	]
 
 });
