@@ -1610,7 +1610,7 @@ monogatari.script({
 	// -------------------------------------------------------------------------
 	'Escena1_QuintaNormal': [
 		'show scene quinta_normal with fadeIn',
-        'play sound sfx_viento_desierto with loop fade 4',
+        //'play sound sfx_viento_desierto with loop fade 4',
 		'La Quinta Normal, ubicada en Santiago, nació en el siglo XIX como un espacio dedicado a la experimentación agrícola y la educación pública. Con el tiempo se transformó en uno de los parques más emblemáticos de la ciudad, albergando instituciones culturales clave.',
 		'show scene museo_historico_nacional with fadeIn',
 		'Su edificio más destacado es el Museo Nacional de Historia Natural, fundado en 1830, uno de los más antiguos de América Latina. Este museo ha sido fundamental para la investigación científica y la divulgación del patrimonio natural chileno, convirtiéndose en un símbolo histórico dentro del parque y en un referente cultural para generaciones de visitantes.',
