@@ -1595,7 +1595,7 @@ monogatari.script({
         showInventoryBar();
     },
 
-     'jump Escena15'
+     'jump Escena1_QuintaNormal'
     ],
 
 /* =====================================================
