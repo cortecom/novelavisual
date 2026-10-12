@@ -1740,7 +1740,7 @@ monogatari.script({
 	'Escena1_Examinar': [
 		'gabriel (Saca su lupa táctica de bolsillo y examina minuciosamente los microsurcos de la talla)',
 		'Revela micrograbados de trazos alfabéticos ocultos bajo la pátina volcánica.',
-		'show storage Dato_Microescritura true',
+		//'show storage Dato_Microescritura true',
         () => addItem('escritura'),
 		'[DATO AÑADIDO]: Microescritura Arcaica registrada en el diario.',
 		() => {
@@ -1754,7 +1754,7 @@ monogatari.script({
 
 	'Escena1_Origen': [
 		'isidora (Consulta sus fichas catalográficas archivadas) La pieza proviene de los diarios de excavación de 1978 en la Región de Aysén.',
-		'show storage Coordenadas_Aysen true',
+		//'show storage Coordenadas_Aysen true',
         () => addItem('fichas_cartograficas'),
 		'[INFORMACIÓN DESBLOQUEADA]: Antecedentes de excavaciones históricas y coordenadas de Aysén.',
 		() => {
@@ -1768,7 +1768,7 @@ monogatari.script({
 
 	'Escena1_Notas': [
 		'gabriel (Dibuja meticulosamente la geometría de la espiral en su libreta de cuero)',
-		'show storage Objeto_Libreta true',
+		//'show storage Objeto_Libreta true',
         () => addItem('diagrama_espiral'),
 		'[OBJETO OBTENIDO]: Libreta con Diagrama de Espiral (+Precisión en puzles posteriores).',
 		() => {
@@ -2003,7 +2003,7 @@ monogatari.script({
 
 	'Escena3_Atenas': [
 		'Helena Papadakis confirma la anomalía arqueológica desde Grecia y ofrece colaboración internacional.',
-		'show storage Contacto_Helena true',
+		//'show storage Contacto_Helena true',
 		() => addItem('contacto_helena'),
 		() => {
 			if (hasItem('mapa')) {
@@ -3754,19 +3754,19 @@ monogatari.script({
 
 	'Escena30_Overlay': [
 		'Las líneas transversales cruzan directamente sobre puntos estratégicos del Mediterráneo y el Vaticano.',
-		'show storage decision_31 1',
+		//'show storage decision_31 1',
 		'jump Escena30_Vaticano'
 	],
 
 	'Escena30_Frecuencia': [
 		'El algoritmo detecta coincidencias directas en la arquitectura sacra del siglo IV en Roma.',
-		'show storage decision_31 2',
+		//'show storage decision_31 2',
 		'jump Escena30_Vaticano'
 	],
 
 	'Escena30_Imprimir': [
 		'Obtienes un bajorrelieve físico que servirá como llave comparativa en el Vaticano.',
-		'show storage decision_31 3',
+		//'show storage decision_31 3',
 		'jump Escena30_Vaticano'
 	],
 
@@ -3866,7 +3866,7 @@ monogatari.script({
 		'Sellas la muestra con nitrógeno gaseoso para evitar el deterioro de la arcilla.',
 		'gabriel La preservación es clave. Este hallazgo podría cambiar nuestra comprensión de la historia.',
 		'gabriel Debemos asegurarnos de que llegue a los laboratorios de la USACH para su análisis.',
-		'show storage decision_31 1',
+		//'show storage decision_31 1',
 		'jump Escena31_Vaticano'
 	],
 
@@ -3874,14 +3874,14 @@ monogatari.script({
 		'El escáner 3D genera una nube de puntos precisa de la incripción φῶς νότου.',
 		'gabriel La digitalización permite preservar la información para futuros estudios.',
 		'gabriel Esta información será invaluable para los investigadores de la USACH.',
-		'show storage decision_31 2',
+		//'show storage decision_31 2',
 		'jump Escena31_Vaticano'
 	],
 
 	'Escena31_Debatir': [
 		'gabriel El vínculo se vuelve irrefutable; la doctrina se expandió llevando la reference del extremo sur.',
 		'gabriel Debemos analizar estos hallazgos en el contexto de la expansión del cristianismo primitivo.',
-		'show storage decision_31 3',
+		//'show storage decision_31 3',
 		'jump Escena31_Vaticano'
 	],
 
@@ -3915,14 +3915,14 @@ monogatari.script({
 		'Analizas los surcos en la piedra: la técnica revela golpes sistemáticos orientados a borrar rostros paganos.',
 		'gabriel Estos bajorrelieves podrían contener pistas sobre la destrucción de símbolos religiosos.',
 		'gabriel debemos partir al Vaticano para verificar los registros de intervención en sitios helenísticos.',
-		'show storage decision_31 1',
+		//'show storage decision_31 1',
 		'jump Escena32_Vaticano'
 	],
 
 	'Escena31_Interrogar': [
 		'layla Los registros sugieren obispos del siglo IV actuando por decreto en zonas helenizadas.',
 		'gabriel debemos partir al Vaticano para verificar los registros de intervención en sitios helenísticos.',
-		'show storage decision_31 2',
+		//'show storage decision_31 2',
 		'jump Escena32_Vaticano'
 	],
 
@@ -3930,7 +3930,7 @@ monogatari.script({
 		'El georradar detecta una oquedad oculta tras un bloque fracturado por impacto manual.',
 		'gabriel Debemos analizar esta hallazgo en el contexto de la expansión del cristianismo primitivo.',
 		'gabriel debemos partir al Vaticano para verificar los registros de intervención en sitios helenísticos.',
-		'show storage decision_31 3',
+		//'show storage decision_31 3',
 		'jump Escena32_Vaticano'
 	],
 
@@ -3997,19 +3997,19 @@ monogatari.script({
 
 	'Escena32_Etica': [
 		'marcus (Sorprendido) El sello de la luz del sur... Pensé que todos habían sido destruidos.',
-		'show storage decision_32 1',
+		//'show storage decision_32 1',
 		'jump Escena33_BibliotecaVaticana'
 	],
 
 	'Escena32_Decretos': [
 		'marcus Conocen bien la patrística... Muy bien, verán los registros de la ejecución de esos decretos.',
-		'show storage decision_32 2',
+		//'show storage decision_32 2',
 		'jump Escena33_BibliotecaVaticana'
 	],
 
 	'Escena32_Diplomacia': [
 		'marcus Sus credenciales son válidas, aunque la verdad que solicitan pesa más que cualquier título.',
-		'show storage decision_32 3',
+		//'show storage decision_32 3',
 		'jump Escena33_BibliotecaVaticana'
 	],
 
@@ -4438,19 +4438,19 @@ monogatari.script({
 
 	'Escena38_Impronta': [
 		'Obtienes un duplicado perfecto de la estela para el cuaderno de campo de la expedición.',
-		'show storage decision_38 1',
+		//'show storage decision_38 1',
 		'jump Escena39_Sinai'
 	],
 
 	'Escena38_Gramatica': [
 		'La estructura léxica es idéntica, demostrando que provienen del mismo autor o círculo.',
-		'show storage decision_38 2',
+		//'show storage decision_38 2',
 		'jump Escena39_Sinai'
 	],
 
 	'Escena38_Logistica': [
 		'Preparas los pertrechos de montaña y las autorizaciones para la expedición al desierto.',
-		'show storage decision_38 3',
+		//'show storage decision_38 3',
 		'jump Escena39_Sinai'
 	],
 
@@ -4524,19 +4524,19 @@ monogatari.script({
 
 	'Escena39_Isidora': [
 		'Isidora El escáner detecta una pared falsa erigida con mortero antiguo. Es un altar judio-cristiano.',
-		'show storage decision_39 1',
+		//'show storage decision_39 1',
 		'jump Escena40_RevelacionFinal'
 	],
 
 	'Escena39_InterrogarMarcus': [
 		'marcus Comprendieron que si el mundo caía en la oscuridad, el origen en el sur debía perdurar.',
-		'show storage decision_39 2',
+		//'show storage decision_39 2',
 		'jump Escena40_RevelacionFinal'
 	],
 
 	'Escena39_Muestras': [
 		'Las muestras contienen mirra y aceites de consagración fechados en el siglo IV.',
-		'show storage decision_39 3',
+		//'show storage decision_39 3',
 		'jump Escena40_RevelacionFinal'
 	],
 
@@ -4587,21 +4587,21 @@ monogatari.script({
 
 	'Cierre_Capitulo3_Bitacora': [
 		'Consignas formalmente el descubrimiento del pacto global de preservación.',
-		'show storage decision_40 1',
+		//'show storage decision_40 1',
 		'[FIN DEL CAPÍTULO 3]: Rumbo al desenlace en la Patagonia.',
 		'jump Capitulo4'
 	],
 
 	'Cierre_Capitulo3_Informe': [
 		'El laboratorio en Chile inicia la preparación del equipo de excavación profunda.',
-		'show storage decision_40 2',
+		//'show storage decision_40 2',
 		'[FIN DEL CAPÍTULO 3]: Rumbo al desenlace en la Patagonia.',
 		'jump Capitulo4'
 	],
 
 	'Cierre_Capitulo3_Geodesico': [
 		'Los cálculos confirman una alineación exacta entre ambos puntos sagrados.',
-		'show storage decision_40 3',
+		//'show storage decision_40 3',
 		'[FIN DEL CAPÍTULO 3]: Rumbo al desenlace en la Patagonia.',
 		'jump Capitulo4'
 	],
