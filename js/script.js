@@ -504,6 +504,26 @@ const itemIcons = {
         description: 'Placa metálica desgastada por el tiempo con inscripciones parcialmente legibles.'
     },
 //Capitulo 4
+	'medicion_geometrica': {
+		icon: 'assets/icons/medicion_geometrica.png',
+		name: 'Medición Geométrica',
+		description: 'Mediciones realizadas de la octava luz para documentar tamaño y proporciones'
+	},
+	'panel_simbolos': {
+		icon: 'assets/icons/panel_simbolos.png',
+		name: 'Panel con Símbolos',
+		description: 'Panel con símbolos mixtos de culturas pre-históricas'
+	},
+	'pasadizo_oculto': {
+		icon: 'assets/icons/pasadizo_oculto.png',
+		name: 'Pasadizo Oculto',
+		description: 'Un pasadizo se observa, pero esta bloqueado.'
+	},
+	'material_octava_luz': {
+		icon: 'assets/icons/material_octava_luz.png',
+		name: 'Material Octava Luz',
+		description: 'Analisis del material de la estructura'
+	},
 	'hielo_fosil': {
 		icon: 'assets/icons/hielo_fosil.png',
 		name: 'Hielo fosil',
@@ -523,6 +543,21 @@ const itemIcons = {
 		icon: 'assets/icons/antorcha_encendida.png',
 		name: 'Antorcha Encendido',
 		description: 'Un palo de antorcha encendido.'
+	},
+	'coordenadas_antartida': {
+		icon: 'assets/icons/coordenadas_antartida.png',
+		name: 'Coordenadas de la Antártida',
+		description: 'Describen la posición georeferenciada de la Antártida.'
+	},
+	'analisis_aleacion': {
+		icon: 'assets/icons/analisis_aleacion.png',
+		name: 'Análisis de Aleación',
+		description: 'El material no coincide con ningún metal conocido.'
+	},
+	'diccionario_simbolos': {
+		icon: 'assets/icons/diccionario_simbolos.png',
+		name: 'Diccionario de símbolos',
+		description: 'Registro de los símbolos en tu cuaderno digital.'
 	}
 };
 
@@ -875,6 +910,10 @@ monogatari.assets ('music', {
 	'capitulo4': 'capitulo4.mp3',
 });
 
+monogatari.settings({
+    'MainScreenMusic': 'capitulo2'
+});
+
 // Define the voice files used in the game.
 monogatari.assets ('voices', {
 
@@ -908,7 +947,6 @@ monogatari.assets ('images', {
 	'overlay_vignette_sepia': 'overlay_vignette_sepia.png',
 	'overlay_grano': 'overlay_grano.png',
 	'overlay_letterbox': 'overlay_letterbox.png',
-
 	'collar': 'collar.png',
 	'amuleto': 'amuleto.png',
 	'tubo': 'tubo.png',
@@ -971,8 +1009,9 @@ monogatari.assets ('scenes', {
 	'bg_manuscrito': 'vatican_manuscript.png',
 	'bg_siria_archivo': 'siria_archive.png',
 	'bg_saqueo_siria': 'archive_attack.png',
+	'bg_paso_subterraneo': 'bg_paso_subterraneo.png',
 	'bg_biblioteca_sidon': 'biblioteca_sidon.png',
-	'bg_sidon': 'sidon_port.png',
+	'bg_sidon': 'bg_sidon.png',
 	'bg_epigrama': 'epigrama_sidon.png',
 	'bg_sinai': 'sinai_mountain.png',
 	'bg_sinai_caverna': 'sinai_caverna.png',
@@ -2272,7 +2311,7 @@ monogatari.script({
 			} else {
 				choice.Choice.Ruta_Grecia = {
 					'Text': '🏛️ Volver donde Lucia, necesitamos un contacto para Viajar a Grecia y Turquía (Atenas y Halicarnaso - Antípatro y el Mausoleo)',
-					'Do': 'jump Escena3_Laboratorio_piedra',
+					'Do': 'jump Escena3_Laboratorio_piedra_decision',
 					'onChosen': () => monogatari.setting('AllowRollback', true)
 				};				
 			}
@@ -2441,33 +2480,44 @@ monogatari.script({
 	'Escena14_Decision': [
 		'show scene biblioteca_atenas with fadeIn',
 		() => monogatari.setting('AllowRollback', false),
-		{
-			'Choice': {
-				'Dialog': 'gabriel (Decisión del jugador)',
-				'Opcion_Poema': {
-					'onChosen': () => monogatari.setting('AllowRollback', true),
+		() => {
+			const choice = {
+				'Choice': {
+					'Dialog': 'gabriel (Decisión del jugador)'
+				}
+			};		
+
+			if (!hasItem('contacto_diodoro')) {
+				choice.Choice.Opcion_Poema = {
 					'Text': 'Preguntar directamente por el contenido y origen de los libros perdidos de Diodoro Sículo',
-					'Do': 'jump Escena14_Poema'
-				},
+					'Do': 'jump Escena14_Poema',
+					'onChosen': () => monogatari.setting('AllowRollback', true)
+				};
+			}
 
-				'Opcion_Mausoleo': {
-					'onChosen': () => monogatari.setting('AllowRollback', true),
+			if (!hasItem('miniatura_cuadriga')) {
+				choice.Choice.Opcion_Mausoleo = {
 					'Text': 'Pedir detalles sobre el relieve único del Mausoleo de Halicarnaso',
-					'Do': 'jump Escena14_Mausoleo'
-				},
-				'Opcion_Antipatro': {
-					'onChosen': () => monogatari.setting('AllowRollback', true),
-					'Text': 'Inquirir sobre la relación de Antípatro de Sidón con las Siete Maravillas',
-					'Do': 'jump Escena14_Antipatro'
+					'Do': 'jump Escena14_Mausoleo',
+					'onChosen': () => monogatari.setting('AllowRollback', true)
+				};
+			}
 
-				},
-				'Opcion_Omar': {
-					'onChosen': () => monogatari.setting('AllowRollback', true),
+			if (!hasItem('fragmento_marfil') && !hasItem('inscripcion_secreta') && !hasItem('simulacion_coloso')) {
+				choice.Choice.Opcion_Antipatro = {
+					'Text': 'Inquirir sobre la relación de Antípatro de Sidón con las Siete Maravillas',
+					'Do': 'jump Escena14_Antipatro',
+					'onChosen': () => monogatari.setting('AllowRollback', true)
+				};
+			}
+			if (hasItem('fragmento_marfil') && hasItem('inscripcion_secreta') && hasItem('miniatura_cuadriga') && hasItem('simulacion_coloso') && hasItem('contacto_diodoro')) {
+				choice.Choice.Opcion_Omar = {
 					'Text': 'Preguntar por un contacto experto para averiguar sobre la relación de Diodoro Sículo con las Siete Maravillas',
 					'Do': 'jump Escena14_Omar',
-					'Condition': () => hasItem('fragmento_marfil') && hasItem('inscripcion_secreta') && hasItem('miniatura_cuadriga') && hasItem('simulacion_coloso') && hasItem('contacto_diodoro') 
-				}
+					'onChosen': () => monogatari.setting('AllowRollback', true)
+				};
 			}
+			monogatari.run(choice);
 		}
 	],
 
@@ -2492,25 +2542,34 @@ monogatari.script({
 		'narrator Trazar el mapa de asentamientos helenísticos vinculados con las 3 divinidades griegas, mencionadas en los libros: Zeus, Artemisa y Helios',
 		() => addItem('contacto_antipatro'),
 		() => monogatari.setting('AllowRollback', false),
-		{
-			'Choice': {
-				'Dialog': 'gabriel ¿A que lugrar mencionado en el Epigrama de Antípatro deberíamos dirigirnos?',
-				'Opcion_Olimpia': {
-					'onChosen': () => monogatari.setting('AllowRollback', true),
-					'Text': 'Proponer viaje inmediato a Olimpia para investigar el culto a Zeus',
-					'Do': 'jump Escena15'
-				},
-				'Opcion_Traduccion': {
-					'onChosen': () => monogatari.setting('AllowRollback', true),
-					'Text': 'Partir hacia Éfeso, Turquía, para seguir la pista de Artemisa',
-					'Do': 'jump Escena17'
-				},
-				'Opcion_RutaGrecia': {
-					'onChosen': () => monogatari.setting('AllowRollback', true),
-					'Text': 'Viajar hasta Rodas, buscando al Dios Sol de Helios',
-					'Do': 'jump Escena22'
+		() => {
+			const choice = {
+				'Choice': {
+					'Dialog': 'gabriel ¿A que lugrar mencionado en el Epigrama de Antípatro deberíamos dirigirnos?',
 				}
+			};					
+			if (!hasItem('fragmento_marfil')) {	
+				choice.Choice.Opcion_Olimpia = {
+						'onChosen': () => monogatari.setting('AllowRollback', true),
+						'Text': 'Proponer viaje inmediato a Olimpia para investigar el culto a Zeus',
+						'Do': 'jump Escena15'
+				};
 			}
+			if (!hasItem('inscripcion_secreta')) {	
+				choice.Choice.Opcion_Traduccion = {
+						'onChosen': () => monogatari.setting('AllowRollback', true),
+						'Text': 'Partir hacia Éfeso, Turquía, para seguir la pista de Artemisa',
+						'Do': 'jump Escena17'
+				};
+			}
+			if (!hasItem('simulacion_coloso')) {	
+				choice.Choice.Opcion_RutaGrecia = {
+						'onChosen': () => monogatari.setting('AllowRollback', true),
+						'Text': 'Viajar hasta Rodas, buscando al Dios Sol de Helios',
+						'Do': 'jump Escena22'
+				};
+			}
+			monogatari.run(choice);
 		}		
 	],
 
@@ -4244,12 +4303,15 @@ monogatari.script({
 	],
 
 	'Escena36_Salida': [
-		'show scene bg_saqueo_siria with fadeIn',
+		'show scene bg_paso_subterraneo with fadeIn',
+		'show character gabriel worried at left with fadeIn',
 		'gabriel Esto confirma que Antípatro tenía conocimiento de tierras lejanas y de la octava luz.',
 		'gabriel Debemos avanzar hacia Sidón para seguir sus pasos y descubrir la verdad detrás de sus escritos.',
+		'show character isidora scared al right with fadein',
 		'isidora La información es valiosa, pero peligrosa. Debemos actuar con cautela.',
+		'show character layla normal at center with fadeIn',
 		'layla Estoy de acuerdo. La seguridad del equipo y la preservación de los fragmentos es nuestra prioridad. Los espera Helena Papadakis en Sidón, quien nos ayudará a interpretar los textos. Adios. debo regresar y proteger los fragmentos que hemos rescatado.',
-		'tomas Debemos planear nuestra ruta hacia Sidón y asegurarnos de que no nos sigan.',
+		'isidora Debemos planear nuestra ruta hacia Sidón y asegurarnos de que no nos sigan.',
 		'jump Escena37_Sidon'
 	],
 
@@ -4259,19 +4321,14 @@ monogatari.script({
 	'Escena37_Sidon': [
 		'show scene bg_sidon with fadeIn',
 		'Sidón es una ciudad antigua junto al mar. Aquí nació Antípatro de Sidón, el poeta que enumeró las maravillas.',
-
 		'show character helena talk at center with fadeIn',
 		'helena Antípatro escribió sobre las maravillas... pero también sobre una luz que las guiaba.',
-
 		'show character gabriel talk at left with fadeIn',
 		'gabriel La octava luz.',
-
 		'show character tomas talk at right with fadeIn',
 		'tomas La que apunta a Chile.',
-
 		'[ACCIÓN DE INVENTARIO] Utilizas el Detector de Metales Inductivo en la zona del viejo puerto fenicio.',
 		'[EFECTO]: Desentierra una estela conmemorativa con una inscripción poética.',
-
 		'TRANSICIÓN HACIA MONTE SINAÍ',
 		'helena Antípatro menciona que la decisión de destruir las maravillas se tomó «en la montaña donde la fe nació».',
 		'gabriel Debemos ir a la biblioteca de Sidón y estudiar los textos antiguos que puedan contener pistas sobre la octava luz.',
@@ -4345,19 +4402,16 @@ monogatari.script({
 	// -------------------------------------------------------------
 	'Escena38_EpigramaOriginal': [
 		//'show scene bg_epigrama with fadeIn',
-
 		'show scene bg_biblioteca_sidon with fadeIn',
 		() => hideAllHotspots(),
-
 		'El epigrama menciona:',
 		'«La octava luz guía a las siete desde el sur del mundo.»',
-
 		'[ACCIÓN DE INVENTARIO] Aplicas una gota de Reactivo Ácido Neutro para limpiar la caliza del epigrama.',
 		'[EFECTO]: Limpia las incrustaciones salinas sin erosionar las tallas en piedra.',
-
 		'show character isidora thought at center with fadeIn',
 		'isidora Antípatro sabía de Chile o sabía de quienes llegaron a Chile.',
 		'isidora Existe o existio una organización que realizó todo esto y el lugar donde todo esto se coordina es en el Monte Sinaí.',
+		'show character gabriel thought at left with fadeIn',
 		'gabriel Debemos ir allí para entender la conexión entre la octava luz y la destrucción de las maravillas.',
 		() => monogatari.setting('AllowRollback', false),
 		{
@@ -4427,7 +4481,7 @@ monogatari.script({
 'Escena39_Caverna': [
 		'show scene bg_sinai_caverna with fadeIn',
 		() => showInventoryBar(),
-		'El quipo decide examinar la biblioteca. Esto activa un hallazgo crucial.',
+		'El quipo decide examinar la cueva. Esto activa un hallazgo crucial.',
 		() => VerObjeto('pared1'),
 		() => VerObjeto('pared2'),
 		() => VerObjeto('pared3'),
@@ -4588,13 +4642,10 @@ monogatari.script({
 		'show scene cascada_congelada with fadeIn',
 		'show character gabriel normal at center',
 		'gabriel Todo nos trajo de vuelta. Antípatro, Diodoro, los cristianos primitivos... todos apuntaban a este lugar.',
-
 		'show character isidora normal at right',
 		'isidora La octava luz está aquí. Y debemos encontrarla.',
-
 		'show character erik normal at left',
 		'erik Hay una cueva más profunda. Nunca la exploré... pero las coordenadas que encontraron coinciden con su entrada.',
-
 		/* Interacción con objeto: GPS antiguo */
 		'narrator Gabriel revisa el GPS antiguo encontrado en el Capítulo 1.',
 		() => addItem('gps_antiguo'),
@@ -4646,7 +4697,6 @@ monogatari.script({
 	============================================================ */
 
 	'Escena42': [
-
 		'show scene camara_profunda with fadeIn duration 3s',
 		'narrator En la entrada de la cueva, el equipo llega nuevamente a la camara con el altar circular con ranuras.',
 		'narrator Ocho ranuras. Una por cada maravilla que Antípatro y Diodoro documentaron... y una octava, la que las precede a todas.',
@@ -4658,14 +4708,14 @@ monogatari.script({
 		'show scene altar with fadeIn',
 		'narrator El altar espera ser activado.',
 		() => showInventoryBar(),
-			       async() => {
-				       if (!monogatari.storage('player').ensamblajeAltar) {
-					monogatari.distractionFree();
-					await monogatari.run('ensamblaje ensamblajePuzzle');
-					monogatari.distractionFree();
-					monogatari.storage('player').ensamblajeAltar = true;
-				}
-					   },
+		async() => {
+			if (!monogatari.storage('player').ensamblajeAltar) {
+		monogatari.distractionFree();
+		await monogatari.run('ensamblaje ensamblajePuzzle');
+		monogatari.distractionFree();
+		monogatari.storage('player').ensamblajeAltar = true;
+			}
+		},
 		'narrator El altar se ilumina con una luz azul.',
 		'narrator La cueva se abre lentamente.',
 		'jump Escena43'
@@ -4684,11 +4734,11 @@ monogatari.script({
 		'narrator Las paredes están cubiertas de símbolos mapuches y helenísticos entrelazados.',
 		'narrator En el centro, una estructura geométrica idéntica a la Gran Pirámide de Giza... pero más pequeña, más antigua, más perfecta.',
 		'narrator La octava luz no es un objeto. Es una estructura. Una maravilla perdida.',
-		'show character tomas normal at left',
+		'show character tomas surprised at left',
 		'tomas Es... una pirámide. Una pirámide mapuche.',
-		'show character isidora normal at right',
+		'show character isidora sorprendida at right',
 		'isidora No. Es anterior a los mapuches. Anterior a los griegos. Anterior a todo lo que conocemos.',
-		'show character gabriel normal at center',
+		'show character gabriel worried at center',
 		'gabriel La octava luz... la maravilla original.',
 		/* Interacción con estructura */
 		'narrator Gabriel toca la superficie de la pirámide.',
@@ -4739,7 +4789,6 @@ monogatari.script({
 	============================================================ */
 
 	'Escena44': [
-
 		'show scene bg_historia_luz with fadeIn duration 3s',
 		'narrator La octava luz es la primera maravilla del mundo antiguo.',
 		'narrator La única construida antes de la expansión de las civilizaciones mediterráneas.',
@@ -4747,7 +4796,6 @@ monogatari.script({
 		'narrator Las otras siete maravillas fueron construidas como réplicas simbólicas de esta estructura original.',
 		'narrator Pero cuando la lucha contra la idolatría comenzó, las réplicas fueron destruidas... y la original fue ocultada en el fin del mundo.',
 		'narrator La única réplica que sobrevivió fue la Gran Pirámide de Giza.',
-
 		() => monogatari.setting('AllowRollback', false),
 		{
 			'Choice': {
@@ -4808,7 +4856,6 @@ monogatari.script({
 	============================================================ */
 
 	'Escena45': [
-
 		'show scene bg_camara_subterranea with shake infinite',
 		'narrator Un estruendo sacude la cámara subterránea.',
 		'narrator El suelo vibra como si la tierra quisiera expulsar la estructura.',
@@ -4821,20 +4868,19 @@ monogatari.script({
 		'show character tomas scared at left',
 		'tomas ¡Las rocas vienen hacia nosotros! ¡Rápido!',
 		'narrator Corres hacia la salida mientras el techo cede a tu espalda.',
-
 		// TODO: reemplaza esta línea por la llamada que ya usas en tus otros
 		// minijuegos para ocultar text-box/quick-menu ANTES del verbo
 		// (crítico: debe ir antes, no después — ver notas de integración).
 		// 'distractionFree' o el helper equivalente que ya tengas en script.js,
-		() => hideinventoryBar(),
-			       async() => {
-				       if (!monogatari.storage('player').derrumbeFinal) {
-					monogatari.distractionFree();
-					await monogatari.run('derrumbe derrumbeFinal');
-					monogatari.distractionFree();
-					monogatari.storage('player').derrumbeFinal = true;
-				}
-					   },
+		() => hideInventoryBar(),
+		async() => {
+			if (!monogatari.storage('player').derrumbeFinal) {
+				monogatari.distractionFree();
+				await monogatari.run('derrumbe derrumbeFinal');
+				monogatari.distractionFree();
+				monogatari.storage('player').derrumbeFinal = true;
+			}
+		},
 
 		// El componente ya dejó dos banderas en monogatari.storage():
 		//   - derrumbeMuroIntacto   → true si la Etapa 1 se completó sin
@@ -4852,11 +4898,8 @@ monogatari.script({
 		//() => addItem('relacion_isidora_mejorada'),
 		'show character isidora normal at right',
 		'narrator El polvo se asienta. Isidora, a salvo, mira hacia atrás.',
-
 		'isidora Gracias por no dejarme atrás.',
-
 		'narrator Ante ustedes, la cámara oculta que el propio derrumbe acaba de revelar.',
-
 		'jump Escena46'
 	],
 
@@ -5118,20 +5161,15 @@ monogatari.script({
 
 		'show character tomas surprised at left',
 		'tomas ¿La octava luz... no es la única?',
-
 		'show character isidora shocked at right',
 		'isidora Gabriel... mira la proyección. La luz se está desplazando.',
-
 		'show character gabriel serious at center',
 		'gabriel No puede ser... está apuntando hacia el sur. Mucho más al sur.',
-
 		'narrator La luz abandona la Patagonia en la proyección y se dirige hacia un punto blanco y vasto.',
 		'narrator La Antártida.',
-
 		//'show character isidora thinking at center',
 		'isidora Si hay otra estructura... entonces la octava luz no era el final.',
 		'isidora Era solo el comienzo.',
-
 		/* Interacción con el artefacto */
 		'narrator El artefacto emite un pulso que golpea suavemente tu pecho.',
 		() => addItem('coordenadas_antartida'),
@@ -5199,25 +5237,17 @@ monogatari.script({
 		'narrator Una estructura enterrada bajo kilómetros de hielo.',
 		'narrator Una maravilla que nadie ha visto.',
 		'narrator Una maravilla que podría cambiarlo todo.',
-
 		'show character gabriel serious at center',
 		'gabriel Nuestro viaje... no ha terminado.',
-
 		'show character isidora determined at right',
 		'isidora Entonces la pregunta es simple.',
 		'isidora ¿Cuándo partimos?',
-
 		'show character tomas thought at left',
 		'tomas La Antártida no es un destino cualquiera. Necesitaremos preparación, permisos, equipo especializado...',
-
 		//'show character isidora calm at center',
 		'isidora Y discreción. Si revelamos esto demasiado pronto, podríamos perder el control de la información.',
-
 		/* Interacción con el artefacto */
 		'narrator El artefacto vuelve a emitir un pulso.',
-		() => addItem('mapa_tridimensional'),
-		'narrator El mapa tridimensional ha sido añadido al inventario.',
-
 		() => monogatari.setting('AllowRollback', false),
 		{
 			'Choice': {

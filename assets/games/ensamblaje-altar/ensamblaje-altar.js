@@ -91,6 +91,19 @@
    mostrar la victoria (showVictory()), igual que ya se hace al
    cambiar de etapa.
 
+   v9: el usuario reportó que las imágenes de los 7 testigos no se
+   veían (seguían con el medallón SVG genérico) y pidió usar sus
+   retratos reales, que ya existen en el proyecto como personajes de
+   Monogatari (assets/characters/<nombre>/normal.png — el mismo sprite
+   de cuerpo completo que el motor usa para mostrarlos hablando en el
+   guion). Se tomó cada sprite real del repositorio del proyecto
+   (github.com/cortecom/novelavisual), se recortó a un busto cuadrado
+   (cabeza y hombros, ~25% superior de la figura, fondo transparente
+   conservado) y se redujo de tamaño para la bandeja del minijuego —
+   ver INTEGRACION.md, sección "Ajustes v9". Las imágenes van en
+   'images/' junto a este archivo; el medallón SVG genérico
+   (BUSTO_SVG) se eliminó del código, ya no se usa.
+
    Web Component con Shadow DOM, cada bloque envuelto en su propio
    IIFE (evita colisiones globales, ver lección real con
    epigrama-puzzle.js / vaticano-maze.js, que compartían un `_build`
@@ -241,21 +254,6 @@
     ];
 
     /* --------------------------------------------------------
-       Retrato genérico (medallón SVG inline, sin depender de un
-       archivo de imagen) para los 7 testigos de la Etapa 2. Cuando el
-       usuario genere retratos reales, basta con cambiar 'icon' en
-       TESTIGOS por el path real (ver prompts en INTEGRACION.md); el
-       componente no necesita ningún otro cambio.
-    -------------------------------------------------------- */
-    const BUSTO_SVG = 'data:image/svg+xml;utf8,' + encodeURIComponent(
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">' +
-        '<circle cx="50" cy="50" r="47" fill="#2a1c0f" stroke="#a9884f" stroke-width="4"/>' +
-        '<circle cx="50" cy="39" r="15" fill="#cbb789"/>' +
-        '<path d="M18 90 Q18 60 50 60 Q82 60 82 90 Z" fill="#cbb789"/>' +
-        '</svg>'
-    );
-
-    /* --------------------------------------------------------
        Decoración del mapa de las Etapas 1 y 2 (rosa de los vientos,
        oleaje y esquineros ornamentales), dibujada inline como SVG para
        que el mapa se vea como un mapa antiguo real y no solo como una
@@ -302,15 +300,25 @@
        ciudad corresponde esa maravilla — igual criterio que en
        OBJETOS/etapaConfig(1), para que la Etapa 2 no se resuelva solo
        leyendo el texto.
+
+       'icon': retrato real de cada testigo (recorte de busto/hombros,
+       cuadrado, fondo transparente), tomado de su propio sprite de
+       personaje del proyecto (assets/characters/<nombre>/normal.png,
+       el mismo que usa Monogatari para mostrarlo hablando) y recortado
+       a una imagen más pequeña y cuadrada para la bandeja del
+       minijuego. Van en 'images/' junto a este archivo, igual que el
+       resto de los assets propios de este minijuego (no en
+       assets/icons/, que es la carpeta de ítems de inventario
+       compartidos). Ya no se usa el medallón SVG genérico.
     -------------------------------------------------------- */
     const TESTIGOS = [
-        { id: 'hemiunu', nombre: 'Hemiunu', rol: 'Arquitecto real de la Gran Pirámide', ciudad: 'giza', icon: BUSTO_SVG },
-        { id: 'amitis', nombre: 'Amitis', rol: 'Reina para quien se habrían construido los Jardines', ciudad: 'babilonia', icon: BUSTO_SVG },
-        { id: 'sacerdotisa_efeso', nombre: 'La Sacerdotisa de Artemisa', rol: 'Guardiana del Templo de Artemisa', ciudad: 'efeso', icon: BUSTO_SVG },
-        { id: 'fidias', nombre: 'Fidias', rol: 'Escultor de la Estatua de Zeus', ciudad: 'olimpia', icon: BUSTO_SVG },
-        { id: 'artemisia_ii', nombre: 'Artemisia II', rol: 'Viuda de Mausolo, mandó construir el Mausoleo', ciudad: 'halicarnaso', icon: BUSTO_SVG },
-        { id: 'cares_de_lindos', nombre: 'Cares de Lindos', rol: 'Escultor del Coloso', ciudad: 'rodas', icon: BUSTO_SVG },
-        { id: 'sostrato_de_cnido', nombre: 'Sóstrato de Cnido', rol: 'Arquitecto del Faro', ciudad: 'alejandria', icon: BUSTO_SVG }
+        { id: 'hemiunu', nombre: 'Hemiunu', rol: 'Arquitecto real de la Gran Pirámide', ciudad: 'giza', icon: 'assets/games/ensamblaje-altar/images/hemiunu.png' },
+        { id: 'amitis', nombre: 'Amitis', rol: 'Reina para quien se habrían construido los Jardines', ciudad: 'babilonia', icon: 'assets/games/ensamblaje-altar/images/amitis.png' },
+        { id: 'sacerdotisa_efeso', nombre: 'La Sacerdotisa de Artemisa', rol: 'Guardiana del Templo de Artemisa', ciudad: 'efeso', icon: 'assets/games/ensamblaje-altar/images/sacerdotisa_efeso.png' },
+        { id: 'fidias', nombre: 'Fidias', rol: 'Escultor de la Estatua de Zeus', ciudad: 'olimpia', icon: 'assets/games/ensamblaje-altar/images/fidias.png' },
+        { id: 'artemisia_ii', nombre: 'Artemisia II', rol: 'Viuda de Mausolo, mandó construir el Mausoleo', ciudad: 'halicarnaso', icon: 'assets/games/ensamblaje-altar/images/artemisia_ii.png' },
+        { id: 'cares_de_lindos', nombre: 'Cares de Lindos', rol: 'Escultor del Coloso', ciudad: 'rodas', icon: 'assets/games/ensamblaje-altar/images/cares_de_lindos.png' },
+        { id: 'sostrato_de_cnido', nombre: 'Sóstrato de Cnido', rol: 'Arquitecto del Faro', ciudad: 'alejandria', icon: 'assets/games/ensamblaje-altar/images/sostrato_de_cnido.png' }
     ];
 
     const TEMPLATE = `
