@@ -1,8 +1,8 @@
 {
-	"short_name": "Monogatari",
-	"name": "Monogatari Visual Novel",
-	"background_color": "#F7F7F7",
-	"theme_color": "#F7F7F7",
+	"short_name": "Maravillas",
+	"name": "Maravillas de la Antigüedad",
+	"background_color": "#1a1208",
+	"theme_color": "#1a1208",
 	"orientation": "landscape",
 	"display": "fullscreen",
 	"start_url": "index.html",
