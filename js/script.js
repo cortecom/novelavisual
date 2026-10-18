@@ -1627,7 +1627,7 @@ monogatari.script({
         showInventoryBar();
     },
 
-     'jump Escena14_Decision'
+     'jump Escena1_QuintaNormal'
     ],
 
 /* =====================================================
