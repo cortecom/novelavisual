@@ -1,10 +1,10 @@
 'use strict';
 
 // The name of your game, no spaces or special characters.
-const name = 'Monogatari';
+const name = 'MaravillasDeLaAntiguedad';
 
 // The cache version.
-const version = '0.1.2';
+const version = '0.1.3';
 
 // Name of the Cache Storage bucket this worker owns.
 const cacheName = `${name}-v${version}`;
