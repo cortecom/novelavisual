@@ -118,6 +118,11 @@ const itemIcons = {
         name: 'Mensaje de Marcus',
         description: 'Mensaje de Apoyo de Marcus para investigar.'
     },
+	'contacto_omar': {
+        icon: 'assets/icons/contacto_omar.png',
+        name: 'Mensaje de Omar',
+        description: 'Mensaje de Apoyo de Omar para investigar.'
+    },
     'relieve_halicarnaso': {
         icon: 'assets/icons/relieve_halicarnaso.png',
         name: 'Relieve de Halicarnaso',
@@ -278,12 +283,12 @@ const itemIcons = {
 	'contacto_diodoro': {
 		icon: 'assets/icons/contacto_diodoro.png',
 		name: 'Contacto con Diodoro Sículo',
-		description: 'Historiador griego del siglo I a.C. que documentó las Siete Maravillas en su obra "Bibliotheca historica".'
+		description: 'Diodoro Sículo: Historiador griego del siglo I a.C. que documentó las Siete Maravillas en su obra "Bibliotheca historica".'
 	},
 	'contacto_antipatro': {
 		icon: 'assets/icons/contacto_antipatro.png',
 		name: 'Contacto con Antipatro de Sidón',
-		description: 'Poeta griego del siglo II a.C. que escribió epigramas por primera vez sobre las Siete Maravillas.'
+		description: 'Atipatro de Sidón: Poeta griego del siglo II a.C. que escribió epigramas por primera vez sobre las Siete Maravillas.'
 	},
     // [REVISION 2026-09-22] SIN USO EN ESCENAS: no se detectaron llamadas a addItem/hasItem/removeItem ni otras referencias a 'espectrometro' fuera de itemIcons. Revisar si falta implementarlo o si puede eliminarse.
     'espectrometro': {
@@ -1622,7 +1627,7 @@ monogatari.script({
         showInventoryBar();
     },
 
-     'jump Escena1_QuintaNormal'
+     'jump Escena14_Decision'
     ],
 
 /* =====================================================
@@ -2502,8 +2507,8 @@ monogatari.script({
 					'onChosen': () => monogatari.setting('AllowRollback', true)
 				};
 			}
-
-			if (!hasItem('fragmento_marfil') && !hasItem('inscripcion_secreta') && !hasItem('simulacion_coloso')) {
+ 
+			if (!hasItem('fragmento_marfil') || !hasItem('inscripcion_secreta') || !hasItem('simulacion_coloso')) {
 				choice.Choice.Opcion_Antipatro = {
 					'Text': 'Inquirir sobre la relación de Antípatro de Sidón con las Siete Maravillas',
 					'Do': 'jump Escena14_Antipatro',
