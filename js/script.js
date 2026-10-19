@@ -913,6 +913,9 @@ monogatari.assets ('music', {
 	'capitulo2': 'capitulo2.mp3',
 	'capitulo3': 'capitulo3.mp3',
 	'capitulo4': 'capitulo4.mp3',
+	'creditos': 'creditos.mp3',
+	'inicio_capitulo': 'inicio_capitulo.mp3',
+	'fin_capitulo': 'fin_capitulo.mp3'
 });
 
 monogatari.settings({
@@ -1788,10 +1791,10 @@ monogatari.script({
 	'Capitulo1': [
 		'stop music tema_principal with fade 3',
 		'show scene negro with fadeIn duration 1s',
-		'play sound sting_inicio_capitulo with loop fade 3',
+		'play music inicio_capitulo with loop fade 3',
 		//'play music sting_inicio_capitulo with loop fade 2',
 		'centered <h1>Capítulo I</h1><p>El Origen Oculto</p>',
-		'stop sound sting_inicio_capitulo with fade 3',
+		'stop music inicio_capitulo with fade 3',
 		'play music capitulo1 with loop fade 4',
 		'jump Escena2_Usach'   // primera escena real del capítulo
 	],
@@ -2405,15 +2408,15 @@ monogatari.script({
 
 	'Capitulo2': [
 		'stop music capitulo1 with fade 3',
-		'play sound sting_fin_capitulo with loop fade 3',
+		'play music fin_capitulo with loop fade 3',
 		'show scene negro with fadeIn duration 2s',
 		'centered <h1>Fin del Capítulo I</h1><p>El Origen Oculto</p>',
 		'wait 1500',
-		'stop sound sting_fin_capitulo with fade 3',
-		'play sound sting_inicio_capitulo with loop fade 3',
+		'stop music fin_capitulo with fade 3',
+		'play music inicio_capitulo with loop fade 3',
 		'show scene negro with fadeIn duration 1s',
 		'centered <h1>Capítulo II</h1><p>El Eco del Mediterraneo</p>',
-		'stop sound sting_inicio_capitulo with fade 3',
+		'stop music inicio_capitulo with fade 3',
 		'play music capitulo2 with loop fade 4',
 		'jump Escena13'   
 	],
@@ -3599,15 +3602,15 @@ monogatari.script({
 
 	'Capitulo3': [
 		'stop music capitulo2 with fade 4',
-		'play sound sting_fin_capitulo with loop fade 3',
+		'play music fin_capitulo with loop fade 3',
 		'show scene negro with fadeIn duration 2s',
 		'centered <h1>Fin del Capítulo II</h1><p>El Eco del Mediterraneo</p>',
 		'wait 1500',
-		'stop sound sting_fin_capitulo with fade 3',
-		'play sound sting_inicio_capitulo with loop fade 3',
+		'stop music fin_capitulo with fade 3',
+		'play music inicio_capitulo with loop fade 3',
 		'show scene negro with fadeIn duration 1s',
 		'centered <h1>Capítulo III</h1><p>Sombras del Imperio</p>',
-		'stop sound sting_inicio_capitulo with fade 3',
+		'stop music inicio_capitulo with fade 3',
 		'play music capitulo3 with loop fade 4',
 		'jump Escena29_Elcairo'
 	],
@@ -4619,15 +4622,15 @@ monogatari.script({
 
    	'Capitulo4': [
 		'stop music capitulo3 with fade 3',
-		'play sound sting_fin_capitulo with loop fade 3',
+		'play music fin_capitulo with loop fade 3',
 		'show scene negro with fadeIn duration 2s',
 		'centered <h1>Fin del Capítulo III</h1><p>Sombras del Imperio</p>',
 		'wait 1500',
-		'stop sound sting_fin_capitulo with fade 3',
-		'play sound sting_inicio_capitulo with loop fade 3',
+		'stop music fin_capitulo with fade 3',
+		'play music inicio_capitulo with loop fade 3',
 		'show scene negro with fadeIn duration 1s',
 		'centered <h1>Capítulo IV</h1><p>La Octava Luz</p>',
-		'stop sound sting_inicio_capitulo with fade 3',
+		'stop music inicio_capitulo with fade 3',
 		'play music capitulo4 with loop fade 4',
 		'jump Escena41'   
 	],
@@ -5364,17 +5367,19 @@ monogatari.script({
 
 	'Creditos': [
 		'stop music capitulo4 with fade 3',
-		'play music tema_principal with loop fade 2',
+		'play music creditos with loop fade 2',
 		'show scene negro with fadeIn duration 2s',
 		'centered <h2>Maravillas de la Antigüedad</h2>',
 		'wait 3000',
-		'centered <h3>Guion y diseño</h3><p>Cortecom</p>',
+		'centered <h3>Guion</h3><p>Cortecom</p>',
+		'wait 3000',
+		'centered <h3>Diseño y Programación</h3><p>Cortecom</p>',
 		'wait 3000',
 		'centered <h3>Música</h3><p>Cortecom</p>',
 		'wait 3000',
 		'centered <h3>Gracias por jugar</h3>',
 		'wait 3000',
-		'stop music tema_principal with fade 2',
+		'stop music creditos with fade 2',
 		'end'     // termina la partida y vuelve al menú principal
 	]
 
