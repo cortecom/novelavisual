@@ -1,9 +1,3 @@
-/*!
- * jardin-puzzle.js (fusionado)
- * Union de jardin-puzzle.js (componente) + jardin-action.js (Accion de Monogatari)
- * en un solo archivo -- misma logica, sin cambios de comportamiento.
- * index.html ya no necesita cargar jardin-action.js por separado.
- */
 /**
  * <jardin-puzzle> — "Los Jardines Colgantes de Babilonia"
  * Minijuego de 3 etapas para Escena31_PuzzleJardin (Capítulo III, paleta índigo).
@@ -47,42 +41,66 @@
 
   // Hotspots de la Etapa 1 (desierto). Coordenadas en % sobre el fondo.
   // Incluye señuelos (isDecoy) que no cuentan como pieza real.
+  const IMG = 'assets/games/jardines-colgantes-babilonia/images/';
+  // Zona de vigilancia del mercado según la posición horizontal del objeto.
+  const zoneOf = (x) => (x < 34 ? 'A' : x < 67 ? 'B' : 'C');
+  // Señuelo: r=4 (cuadrado de 8% del ancho). `fb` = imagen de respaldo (ya existente)
+  // que se muestra mientras la imagen nueva todavía no esté en la carpeta images/.
+  const D = (id, x, y, file, hint, fb) => ({ id, x, y, r: 4, isDecoy: true, hint, icon: IMG + file + '.png', fallback: IMG + fb + '.png' });
+
+  // ETAPA 1 — DESIERTO. Todo sobre la franja de arena del fondo (y 50–80), en 3 filas escalonadas.
   const STAGE1_SPOTS = [
-    { id: 'terraza_baja',  x: 18, y: 72, r: 6, isDecoy: false },
-    { id: 'terraza_media', x: 47, y: 58, r: 6, isDecoy: false },
-    { id: 'terraza_alta',  x: 76, y: 68, r: 6, isDecoy: false },
-    { id: 'decoy1', x: 8, y: 50, r: 5, isDecoy: true, hint: 'Solo un hueso de camello.', icon: 'assets/games/jardines-colgantes-babilonia/images/decoy_hueso_camello.png' },
-    { id: 'decoy2', x: 92, y: 44, r: 5, isDecoy: true, hint: 'Una roca cualquiera, nada tallado en ella.', icon: 'assets/games/jardines-colgantes-babilonia/images/decoy_roca_lisa.png' },
-    { id: 'decoy3', x: 35, y: 84, r: 5, isDecoy: true, hint: 'Chatarra de una expedición anterior.', icon: 'assets/games/jardines-colgantes-babilonia/images/decoy_chatarra.png' },
-    // Señuelos adicionales — objetos "de mercado" fuera de lugar en pleno desierto.
-    // Coordenadas dentro de la franja de arena/terreno (y entre 44 y 84 aprox.),
-    // lejos del cielo/horizonte y de cualquier río de fondo — nunca por encima
-    // de donde están las piezas reales, para que no parezcan flotando.
-    { id: 'decoy4', x: 8, y: 84, r: 5, isDecoy: true, hint: 'Una figura de piedra reconstituida... esto es del mercado, no de aquí.', icon: 'assets/games/jardines-colgantes-babilonia/images/decoy_replica_barata.png' },
-    { id: 'decoy5', x: 85, y: 78, r: 5, isDecoy: true, hint: 'Cerámica pintada de algún puesto de mercader. No pertenece a estas ruinas.', icon: 'assets/games/jardines-colgantes-babilonia/images/decoy_ceramica_moderna.png' },
-    { id: 'decoy6', x: 60, y: 46, r: 5, isDecoy: true, hint: 'Una lámpara de cobre de algún mercader. Nada que ver con los jardines.', icon: 'assets/games/jardines-colgantes-babilonia/images/decoy_lampara_cobre.png' },
-    { id: 'decoy7', x: 65, y: 84, r: 5, isDecoy: true, hint: 'Solo una alfombra vieja, olvidada por algún viajero.', icon: 'assets/games/jardines-colgantes-babilonia/images/decoy_alfombra_enrollada.png' },
-    { id: 'decoy8', x: 25, y: 46, r: 5, isDecoy: true, hint: 'Un cofre de madera vacío. No es lo que buscamos.', icon: 'assets/games/jardines-colgantes-babilonia/images/decoy_cofre_madera.png' }
+    // piezas reales
+    { id: 'terraza_baja',  x: 28, y: 65, r: 4, isDecoy: false },
+    { id: 'terraza_media', x: 50, y: 50, r: 4, isDecoy: false },
+    { id: 'terraza_alta',  x: 71, y: 65, r: 4, isDecoy: false },
+    // señuelos originales (8)
+    D('decoy1',  7, 50, 'decoy_hueso_camello',      'Solo un hueso de camello.', 'decoy_hueso_camello'),
+    D('decoy2', 93, 50, 'decoy_roca_lisa',          'Una roca cualquiera, nada tallado en ella.', 'decoy_roca_lisa'),
+    D('decoy3', 36, 80, 'decoy_chatarra',           'Chatarra de una expedición anterior.', 'decoy_chatarra'),
+    D('decoy4',  7, 80, 'decoy_replica_barata',     'Una figura de piedra reconstituida... esto es del mercado, no de aquí.', 'decoy_replica_barata'),
+    D('decoy5', 79, 80, 'decoy_ceramica_moderna',   'Cerámica pintada de algún puesto de mercader. No pertenece a estas ruinas.', 'decoy_ceramica_moderna'),
+    D('decoy6', 64, 50, 'decoy_lampara_cobre',      'Una lámpara de cobre de algún mercader. Nada que ver con los jardines.', 'decoy_lampara_cobre'),
+    D('decoy7', 64, 80, 'decoy_alfombra_enrollada', 'Solo una alfombra vieja, olvidada por algún viajero.', 'decoy_alfombra_enrollada'),
+    D('decoy8', 21, 50, 'decoy_cofre_madera',       'Un cofre de madera vacío. No es lo que buscamos.', 'decoy_cofre_madera'),
+    // señuelos NUEVOS (8) — imágenes por crear (ver PROMPTS_IMAGENES.md)
+    D('decoy9',  36, 50, 'decoy_balanza_bronce',    'Una balanza de mercader. No sirve para construir nada.', 'decoy_lampara_cobre'),
+    D('decoy10', 79, 50, 'decoy_cantimplora_cuero', 'Una cantimplora vacía de algún viajero.', 'decoy_chatarra'),
+    D('decoy11', 14, 65, 'decoy_sandalia_vieja',    'Una sandalia gastada, olvidada hace décadas.', 'decoy_hueso_camello'),
+    D('decoy12', 43, 65, 'decoy_vasija_barro_rota', 'Barro cocido sin ningún grabado. Cerámica común.', 'decoy_ceramica_moderna'),
+    D('decoy13', 57, 65, 'decoy_monedas_oxidadas',  'Unas monedas corroídas. Valen poco y no sirven aquí.', 'decoy_chatarra'),
+    D('decoy14', 86, 65, 'decoy_sacos_grano',       'Un saco de grano roto por el sol.', 'decoy_alfombra_enrollada'),
+    D('decoy15', 93, 80, 'decoy_jarra_vidrio_azul', 'Vidrio moderno, de un puesto de mercado.', 'decoy_ceramica_moderna'),
+    D('decoy16', 21, 80, 'decoy_lanza_oxidada',     'Una lanza oxidada. Nada que ver con los jardines.', 'decoy_chatarra')
   ];
 
   // Hotspots de la Etapa 2 (mercado negro), cada uno con una zona de "vigilancia"
   // asociada (watchZone) que se enciende/apaga con el tiempo.
+  // ETAPA 2 — MERCADO NEGRO. Todo sobre los mostradores/tiendas del fondo (y 52–82), 3 filas escalonadas.
   const STAGE2_SPOTS = [
-    { id: 'arcos',      x: 22, y: 66, r: 6, isDecoy: false, watchZone: 'A' },
-    { id: 'tornillo',   x: 52, y: 74, r: 6, isDecoy: false, watchZone: 'B' },
-    { id: 'vegetacion', x: 80, y: 60, r: 6, isDecoy: false, watchZone: 'C' },
-    { id: 'decoy1', x: 10, y: 46, r: 5, isDecoy: true, watchZone: 'A', hint: 'Una réplica barata, no sirve.', icon: 'assets/games/jardines-colgantes-babilonia/images/decoy_replica_barata.png' },
-    { id: 'decoy2', x: 45, y: 46, r: 5, isDecoy: true, watchZone: 'B', hint: 'Cerámica moderna pintada como antigua.', icon: 'assets/games/jardines-colgantes-babilonia/images/decoy_ceramica_moderna.png' },
-    // Señuelos adicionales — objetos "del desierto" fuera de lugar en el mercado.
-    // Coordenadas a nivel de mostrador/puesto (y entre 46 y 82 aprox.), nunca
-    // sobre los techos de las tiendas ni en el pasillo central despejado —
-    // en la misma franja donde están las piezas reales, para que no floten.
-    { id: 'decoy3', x: 90, y: 46, r: 5, isDecoy: true, watchZone: 'C', hint: 'Otro hueso más, esta vez lo trajeron del desierto por error.', icon: 'assets/games/jardines-colgantes-babilonia/images/decoy_hueso_camello.png' },
-    { id: 'decoy4', x: 32, y: 54, r: 5, isDecoy: true, watchZone: 'A', hint: 'Una roca del desierto, alguien la dejó aquí sin razón.', icon: 'assets/games/jardines-colgantes-babilonia/images/decoy_roca_lisa.png' },
-    { id: 'decoy5', x: 65, y: 62, r: 5, isDecoy: true, watchZone: 'C', hint: 'Chatarra vieja, no vale nada.', icon: 'assets/games/jardines-colgantes-babilonia/images/decoy_chatarra.png' },
-    { id: 'decoy6', x: 15, y: 80, r: 5, isDecoy: true, watchZone: 'A', hint: 'La calavera de algún animal del desierto. No es una pieza de los jardines.', icon: 'assets/games/jardines-colgantes-babilonia/images/decoy_calavera_animal.png' },
-    { id: 'decoy7', x: 65, y: 82, r: 5, isDecoy: true, watchZone: 'B', hint: 'Un fragmento de arenisca sin tallar. No sirve.', icon: 'assets/games/jardines-colgantes-babilonia/images/decoy_piedra_arenisca.png' }
-  ];
+    // piezas reales
+    { id: 'arcos',      x: 22, y: 67, r: 4, isDecoy: false, watchZone: zoneOf(22) },
+    { id: 'tornillo',   x: 50, y: 67, r: 4, isDecoy: false, watchZone: zoneOf(50) },
+    { id: 'vegetacion', x: 80, y: 52, r: 4, isDecoy: false, watchZone: zoneOf(80) },
+    // señuelos originales (7)
+    ...[
+      D('decoy1', 10, 52, 'decoy_replica_barata',  'Una réplica barata, no sirve.', 'decoy_replica_barata'),
+      D('decoy2', 36, 52, 'decoy_ceramica_moderna','Cerámica moderna pintada como antigua.', 'decoy_ceramica_moderna'),
+      D('decoy3', 93, 52, 'decoy_hueso_camello',   'Otro hueso más, esta vez lo trajeron del desierto por error.', 'decoy_hueso_camello'),
+      D('decoy4', 51, 52, 'decoy_roca_lisa',       'Una roca del desierto, alguien la dejó aquí sin razón.', 'decoy_roca_lisa'),
+      D('decoy5', 65, 67, 'decoy_chatarra',        'Chatarra vieja, no vale nada.', 'decoy_chatarra'),
+      D('decoy6', 10, 82, 'decoy_calavera_animal', 'La calavera de algún animal del desierto. No es una pieza de los jardines.', 'decoy_calavera_animal'),
+      D('decoy7', 66, 82, 'decoy_piedra_arenisca', 'Un fragmento de arenisca sin tallar. No sirve.', 'decoy_piedra_arenisca'),
+      // señuelos NUEVOS (7) — imágenes por crear (ver PROMPTS_IMAGENES.md)
+      D('decoy8',  36, 67, 'decoy_arbusto_seco',    'Un arbusto seco del desierto. Aquí no pinta nada.', 'decoy_roca_lisa'),
+      D('decoy9',  80, 67, 'decoy_concha_fosil',    'Una concha fósil. Bonita, pero no es lo que buscamos.', 'decoy_piedra_arenisca'),
+      D('decoy10', 93, 67, 'decoy_cuerno_cabra',    'Un cuerno de cabra montés. No sirve para armar nada.', 'decoy_hueso_camello'),
+      D('decoy11', 50, 82, 'decoy_tronco_petrificado','Madera petrificada sin forma. No es arquitectura.', 'decoy_roca_lisa'),
+      D('decoy12', 22, 82, 'decoy_geoda_partida',   'Una geoda partida. Es mineral, no un fragmento tallado.', 'decoy_piedra_arenisca'),
+      D('decoy13', 80, 82, 'decoy_costilla_animal', 'Una costilla de animal. Nada que ver con los jardines.', 'decoy_calavera_animal'),
+      D('decoy14', 93, 82, 'decoy_escorpion_seco',  'Un escorpión disecado. Curioso, pero inútil.', 'decoy_calavera_animal')
+    ]
+  ].map(sp => (sp.watchZone ? sp : Object.assign({}, sp, { watchZone: zoneOf(sp.x) })));
 
   const WATCH_ZONES = ['A', 'B', 'C'];
   const WATCH_CYCLE_MS = 2600; // cuánto dura cada fase de vigilancia
@@ -169,7 +187,8 @@
         transform: translate(-50%, -50%);
         cursor: pointer;
         background-color: transparent;
-        background-size: 78%;
+        aspect-ratio: 1 / 1;
+        background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
         filter: drop-shadow(0 5px 7px rgba(0,0,0,.55));
@@ -269,10 +288,12 @@
         top: 76px; bottom: 120px; left: 0; right: 0;
         display: flex; align-items: center; justify-content: center;
       }
+      .blueprint { container-type: size; }
       .blueprint-art {
         position: relative;
-        height: 100%;
-        max-width: 92%;
+        /* siempre proporción 4:5 (los espacios van en % del plano) y lo más grande posible */
+        width: min(98cqw, 80cqh);
+        height: auto;
         aspect-ratio: 4 / 5;
         background-size: contain;
         background-repeat: no-repeat;
@@ -360,14 +381,46 @@
       }
       .overlay p { max-width: 560px; font-size: 16px; line-height: 1.5; color: #e6dcc6; margin: 0; }
       .overlay .reveal-img {
-        width: min(80vw, 680px);
+        width: auto; height: auto;
+        max-width: min(92vw, 680px);
+        max-height: calc(100vh - 230px);
+        max-height: calc(100dvh - 230px);
+        object-fit: contain;
         border-radius: 12px;
         box-shadow: 0 20px 60px rgba(0,0,0,.6);
         opacity: 0;
         transform: scale(.96);
         transition: opacity 1.1s ease, transform 1.1s ease;
+        flex: 0 1 auto;
+        min-height: 0;
       }
       .overlay .reveal-img.show { opacity: 1; transform: scale(1); }
+
+      /* Pantalla de victoria: nunca debe quedar el botón fuera de vista */
+      #overlayWin { overflow-y: auto; padding: 16px 20px; gap: 12px; }
+      #overlayWin .win-side {
+        display: flex; flex-direction: column; align-items: center;
+        gap: 10px; flex: 0 0 auto;
+      }
+      #overlayWin .win-side h2 { font-size: 22px; }
+
+      /* Celular en horizontal (pantalla baja): imagen a la izquierda,
+         título + texto + botón Continuar a la derecha, todo visible. */
+      @media (max-height: 540px) {
+        #overlayWin {
+          flex-direction: row; align-items: center; justify-content: center;
+          gap: 22px; padding: 12px 18px;
+        }
+        #overlayWin .reveal-img {
+          max-width: 58vw;
+          max-height: calc(100vh - 24px);
+          max-height: calc(100dvh - 24px);
+        }
+        #overlayWin .win-side { flex: 1 1 0; min-width: 0; max-width: 300px; }
+        #overlayWin .win-side h2 { font-size: 18px; }
+        #overlayWin .win-side p { font-size: 14px; line-height: 1.35; }
+        button.btn { padding: 9px 20px; }
+      }
 
       button.btn {
         font-family: 'Cinzel', serif;
@@ -386,6 +439,51 @@
         background: transparent;
         border: 1px solid #d8b26b;
         color: #d8b26b;
+      }
+
+      /* ===== Celulares ===== */
+      /* El mensaje de Gabriel / del vendedor ya NO queda fijo tapando objetos:
+         solo el retrato (chico) queda en la esquina; el globo aparece unos
+         segundos cuando hay una pista o un aviso, y deja pasar los toques. */
+      @media (max-height: 540px), (max-width: 700px) {
+        .hud { padding: 8px 12px; }
+        .hud h1 { font-size: 15px; }
+        .hud .sub { font-size: 12px; }
+        .piece-chip { width: 28px; height: 28px; }
+        .npc { left: 8px; bottom: 8px; max-width: 60%; gap: 6px; pointer-events: none; }
+        .npc img { width: 52px; height: 52px; pointer-events: auto; }
+        .npc .bubble {
+          font-size: 12px; padding: 5px 9px; max-width: 46vw;
+          opacity: 0; transition: opacity .3s; pointer-events: none;
+        }
+        .npc .bubble.flash { opacity: 1; }
+        .npc .hint-count { font-size: 10px; margin-top: 2px; }
+        .strikes { top: 52px; right: 12px; }
+        .toast { bottom: 70px; font-size: 13px; padding: 6px 12px; }
+        .tray-piece, .drag-ghost { width: 52px; height: 52px; }
+        .slot { width: 19%; }
+        button.btn { padding: 9px 20px; }
+      }
+
+      /* Etapa 3 en celular HORIZONTAL: el plano usa toda la altura y las
+         piezas pasan a una columna a la derecha (antes quedaba diminuto). */
+      @media (max-height: 540px) {
+        #scene3 .hud { padding: 6px 12px; }
+        #scene3 .hud .sub { display: none; }
+        #scene3 .progress-bar { top: 34px; left: 12px; right: 160px; }
+        #scene3 .blueprint { top: 42px; bottom: 6px; left: 6px; right: 156px; }
+        #scene3 .tray {
+          left: auto; right: 6px; top: 42px; bottom: 6px; width: 146px;
+          padding: 4px; gap: 8px; flex-wrap: wrap; align-content: center;
+          justify-content: center; background: rgba(10,7,20,.55);
+          border-radius: 10px;
+        }
+      }
+
+      /* Etapa 3 en celular VERTICAL: bandeja en 1 sola fila sin desbordar */
+      @media (max-width: 700px) and (min-height: 541px) {
+        #scene3 .tray { padding: 8px 8px 12px; gap: 6px; flex-wrap: wrap; }
+        #scene3 .blueprint { top: 70px; bottom: 90px; }
       }
     </style>
 
@@ -476,12 +574,14 @@
 
       <!-- OVERLAY: victoria final -->
       <div class="overlay hidden" id="overlayWin">
-        <h2>Los Jardines Colgantes, reconstruidos</h2>
         <img class="reveal-img" id="revealImg"
              src="assets/games/jardines-colgantes-babilonia/images/jardines_reconstruidos_hero.png"
              alt="Jardines Colgantes de Babilonia reconstruidos">
-        <p>Pieza a pieza, la maravilla vuelve a tomar forma ante ustedes.</p>
-        <button class="btn" id="winContinue">Continuar</button>
+        <div class="win-side">
+          <h2>Los Jardines Colgantes, reconstruidos</h2>
+          <p>Pieza a pieza, la maravilla vuelve a tomar forma ante ustedes.</p>
+          <button class="btn" id="winContinue">Continuar</button>
+        </div>
       </div>
 
     </div>
@@ -559,6 +659,8 @@
 
     // eventos fijos (una sola vez)
     self._el.gabrielImg.addEventListener('click', () => _useHint(root, self));
+    const vImg = root.querySelector('#npc2 img');
+    if (vImg) vImg.addEventListener('click', () => _flashBubble(self._el.vendorLine));
     self._el.transContinue.addEventListener('click', () => _onTransitionContinue(root, self));
     self._el.retryStage2.addEventListener('click', () => _goToStage2(root, self, true));
     self._el.winContinue.addEventListener('click', () => _finish(root, self));
@@ -607,6 +709,7 @@
     self._state.current = STATE.STAGE1;
     _hideAllScenes(self);
     self._el.scene1.style.display = 'block';
+    _flashBubble(self._el.gabrielLine);
 
     const container = self._el.hotspots1;
     container.innerHTML = '';
@@ -617,8 +720,8 @@
       el.style.left = spot.x + '%';
       el.style.top = spot.y + '%';
       el.style.width = (spot.r * 2) + '%';
-      el.style.height = (spot.r * 2) + '%';
-      el.style.backgroundImage = `url('${spot.isDecoy ? spot.icon : _pieceIcon(spot.id)}')`;
+      el.style.height = 'auto';
+      _setSpotImage(el, spot);
       el.dataset.id = spot.id;
       if (!already) {
         el.addEventListener('click', () => _onStage1Click(root, self, spot, el));
@@ -665,6 +768,7 @@
     self._state.hintsLeft -= 1;
     self._el.hintCount1.textContent = `Pistas restantes: ${self._state.hintsLeft}`;
     self._el.gabrielLine.textContent = self._gabrielLines[(3 - self._state.hintsLeft) % self._gabrielLines.length];
+    _flashBubble(self._el.gabrielLine);
     const target = self._el.hotspots1.querySelector(`[data-id="${pending.id}"]`);
     if (target) {
       target.style.boxShadow = '0 0 0 3px rgba(216,178,107,.9)';
@@ -684,6 +788,7 @@
     }
     _hideAllScenes(self);
     self._el.scene2.style.display = 'block';
+    _flashBubble(self._el.vendorLine);
     self._el.overlayCaught.classList.add('hidden');
 
     _renderStrikes(self);
@@ -697,8 +802,8 @@
       el.style.left = spot.x + '%';
       el.style.top = spot.y + '%';
       el.style.width = (spot.r * 2) + '%';
-      el.style.height = (spot.r * 2) + '%';
-      el.style.backgroundImage = `url('${spot.isDecoy ? spot.icon : _pieceIcon(spot.id)}')`;
+      el.style.height = 'auto';
+      _setSpotImage(el, spot);
       el.dataset.id = spot.id;
       el.dataset.zone = spot.watchZone;
       if (!already) {
@@ -758,6 +863,7 @@
       _renderStrikes(self);
       _toast(self._el.toast2, '¡El vendedor te vio revisar ahí!');
       self._el.vendorLine.textContent = '¿Se te perdió algo entre mis cosas?';
+      _flashBubble(self._el.vendorLine);
       if (self._state.strikes >= MAX_STRIKES) {
         _clearWatchTimer(self);
         self._el.overlayCaught.classList.remove('hidden');
@@ -860,17 +966,16 @@
   }
 
   function _dropPiece(root, self, piece, sourceEl, evt) {
-    const slotEl = self._root.getElementById(piece.slot);
-    const rect = slotEl.getBoundingClientRect();
-    const inside = evt.clientX >= rect.left && evt.clientX <= rect.right &&
-                   evt.clientY >= rect.top && evt.clientY <= rect.bottom;
-    // también acepta soltar sobre CUALQUIER slot vacío que coincida en área,
-    // pero solo el slot correcto para esta pieza queda "filled".
-    let landedSlot = null;
+    // Tolerancia de 14 px alrededor de cada espacio (el dedo tapa y es impreciso);
+    // si caen varios, gana el más cercano al punto donde se soltó.
+    const MARGIN = 14;
+    let landedSlot = null, best = Infinity;
     self._root.querySelectorAll('.slot').forEach(s => {
       const r = s.getBoundingClientRect();
-      if (evt.clientX >= r.left && evt.clientX <= r.right && evt.clientY >= r.top && evt.clientY <= r.bottom) {
-        landedSlot = s;
+      if (evt.clientX >= r.left - MARGIN && evt.clientX <= r.right + MARGIN &&
+          evt.clientY >= r.top - MARGIN && evt.clientY <= r.bottom + MARGIN) {
+        const d = Math.hypot(evt.clientX - (r.left + r.right) / 2, evt.clientY - (r.top + r.bottom) / 2);
+        if (d < best) { best = d; landedSlot = s; }
       }
     });
 
@@ -922,6 +1027,28 @@
   function _pieceName(id) {
     const p = PIECES.find(p => p.id === id);
     return p ? p.name : id;
+  }
+
+  // Muestra la imagen del objeto; si el archivo todavía no existe en images/,
+  // usa la imagen de respaldo (así el juego es jugable mientras se crean las nuevas).
+  function _setSpotImage(el, spot) {
+    const main = spot.isDecoy ? spot.icon : _pieceIcon(spot.id);
+    el.style.backgroundImage = `url('${main}')`;
+    if (spot.isDecoy && spot.fallback && spot.fallback !== main) {
+      const probe = new Image();
+      probe.onerror = () => { el.style.backgroundImage = `url('${spot.fallback}')`; };
+      probe.src = main;
+    }
+  }
+
+  // Muestra el globo de diálogo unos segundos (en celular está oculto por defecto).
+  function _flashBubble(el) {
+    if (!el) return;
+    const bubble = el.closest ? el.closest('.bubble') : null;
+    if (!bubble) return;
+    bubble.classList.add('flash');
+    clearTimeout(bubble._t);
+    bubble._t = setTimeout(() => bubble.classList.remove('flash'), 4200);
   }
 
   function _pieceIcon(id) {
@@ -977,7 +1104,7 @@
 
 })();
 
-/* ---- jardin-action.js fusionado a continuacion ---- */
+
 /**
  * Acción de Monogatari para el verbo `jardin`.
  * Uso en script.js:  'jardin jardinPuzzle'

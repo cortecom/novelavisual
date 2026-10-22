@@ -1630,7 +1630,7 @@ monogatari.script({
         showInventoryBar();
     },
 
-     'jump Escena1_QuintaNormal'
+     'jump Escena29_Babilonia'
     ],
 
 /* =====================================================

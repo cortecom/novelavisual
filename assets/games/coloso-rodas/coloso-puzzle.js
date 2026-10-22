@@ -240,8 +240,31 @@
     button.cbtn:disabled { opacity:.4; cursor:default; }
 
     /* ---- Etapa 1: buceo ---- */
-    .dive-area { position: relative; flex: 1; display:flex; align-items:center; justify-content:center; min-height:0; }
-    canvas.game-canvas { border: 2px solid #6d7a4f; border-radius: 6px; background:#0d1a14; max-width:100%; max-height:100%; height:auto; }
+    .dive-area { position: relative; flex: 1; display:flex; flex-direction:row; align-items:center; justify-content:center; gap:14px; min-height:0; }
+    .canvas-wrap { position:relative; flex:1; min-width:0; min-height:0; height:100%; display:flex; align-items:center; justify-content:center; }
+    canvas.game-canvas { border: 2px solid #6d7a4f; border-radius: 6px; background:#0d1a14; max-width:100%; max-height:100%; height:auto; touch-action:none; }
+
+    /* Pad direccional táctil (solo en pantallas táctiles / chicas) */
+    .dpad {
+      display:none; flex:0 0 auto; position:relative; width:168px; height:168px; border-radius:50%;
+      background: radial-gradient(circle at 50% 50%, rgba(20,32,24,.85) 0%, rgba(10,16,12,.75) 100%);
+      border:2px solid #6d7a4f; touch-action:none; user-select:none; -webkit-user-select:none;
+      -webkit-touch-callout:none; -webkit-tap-highlight-color:transparent;
+    }
+    .dpad .arrow {
+      position:absolute; width:52px; height:52px; display:flex; align-items:center; justify-content:center;
+      font-size:26px; color:#d8c27c; border-radius:12px; background:rgba(60,74,44,.55);
+      border:1px solid rgba(216,194,124,.5); pointer-events:none; transition:background .08s ease, transform .08s ease;
+    }
+    .dpad .arrow.on { background:rgba(216,194,124,.55); color:#10170f; transform:scale(.94); }
+    .dpad .arrow[data-dir="up"]    { top:6px;  left:calc(50% - 26px); }
+    .dpad .arrow[data-dir="down"]  { bottom:6px; left:calc(50% - 26px); }
+    .dpad .arrow[data-dir="left"]  { left:6px; top:calc(50% - 26px); }
+    .dpad .arrow[data-dir="right"] { right:6px; top:calc(50% - 26px); }
+    .dpad .hub { position:absolute; left:calc(50% - 16px); top:calc(50% - 16px); width:32px; height:32px; border-radius:50%;
+      background:rgba(216,194,124,.15); border:1px solid rgba(216,194,124,.35); pointer-events:none; }
+    @media (pointer: coarse), (max-width: 900px) { .dpad { display:block; } }
+    .rotate-hint { display:none; font-size:12px; opacity:.8; text-align:center; }
     .hud { position:absolute; top: 8px; left: 8px; display:flex; gap:6px; }
     .hud .hit-icon { width:18px; height:18px; border-radius:50%; background:#8a3030; border:1px solid #f2ecd9; opacity:.35; }
     .hud .hit-icon.lost { opacity:1; background:#c94c4c; }
@@ -295,7 +318,8 @@
 
     /* ---- Etapa 3: ensamblaje (el Coloso ocupa todo el fondo) ---- */
     .assembly { flex:1; position:relative; min-height:0; border-radius:6px; overflow:hidden; border:2px solid #6d7a4f; }
-    .statue-frame { position:absolute; inset:0; }
+    .statue-area { position:absolute; inset:0; }
+    .statue-frame { position:absolute; } /* tamaño y posición los calcula layoutStatue() con la proporción real de la imagen */
     .statue-frame img.guide {
       position:absolute; inset:0; width:100%; height:100%; object-fit:contain;
       filter: grayscale(1) brightness(.55) contrast(1.05); opacity:.55;
@@ -342,6 +366,69 @@
     .final-bar h2 { font-size:20px; color:#d8c27c; margin:0; }
     .final-bar p { font-size:13.5px; max-width:560px; margin:0 0 4px 0; opacity:.92; }
     .assembly.done .tray-bar { display:none; }
+
+    /* ---- Optimización para smartphone ---- */
+    /* Vertical: el pad va debajo del canvas */
+    @media (max-width: 900px) and (orientation: portrait) {
+      .dive-area { flex-direction:column; justify-content:center; gap:10px; }
+      .canvas-wrap { width:100%; height:auto; flex:0 0 auto; }
+      .hud { top:6px; left:6px; } .pickup-count { top:6px; right:6px; }
+      .dpad { width:150px; height:150px; }
+      .dpad .arrow { width:46px; height:46px; font-size:22px; }
+      .dpad .arrow[data-dir="up"], .dpad .arrow[data-dir="down"] { left:calc(50% - 23px); }
+      .dpad .arrow[data-dir="left"], .dpad .arrow[data-dir="right"] { top:calc(50% - 23px); }
+      .rotate-hint { display:block; }
+      .market-grid { grid-template-columns:1fr; }
+    }
+    /* Pantallas bajas (celular en horizontal) */
+    @media (max-height: 520px), (max-width: 900px) {
+      .stage { padding:8px 10px; }
+      .topbar { margin-bottom:4px; gap:8px; }
+      .topbar .title { font-size:15px; }
+      .topbar .round { font-size:11px; }
+      .topbar .instr { font-size:11px; line-height:1.2; max-width:62%; }
+      .hud .hit-icon { width:14px; height:14px; }
+      .pickup-count { font-size:11px; padding:3px 8px; }
+      .toast { font-size:11.5px; padding:6px 10px; }
+      .overlay-msg h2 { font-size:17px; }
+      .overlay-msg { gap:8px; padding:12px; font-size:13px; }
+      button.cbtn { padding:8px 14px; font-size:13px; min-height:40px; }
+      .board { padding:8px; gap:6px; }
+      .recovered-panel { padding:4px; }
+      .recovered-item { width:54px; }
+      .recovered-item img { width:34px; height:34px; }
+      .card { padding:6px; gap:8px; }
+      .card img { width:44px; height:44px; }
+      .card .card-text { font-size:11.5px; line-height:1.25; }
+      .market-grid { gap:8px; }
+      .token { width:62px; padding:4px; }
+      .token img { width:30px; height:30px; }
+      .token .token-label { font-size:8.5px; }
+      .final-bar { padding:16px 12px 8px; }
+      .final-bar h2 { font-size:16px; }
+      .final-bar p { font-size:11.5px; }
+    }
+    @media (max-width: 900px), (max-height: 520px) {
+      .assembly { display:flex; flex-direction:column; }
+      .assembly .statue-area { position:relative; inset:auto; flex:1; min-height:0; min-width:0; }
+      .assembly .tray-bar {
+        position:relative; flex:0 0 auto; flex-wrap:wrap; justify-content:center; gap:6px; overflow-y:auto; overflow-x:hidden;
+        max-height:36%; padding:6px; background:rgba(8,14,10,.78); pointer-events:auto;
+      }
+      .assembly .token.placed { display:none; }
+    }
+    @media (max-height: 520px) and (orientation: landscape) {
+      .assembly { flex-direction:row; }
+      .assembly .tray-bar { width:206px; max-height:none; align-content:flex-start; justify-content:flex-start; }
+      .final-bar { left:auto; top:0; width:250px; justify-content:center; padding:12px; background:rgba(8,14,10,.88); }
+    }
+    @media (max-height: 520px) and (orientation: landscape) {
+      .stage-1 .topbar .instr { display:none; }
+      .dpad { width:132px; height:132px; }
+      .dpad .arrow { width:40px; height:40px; font-size:20px; }
+      .dpad .arrow[data-dir="up"], .dpad .arrow[data-dir="down"] { left:calc(50% - 20px); }
+      .dpad .arrow[data-dir="left"], .dpad .arrow[data-dir="right"] { top:calc(50% - 20px); }
+    }
     .assembly.done .final-bar { display:flex; }
     /* Al completar, las casillas guía se desvanecen para que el Coloso se vea limpio. */
     .assembly.done .zone, .assembly.done .zone-deco { opacity:0; transition:opacity .9s ease; }
@@ -362,10 +449,20 @@
             <div class="instr">Mueve al buzo con flechas o WASD. Recupera los hallazgos y evita a los buzos del mercado negro. El punto marcado con ❔ es un fragmento perdido: alguien se te adelantó y ya no está aquí.</div>
           </div>
           <div class="dive-area">
-            <canvas class="game-canvas" width="${CANVAS_W}" height="${CANVAS_H}"></canvas>
-            <div class="hud"></div>
-            <div class="pickup-count"></div>
-            <div class="toast"></div>
+            <div class="canvas-wrap">
+              <canvas class="game-canvas" width="${CANVAS_W}" height="${CANVAS_H}"></canvas>
+              <div class="hud"></div>
+              <div class="pickup-count"></div>
+              <div class="toast"></div>
+            </div>
+            <div class="rotate-hint">Tip: gira el teléfono a horizontal para jugar más cómodo</div>
+            <div class="dpad" aria-label="Controles de nado">
+              <div class="arrow" data-dir="up">▲</div>
+              <div class="arrow" data-dir="left">◀</div>
+              <div class="arrow" data-dir="right">▶</div>
+              <div class="arrow" data-dir="down">▼</div>
+              <div class="hub"></div>
+            </div>
             <div class="overlay-msg" hidden>
               <h2></h2>
               <p class="overlay-detail"></p>
@@ -400,9 +497,11 @@
             <div class="instr">Arrastra cada uno de los 9 fragmentos autenticados a su zona exacta sobre la estatua.</div>
           </div>
           <div class="assembly">
-            <div class="statue-frame">
-              <img class="guide" src="${ASSETS.coloso}" alt="Coloso de Rodas" />
-              <div class="glow-spot"></div>
+            <div class="statue-area">
+              <div class="statue-frame">
+                <img class="guide" src="${ASSETS.coloso}" alt="Coloso de Rodas" />
+                <div class="glow-spot"></div>
+              </div>
             </div>
             <div class="tray-bar"></div>
             <div class="final-bar">
@@ -479,6 +578,7 @@
     function currentRound() { return ROUNDS[roundIndex]; }
 
     function resetRound() {
+      resetPad();
       const r = currentRound();
       player = { x: CANVAS_W / 2, y: CANVAS_H - 50, r: 20, vx: 0, vy: 0, facing: 1 };
       spots = r.spots.map((s) => ({ ...s, got: s.frag ? state.collectedFragments.has(s.frag) : false }));
@@ -514,6 +614,41 @@
     document.addEventListener('keydown', onKeyDown);
     document.addEventListener('keyup', onKeyUp);
 
+    // Pad direccional táctil: un solo contenedor lee la posición del dedo respecto
+    // al centro, así se pueden hacer diagonales y deslizar el dedo sin soltar.
+    const dpad = root.querySelector('.dpad');
+    const padDir = { x: 0, y: 0 };
+    let padPointer = null;
+    function setPad(x, y) {
+      padDir.x = x; padDir.y = y;
+      dpad.querySelector('[data-dir="up"]').classList.toggle('on', y < 0);
+      dpad.querySelector('[data-dir="down"]').classList.toggle('on', y > 0);
+      dpad.querySelector('[data-dir="left"]').classList.toggle('on', x < 0);
+      dpad.querySelector('[data-dir="right"]').classList.toggle('on', x > 0);
+    }
+    function resetPad() { padPointer = null; setPad(0, 0); }
+    function readPad(e) {
+      const r = dpad.getBoundingClientRect();
+      const vx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
+      const vy = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+      if (Math.hypot(vx, vy) < 0.2) { setPad(0, 0); return; }
+      let x = Math.abs(vx) > 0.38 ? Math.sign(vx) : 0;
+      let y = Math.abs(vy) > 0.38 ? Math.sign(vy) : 0;
+      if (!x && !y) { if (Math.abs(vx) >= Math.abs(vy)) x = Math.sign(vx); else y = Math.sign(vy); }
+      setPad(x, y);
+    }
+    dpad.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      padPointer = e.pointerId;
+      try { dpad.setPointerCapture(e.pointerId); } catch (err) { /* sin captura */ }
+      readPad(e);
+    });
+    dpad.addEventListener('pointermove', (e) => { if (e.pointerId === padPointer) { e.preventDefault(); readPad(e); } });
+    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach((t) => {
+      dpad.addEventListener(t, (e) => { if (e.pointerId === padPointer) resetPad(); });
+    });
+    dpad.addEventListener('contextmenu', (e) => e.preventDefault());
+
     function startRound(idx) {
       roundIndex = idx;
       resetRound();
@@ -523,6 +658,7 @@
       raf1 = requestAnimationFrame(loop1);
     }
     function stopStage1() {
+      resetPad();
       stage1Live = false;
       if (raf1) cancelAnimationFrame(raf1);
       raf1 = null;
@@ -543,6 +679,7 @@
       if (keys.has('arrowdown') || keys.has('s')) dy += 1;
       if (keys.has('arrowleft') || keys.has('a')) dx -= 1;
       if (keys.has('arrowright') || keys.has('d')) dx += 1;
+      dx += padDir.x; dy += padDir.y;
       moveWithInertia(player, dx, dy, PLAYER_MAX_SPEED, PLAYER_ACCEL, dt);
       player.x = Math.max(player.r, Math.min(CANVAS_W - player.r, player.x));
       player.y = Math.max(player.r, Math.min(CANVAS_H - player.r, player.y));
@@ -769,10 +906,27 @@
        ETAPA 3 — ENSAMBLAJE (9 fragmentos, estatua de fondo completo)
        ========================================================== */
     const statueFrame = root.querySelector('.statue-frame');
+    const statueArea = root.querySelector('.statue-area');
     const trayBar = root.querySelector('.tray-bar');
     let stage3Built = false;
 
+    // Ajusta el marco a la proporción real del Coloso (346x520), centrado y lo más grande
+    // posible dentro del área disponible. Las casillas (en %) quedan así alineadas con la silueta.
+    function layoutStatue() {
+      const w = statueArea.clientWidth, h = statueArea.clientHeight;
+      if (!w || !h) return;
+      const k = Math.min(w / 346, h / 520);
+      const fw = 346 * k, fh = 520 * k;
+      statueFrame.style.width = fw + 'px';
+      statueFrame.style.height = fh + 'px';
+      statueFrame.style.left = ((w - fw) / 2) + 'px';
+      statueFrame.style.top = ((h - fh) / 2) + 'px';
+    }
+    if (window.ResizeObserver) new ResizeObserver(layoutStatue).observe(statueArea);
+    window.addEventListener('resize', layoutStatue);
+
     function buildStage3() {
+      layoutStatue();
       if (stage3Built) return;
       stage3Built = true;
 
