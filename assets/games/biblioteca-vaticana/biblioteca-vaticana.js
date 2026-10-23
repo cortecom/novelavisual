@@ -1,9 +1,3 @@
-/*!
- * biblioteca-vaticana.js (fusionado)
- * Union de biblioteca-vaticana.js (componente) + biblioteca-action.js (Accion de Monogatari)
- * en un solo archivo -- misma logica, sin cambios de comportamiento.
- * index.html ya no necesita cargar biblioteca-action.js por separado.
- */
 /*
  * <biblioteca-vaticana>
  * Minijuego "Biblioteca Secreta Vaticana" — Escena 33, Capítulo III.
@@ -35,13 +29,13 @@
       lugar: 'Olimpia, Grecia',
       icon: `<svg viewBox="0 0 64 64"><path d="M32 6c-3 0-5 2-5 5 0 2 1 4 3 5l-2 6h8l-2-6c2-1 3-3 3-5 0-3-2-5-5-5z"/><path d="M20 24h24l4 8-6 2v22h-4V36h-4v20h-8V36h-4v20h-4V34l-6-2z"/></svg>`,
       libros: [
-        { titulo: 'Fragmento de Pausanias', excerpt: 'Describe una imagen sedente de marfil y oro, tan alta que casi toca el techo del templo, obra de Fidias.' },
-        { titulo: 'Carta de un peregrino, s. IV', excerpt: 'Menciona un edicto imperial contra los "ídolos paganos" que aún se veneraban en Olimpia.' }
+        { titulo: 'Pausanias, Descripción de Grecia, libro V', excerpt: 'Describe en Olimpia la estatua sedente de Zeus, de marfil y oro, obra de Fidias (hacia 435 a. C.), de unos 12 metros de altura.' },
+        { titulo: 'Código Teodosiano, XVI.10 (copia vaticana)', excerpt: 'Edictos de 391 a 435 que prohíben los sacrificios y ordenan destruir los templos paganos. Una nota al margen cita Olimpia y a su obispo.' }
       ],
       correcto: 'La Estatua de Zeus fue destruida por obispos locales.',
       decoys: [
-        'La Estatua de Zeus fue trasladada a Constantinopla y allí se perdió en un incendio del palacio.',
-        'La Estatua de Zeus se derrumbó por un terremoto y sus restos se dispersaron.'
+        'La Estatua de Zeus fue trasladada a Constantinopla y allí se perdió en el incendio del año 475.',
+        'La Estatua de Zeus se derrumbó con los terremotos que sacudieron Olimpia y sus restos se dispersaron.'
       ]
     },
     {
@@ -50,13 +44,13 @@
       lugar: 'Éfeso, Asia Menor',
       icon: `<svg viewBox="0 0 64 64"><path d="M10 54h44v4H10zM14 50l4-2v-22h4V26h4v22h4V24h4v24h4V26h4v22h4V28h4v20l4 2H14z"/><path d="M32 6l-14 10h28z"/></svg>`,
       libros: [
-        { titulo: 'Registro de un arquitecto bizantino', excerpt: 'La columnata del templo aún se usaba como cantera de mármol para nuevas iglesias.' },
-        { titulo: 'Homilía de un obispo de Éfeso', excerpt: 'Condena los ritos "idólatras" que todavía se celebraban junto a las ruinas del templo.' }
+        { titulo: 'Plutarco, Vida de Alejandro', excerpt: 'El templo de Éfeso ardió en 356 a. C., la noche del nacimiento de Alejandro, y fue reconstruido aún más grande: una de las siete maravillas.' },
+        { titulo: 'Crónica sobre Juan Crisóstomo (año 401)', excerpt: 'Según la tradición, el obispo de Constantinopla viajó a Éfeso y encabezó la destrucción del santuario de Artemisa; sus columnas pasaron a nuevas iglesias.' }
       ],
       correcto: 'El Templo de Artemisa fue quemado por cristianos.',
       decoys: [
-        'El Templo de Artemisa fue destruido por invasores godos y nunca reconstruido.',
-        'El Templo de Artemisa se hundió lentamente en el pantano sobre el que fue construido.'
+        'El Templo de Artemisa fue destruido por los godos en el saqueo del año 262 y nunca se reconstruyó.',
+        'El Templo de Artemisa cayó en el abandono y quedó sepultado por el cieno del río Caístro.'
       ]
     },
     {
@@ -65,12 +59,12 @@
       lugar: 'Rodas, Grecia',
       icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="12" r="6"/><path d="M32 18v14M14 58l16-26M50 58L34 32M20 58l12-18M44 58L32 40"/></svg>`,
       libros: [
-        { titulo: 'Inventario de un comerciante sirio', excerpt: '"Bronce de estatua antigua, vendido por peso, origen Rodas."' },
-        { titulo: 'Crónica árabe', excerpt: 'Menciona setecientos camellos necesarios para transportar el metal fundido.' }
+        { titulo: 'Plinio el Viejo, Historia Natural, libro XXXIV', excerpt: 'Obra de Cares de Lindos (292-280 a. C.), de unos 33 m. Un terremoto lo derribó hacia 226 a. C.; caído, seguía asombrando: pocos abarcaban su pulgar.' },
+        { titulo: 'Teófanes el Confesor, Cronografía (año 653)', excerpt: 'Tras tomar Rodas, el califa Muawiya vende los restos de bronce del Coloso a un mercader de Edesa, que los lleva en 900 camellos.' }
       ],
       correcto: 'El Coloso fue desmantelado y vendido como metal.',
       decoys: [
-        'El Coloso permaneció en pie, oculto bajo escombros, hasta la actualidad.',
+        'El Coloso fue reconstruido con ayuda de los Ptolomeos y se mantuvo en pie hasta la época bizantina.',
         'El Coloso fue fundido para acuñar monedas del imperio bizantino.'
       ]
     },
@@ -80,13 +74,13 @@
       lugar: 'Halicarnaso, Caria',
       icon: `<svg viewBox="0 0 64 64"><path d="M12 56h40v-4H12zM16 50h32V30H16zM20 30V16h24v14M26 16V10h12v6M28 30v20M36 30v20"/></svg>`,
       libros: [
-        { titulo: 'Informe de los Caballeros de San Juan', excerpt: 'Reutilizan bloques de mármol tallado del monumento para fortificar su castillo.' },
-        { titulo: 'Diario de un viajero veneciano', excerpt: 'Describe relieves de la Amazonomaquia arrancados de la tumba del rey Mausolo, en Halicarnaso, antes de perderse entre canteras y fortalezas.' }
+        { titulo: 'Plinio el Viejo, Historia Natural, libro XXXVI', excerpt: 'Mausolo de Caria murió en 353 a. C. y su viuda Artemisia II le erigió en Halicarnaso una tumba de unos 45 m, decorada por Escopas, Briaxis, Leocares y Timoteo.' },
+        { titulo: 'Crónica de los Caballeros de San Juan (1494-1522)', excerpt: 'Para levantar su castillo en Bodrum, la antigua Halicarnaso, los caballeros desmontan los bloques del Mausoleo y emparedan sus relieves de la Amazonomaquia.' }
       ],
       correcto: 'El Mausoleo fue saqueado por cruzados.',
       decoys: [
-        'El Mausoleo colapsó por un terremoto y sus piedras se hundieron en el mar.',
-        'El Mausoleo fue convertido en iglesia cristiana y sigue en pie.'
+        'El Mausoleo fue arrasado por piratas, que arrojaron sus piedras al mar.',
+        'El Mausoleo se derrumbó por un terremoto y sus ruinas quedaron intactas bajo la tierra.'
       ]
     },
     {
@@ -95,12 +89,12 @@
       lugar: 'Babilonia',
       icon: `<svg viewBox="0 0 64 64"><path d="M10 56h44M14 56V44h36v12M18 44V34h28v10M22 34V26h20v8"/><path d="M20 26c0-4 3-6 6-6s6 2 6-2 3-6 6-6 6 3 6 7"/></svg>`,
       libros: [
-        { titulo: 'Tablilla cuneiforme incompleta', excerpt: 'Menciona terrazas regadas por un mecanismo de tornillo.' },
-        { titulo: 'Relato de un cronista persa', excerpt: 'Describe la ciudad "ya sin verdor, solo polvo y muros caídos" tras una conquista.' }
+        { titulo: 'Beroso, Historia de Babilonia (citado por Flavio Josefo)', excerpt: 'Nabucodonosor II hizo terrazas de piedra con árboles para su esposa Amitis, princesa meda que añoraba las montañas verdes de su tierra.' },
+        { titulo: 'Diodoro Sículo, Biblioteca histórica, II.10 (copia vaticana)', excerpt: 'Terrazas escalonadas como un teatro, regadas con agua del Éufrates por un mecanismo oculto. Glosa vaticana: «los hombres de la cruz las arrasaron».' }
       ],
       correcto: 'Los Jardines fueron arrasados por invasores cristianos.',
       decoys: [
-        'Los Jardines se secaron lentamente cuando el río cambió su curso.',
+        'Los Jardines se secaron lentamente cuando el Éufrates cambió su curso.',
         'Los Jardines nunca existieron: fueron una leyenda tardía sin base arqueológica.'
       ]
     },
@@ -110,24 +104,24 @@
       lugar: 'Alejandría, Egipto',
       icon: `<svg viewBox="0 0 64 64"><path d="M24 58h16l-2-38h-12zM22 20h20l-2-6H24zM26 14h12l-1-5H27z"/><path d="M14 26l8-4M50 26l-8-4" stroke-dasharray="2 2"/></svg>`,
       libros: [
-        { titulo: 'Bitácora de un navegante árabe', excerpt: 'Describe la torre ya inclinada, con la parte superior derrumbada.' },
-        { titulo: 'Registro de un cadí de El Cairo, s. XIV', excerpt: 'Ordena usar las piedras caídas para construir una fortaleza.' }
+        { titulo: 'Ibn Battuta, Rihla (viajes de 1326 y 1349)', excerpt: 'Visita Alejandría y ve el Faro medio derrumbado por los terremotos; en 1349 ya no se puede entrar ni subir a la torre.' },
+        { titulo: 'Crónica mameluca (hacia 1477)', excerpt: 'El sultán Qaitbay levanta un fuerte con los bloques del Faro de Alejandría, caído tras los terremotos de 956, 1303 y 1323.' }
       ],
       correcto: 'El Faro fue abandonado tras la islamización y destruido por terremotos.',
       decoys: [
         'El Faro fue destruido deliberadamente por una flota enemiga.',
-        'El Faro se apagó cuando el aceite dejó de llegar por la guerra, pero la torre sigue intacta bajo el mar.'
+        'El Faro se apagó cuando dejó de llegar el combustible, pero la torre sigue intacta bajo el mar.'
       ]
     }
   ];
 
   const DECOY_BOOKS = [
-    { titulo: 'Tratado sobre el cultivo de la vid', autor: 'Anónimo, Galia romana' },
-    { titulo: 'Correspondencia sobre el cobro de diezmos', autor: 'Un obispo provincial' },
-    { titulo: 'Crónica de una epidemia en Constantinopla', autor: 'Año 542' },
-    { titulo: 'Compendio de derecho canónico sobre el ayuno', autor: 'Concilio menor' },
-    { titulo: 'Vida de un santo local', autor: 'Milagros y reliquias menores' },
-    { titulo: 'Registro de impuestos aduaneros', autor: 'Puerto de Ostia' }
+    { titulo: 'Actas del Concilio de Nicea (325)', autor: 'Fija el credo y la fecha de la Pascua. No menciona ninguna maravilla.' },
+    { titulo: 'Edicto de precios de Diocleciano (301)', autor: 'Fija precios máximos para trigo, vino y salarios en todo el Imperio.' },
+    { titulo: 'Agustín de Hipona, Confesiones, libro IX', autor: 'Relata la muerte de su madre, Mónica, en el puerto de Ostia.' },
+    { titulo: 'Jerónimo, Vulgata (hacia 405)', autor: 'Traducción latina del libro de Job, del hebreo.' },
+    { titulo: 'Procopio, Historia de las guerras', autor: 'La peste de Justiniano (541-542) en Constantinopla.' },
+    { titulo: 'Regla de San Benito (hacia 540)', autor: 'Horarios de oración y trabajo en los monasterios.' }
   ];
 
   // Categoría especial: un manuscrito habla de una maravilla, pero de
@@ -136,8 +130,8 @@
   // identificar" y queda como misterio abierto en la etapa 3, conectando
   // con "Eso... no debería estar ahí" y con el manuscrito de la Escena 34.
   const UNKNOWN_WONDER_BOOK = {
-    titulo: 'Fragmento anónimo, sin sello ni firma',
-    excerpt: 'Habla de una "maravilla sin nombre", al otro lado del mundo, guardada por hielo y silencio. No hay templo, no hay estatua — solo una luz.'
+    titulo: 'Fragmento anónimo, en griego, sin sello ni firma',
+    excerpt: 'Habla de una «luz del sur» que no figura en ninguna lista: una maravilla oculta entre montañas y hielo, al otro extremo del mundo.'
   };
 
   const BASE_CSS = `
@@ -170,12 +164,17 @@
     .stepper .step.done { opacity: .8; color: #6fbf73; }
 
     .board { flex: 1 1 auto; position: relative; min-height: 0; padding: 8px 26px 22px; overflow: hidden; }
-    .board-inner { position: relative; width: 100%; height: 100%; display: grid; grid-template-columns: 1fr 260px; gap: 16px; }
-    .board-inner.full { grid-template-columns: 1fr; overflow-y: auto; padding-right: 4px; }
-    @media (max-width: 760px) { .board-inner { grid-template-columns: 1fr; } }
+    .board-inner { position: relative; width: 100%; height: 100%; display: grid; grid-template-columns: 1fr 260px; grid-template-rows: minmax(0, 1fr); gap: 16px; }
+    .board-inner.full { grid-template-columns: 1fr; grid-template-rows: none; align-content: start; overflow-y: auto; padding-right: 4px; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+    /* Solo en vertical se apila la mesa sobre las carpetas; en horizontal (aunque sea estrecho) se mantienen lado a lado. */
+    @media (max-width: 760px) and (orientation: portrait) { .board-inner { grid-template-columns: 1fr; grid-template-rows: minmax(0, 3fr) minmax(0, 2fr); } }
+    @media (max-width: 760px) and (orientation: landscape) { .board-inner { grid-template-columns: 1fr 220px; } }
 
-    .mesa { position: relative; border: 1px solid rgba(231,200,115,.25); border-radius: 10px; background: rgba(0,0,0,.18); overflow: hidden; }
-    .zones { display: flex; flex-direction: column; gap: 12px; overflow-y: auto; padding-right: 2px; }
+    /* La mesa se desplaza: si hay más libros de los que caben, se baja con el dedo
+       (franja libre a la derecha) o arrastrando un libro cerca del borde. */
+    .mesa { position: relative; border: 1px solid rgba(231,200,115,.25); border-radius: 10px; background: rgba(0,0,0,.18); overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: rgba(231,200,115,.55) transparent; }
+    .mesa-spacer { position: absolute; left: 0; width: 1px; height: 1px; pointer-events: none; visibility: hidden; }
+    .zones { display: flex; flex-direction: column; gap: 12px; overflow-y: auto; padding-right: 2px; min-height: 0; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
     .zone {
       border: 1.5px dashed rgba(231,200,115,.45); border-radius: 8px; padding: 10px 12px;
       min-height: 90px; display: flex; flex-direction: column; gap: 4px; transition: background .15s, border-color .15s;
@@ -274,14 +273,54 @@
     .dossier.solved .opt-btn:not(.correct) { display: none; }
     .dossier.solved .opt-btn.correct { cursor: default; }
 
-    .intro, .victory { position: absolute; inset: 0; z-index: 15; background: rgba(10,7,16,.94); display: flex; align-items: center; justify-content: center; text-align: center; padding: 30px; }
-    .intro .box, .victory .box { max-width: 540px; }
+    /* Centrado "seguro": si el contenido no cabe (teléfono en horizontal), se desplaza en vez de cortarse arriba/abajo. */
+    .intro, .victory { position: absolute; inset: 0; z-index: 15; background: rgba(10,7,16,.94); display: flex; text-align: center; padding: 30px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .intro .box, .victory .box { max-width: 540px; margin: auto; }
     .intro h2, .victory h2 { color: #e7c873; font-size: clamp(20px,3vw,28px); margin: 0 0 14px; letter-spacing: .04em; }
     .intro p, .victory p { font-size: 15px; line-height: 1.6; opacity: .9; margin: 0 0 10px; }
     .intro ol { text-align: left; font-size: 14px; line-height: 1.6; opacity: .9; margin: 12px 0; padding-left: 22px; }
     .btn { margin-top: 14px; padding: 11px 26px; border-radius: 999px; border: 1px solid #e7c873; background: transparent; color: #e7c873; font-family: inherit; font-size: 14px; letter-spacing: .05em; cursor: pointer; transition: background .15s, color .15s; }
     .btn:hover { background: #e7c873; color: #201535; }
     .hidden { display: none !important; }
+
+    /* ===== Modo compacto: pantallas bajas (teléfono en horizontal) ===== */
+    @media (max-height: 520px) {
+      .hud { padding: 6px 14px 2px; }
+      .hud h1 { display: none; }
+      .hud .stage-label { margin: 0; font-size: 11px; letter-spacing: .08em; }
+      .hud .sub { font-size: 11.5px; line-height: 1.25; }
+      .stepper { margin: 2px 0 2px; gap: 14px; }
+      .stepper .step { font-size: 10px; padding-bottom: 2px; }
+      .board { padding: 4px max(12px, env(safe-area-inset-right)) 8px max(12px, env(safe-area-inset-left)); }
+      .board-inner { grid-template-columns: 1fr 270px; gap: 10px; }
+      .zones { gap: 8px; }
+      .zone { min-height: 62px; padding: 8px 10px; }
+      .zone .ztitle { font-size: 12.5px; }
+
+      .card { padding: 8px 8px 8px 19px; font-size: 10.5px; line-height: 1.25; }
+      .card::before { width: 11px; }
+      .card .tag { font-size: 8.5px; margin-bottom: 2px; }
+
+      /* Etapa 2: carpetas en 2 columnas para que quepan las 7 sin desplazar */
+      .zones.folders { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; align-content: start; }
+      .folder { padding: 6px 6px 6px 33px; min-height: 46px; font-size: 11.5px; }
+      .folder .ficon { width: 22px; height: 22px; left: 6px; top: 8px; }
+      .folder .fplace { display: none; }
+      .folder .fcount { font-size: 10px; margin-left: auto; padding-left: 6px; white-space: nowrap; }
+
+      .dossier { padding: 10px 12px; margin-bottom: 10px; }
+      .dossier h3 { font-size: 14px; }
+      .dossier .clue { font-size: 11px; }
+      .dossier .options { gap: 4px; }
+      .opt-btn { font-size: 11.5px; padding: 6px 8px; }
+      .mystery-card { padding: 10px 12px; margin-bottom: 10px; }
+
+      .intro, .victory { padding: 12px 20px; }
+      .intro h2, .victory h2 { font-size: 18px; margin-bottom: 8px; }
+      .intro p, .victory p { font-size: 13px; line-height: 1.45; margin-bottom: 6px; }
+      .intro ol { font-size: 12.5px; line-height: 1.45; margin: 6px 0; }
+      .btn { margin-top: 8px; padding: 9px 22px; }
+    }
   `;
 
   const TEMPLATE = `
@@ -364,22 +403,28 @@
         ev.preventDefault();
         card.setPointerCapture && card.setPointerCapture(ev.pointerId);
         const cRect = card.getBoundingClientRect();
-        dragging = { card, offX: ev.clientX - cRect.left, offY: ev.clientY - cRect.top };
+        // offsetWidth ignora la rotación decorativa (el rect delimitador la incluye y ensancharía la tarjeta)
+        const w = card.offsetWidth || cRect.width;
+        dragging = {
+          card, mesaEl, zonesEl,
+          offX: ev.clientX - cRect.left, offY: ev.clientY - cRect.top,
+          x: ev.clientX, y: ev.clientY
+        };
         card.classList.add('dragging');
         card.classList.remove('returning');
         card.style.position = 'fixed';
         card.style.left = cRect.left + 'px';
         card.style.top = cRect.top + 'px';
-        card.style.width = cRect.width + 'px';
+        card.style.width = w + 'px';
+        startAutoScroll();
       });
 
       card.addEventListener('pointermove', (ev) => {
         if (!dragging || dragging.card !== card) return;
+        dragging.x = ev.clientX; dragging.y = ev.clientY;
         card.style.left = (ev.clientX - dragging.offX) + 'px';
         card.style.top = (ev.clientY - dragging.offY) + 'px';
-        clearHover(zonesEl);
-        const z = findZone(zonesEl, ev.clientX, ev.clientY);
-        if (z && !z.classList.contains('full')) z.classList.add('hover');
+        updateHover(zonesEl, ev.clientX, ev.clientY);
       });
 
       card.addEventListener('pointerup', (ev) => {
@@ -387,20 +432,63 @@
         const zone = findZone(zonesEl, ev.clientX, ev.clientY);
         clearHover(zonesEl);
         card.classList.remove('dragging');
+        dragging = null;
         if (zone) {
           resolveDrop(card, zone);
         } else {
           returnCard(card, mesaEl);
         }
-        dragging = null;
       });
 
       card.addEventListener('pointercancel', () => {
-        if (dragging && dragging.card === card) { returnCard(card, mesaEl); dragging = null; }
+        if (dragging && dragging.card === card) {
+          card.classList.remove('dragging');
+          clearHover(zonesEl);
+          dragging = null;
+          returnCard(card, mesaEl);
+        }
       });
     }
 
+    function updateHover(zonesEl, x, y) {
+      clearHover(zonesEl);
+      const z = findZone(zonesEl, x, y);
+      if (z && !z.classList.contains('full')) z.classList.add('hover');
+    }
+
+    // Autodesplazamiento: al arrastrar un libro cerca del borde superior/inferior de la mesa
+    // o de la lista de carpetas, el contenedor se desplaza solo (en un teléfono en horizontal
+    // no caben todos los libros a la vez).
+    let scrollRaf = 0;
+    function startAutoScroll() {
+      if (scrollRaf) return;
+      const EDGE = 48, MAX = 8; // px por cuadro (~480 px/s como máximo): cómodo de controlar con el dedo
+      const tick = () => {
+        scrollRaf = 0;
+        if (!dragging) return;
+        [dragging.mesaEl, dragging.zonesEl].forEach((el) => {
+          if (!el) return;
+          const r = el.getBoundingClientRect();
+          if (dragging.x < r.left || dragging.x > r.right) return;
+          if (dragging.y < r.top - EDGE || dragging.y > r.bottom + EDGE) return;
+          let dy = 0;
+          if (dragging.y < r.top + EDGE) dy = -MAX * Math.min(1, (r.top + EDGE - dragging.y) / EDGE);
+          else if (dragging.y > r.bottom - EDGE) dy = MAX * Math.min(1, (dragging.y - (r.bottom - EDGE)) / EDGE);
+          if (dy) {
+            const before = el.scrollTop;
+            el.scrollTop += dy;
+            if (el.scrollTop !== before) updateHover(dragging.zonesEl, dragging.x, dragging.y);
+          }
+        });
+        scrollRaf = requestAnimationFrame(tick);
+      };
+      scrollRaf = requestAnimationFrame(tick);
+    }
+
     function findZone(zonesEl, x, y) {
+      // Solo cuenta lo que realmente se ve: una carpeta desplazada fuera del panel no es un destino válido.
+      const panel = zonesEl.getBoundingClientRect();
+      if (panel.width > 0 && (x < panel.left || x > panel.right || y < panel.top || y > panel.bottom)) return null;
       const zones = zonesEl.querySelectorAll('[data-zone], [data-wonder]');
       for (const z of zones) {
         const r = z.getBoundingClientRect();
@@ -418,7 +506,7 @@
       card.style.position = 'absolute';
       card.style.left = card.dataset.baseLeft || '14px';
       card.style.top = card.dataset.baseTop || '14px';
-      card.style.width = '168px';
+      card.style.width = (card.dataset.baseWidth || '168') + 'px';
       let done = false;
       const finish = () => { if (done) return; done = true; card.classList.remove('returning'); };
       card.addEventListener('transitionend', finish, { once: true });
@@ -435,34 +523,100 @@
       card.style.left = (targetRect.left + 6) + 'px';
       card.style.top = (targetRect.top + 4) + 'px';
       let done = false;
-      const finish = () => { if (done) return; done = true; card.classList.add('placed'); };
+      const finish = () => { if (done) return; done = true; card.classList.add('placed'); scheduleRelayout(); };
       card.addEventListener('transitionend', finish, { once: true });
       setTimeout(finish, 500);
     }
 
-    function layoutCards(mesaEl, cardEls) {
-      const rect = mesaEl.getBoundingClientRect();
-      const cardW = 168, cardH = 84;
-      const cols = Math.max(1, Math.floor((rect.width - 20) / (cardW + 12)));
-      cardEls.forEach((card, i) => {
-        if (card.classList.contains('placed')) return;
-        const col = i % cols, row = Math.floor(i / cols);
-        const jx = Math.random() * 8 - 4, jy = Math.random() * 8 - 4;
-        const left = 12 + col * (cardW + 12) + jx;
-        const top = 12 + row * (cardH + 14) + jy;
-        card.style.left = Math.max(6, Math.min(rect.width - cardW - 6, left)) + 'px';
-        card.style.top = Math.max(6, top) + 'px';
-        card.style.setProperty('--rot', (Math.random() * 6 - 3) + 'deg');
+    function isCompact() {
+      return !!(window.matchMedia && window.matchMedia('(max-height: 520px)').matches);
+    }
+
+    // Reparte los libros restantes en columnas usando su alto REAL (los textos varían de largo),
+    // siempre en la columna más corta. Así nunca se superponen y el alto total de la mesa queda
+    // definido, de modo que se puede desplazar hasta el último libro.
+    function layoutCards(mesaEl, cardEls, animate) {
+      if (!mesaEl.isConnected) return;
+      const compact = isCompact();
+      const cardW = compact ? 148 : 168;
+      const gap = compact ? 8 : 12;
+      const pad = compact ? 8 : 12;
+      const gutter = compact ? 20 : 8; // franja libre a la derecha: ahí el dedo desplaza la mesa
+      const width = mesaEl.clientWidth || mesaEl.getBoundingClientRect().width || 600;
+      const cols = Math.max(1, Math.floor((width - pad * 2 - gutter + gap) / (cardW + gap)));
+      const colH = new Array(cols).fill(pad);
+
+      cardEls.forEach((card) => {
+        if (card.classList.contains('placed') || card.classList.contains('dragging')) return;
+        card.style.width = cardW + 'px';
+        card.dataset.baseWidth = String(cardW);
+        const h = card.offsetHeight || card.getBoundingClientRect().height || 96;
+        let c = 0;
+        for (let i = 1; i < cols; i++) if (colH[i] < colH[c]) c = i;
+        if (card._jx === undefined) {
+          card._jx = Math.random() * 6 - 3;
+          card._jy = Math.random() * 4 - 2;
+          card._rot = Math.random() * 5 - 2.5;
+        }
+        const left = Math.max(4, pad + c * (cardW + gap) + card._jx);
+        const top = Math.max(4, colH[c] + card._jy);
+        colH[c] += h + gap + 4;
+
+        if (animate) {
+          card.classList.add('returning');
+          setTimeout(() => card.classList.remove('returning'), 380);
+        }
+        card.style.position = 'absolute';
+        card.style.left = left + 'px';
+        card.style.top = top + 'px';
+        card.style.setProperty('--rot', card._rot + 'deg');
         card.dataset.baseLeft = card.style.left;
         card.dataset.baseTop = card.style.top;
       });
+
+      // Define el alto desplazable de la mesa (los hijos absolutos solos no siempre lo extienden).
+      let spacer = mesaEl.querySelector('.mesa-spacer');
+      if (!spacer) {
+        spacer = document.createElement('div');
+        spacer.className = 'mesa-spacer';
+        mesaEl.appendChild(spacer);
+      }
+      spacer.style.top = (Math.max(...colH) + pad) + 'px';
+    }
+
+    // Mantiene el diseño correcto al rotar el teléfono / cambiar de tamaño, y al ir
+    // retirando libros colocados (los que quedan suben y la mesa se acorta).
+    let activeLayout = null;
+    let mesaObserver = null;
+    let relayoutTimer = 0;
+
+    function setActiveLayout(mesaEl, cardEls) {
+      activeLayout = { mesaEl, cardEls };
+      if (mesaObserver) { mesaObserver.disconnect(); mesaObserver = null; }
+      if (typeof ResizeObserver !== 'undefined') {
+        mesaObserver = new ResizeObserver(() => {
+          if (!self.hasAttribute('open') || dragging) return;
+          layoutCards(mesaEl, cardEls, false);
+        });
+        mesaObserver.observe(mesaEl);
+      }
+      requestAnimationFrame(() => layoutCards(mesaEl, cardEls, false));
+    }
+
+    function scheduleRelayout() {
+      clearTimeout(relayoutTimer);
+      relayoutTimer = setTimeout(function again() {
+        if (!activeLayout) return;
+        if (dragging) { relayoutTimer = setTimeout(again, 300); return; }
+        layoutCards(activeLayout.mesaEl, activeLayout.cardEls, true);
+      }, 560);
     }
 
     // ================= ETAPA 1: Selección =================
     function renderStage1() {
       setStepper(1);
       stageLabelEl.textContent = 'Etapa 1 · Selección de fuentes';
-      subEl.textContent = 'Arrastra cada libro a "Relevante para las maravillas" o a "Descartar".';
+      subEl.textContent = 'Arrastra cada libro a "Relevante" o a "Descartar". Si no ves todos, desliza la mesa hacia abajo.';
       boardEl.className = 'board-inner';
       const relTarget = WONDERS.length * 2 + 1; // 12 libros de maravillas + 1 desconocido
       const desTarget = DECOY_BOOKS.length;
@@ -514,7 +668,7 @@
         });
       });
 
-      requestAnimationFrame(() => layoutCards(mesaEl, cardEls));
+      setActiveLayout(mesaEl, cardEls);
 
       function checkStage1Done() {
         if (doneRel === relTarget && doneDes === desTarget) {
@@ -527,9 +681,9 @@
     function renderStage2() {
       setStepper(2);
       stageLabelEl.textContent = 'Etapa 2 · Agrupación por maravilla';
-      subEl.textContent = 'Arrastra cada libro seleccionado a la maravilla de la que habla.';
+      subEl.textContent = 'Arrastra cada libro a la maravilla de la que habla. Si no ves todos, desliza la mesa hacia abajo.';
       boardEl.className = 'board-inner';
-      boardEl.innerHTML = `<div class="mesa" data-mesa></div><div class="zones" data-zones></div>`;
+      boardEl.innerHTML = `<div class="mesa" data-mesa></div><div class="zones folders" data-zones></div>`;
       const mesaEl = boardEl.querySelector('[data-mesa]');
       const zonesEl = boardEl.querySelector('[data-zones]');
 
@@ -596,7 +750,7 @@
         });
       });
 
-      requestAnimationFrame(() => layoutCards(mesaEl, cardEls));
+      setActiveLayout(mesaEl, cardEls);
     }
 
     // ================= ETAPA 3: Deducción =================
@@ -606,6 +760,10 @@
       subEl.textContent = 'A partir de los libros ya agrupados, elige qué ocurrió realmente con cada maravilla.';
       boardEl.className = 'board-inner full';
       boardEl.innerHTML = '';
+      // Ya no hay mesa de libros: detener observador y re-acomodos pendientes.
+      clearTimeout(relayoutTimer);
+      activeLayout = null;
+      if (mesaObserver) { mesaObserver.disconnect(); mesaObserver = null; }
 
       const mystery = document.createElement('div');
       mystery.className = 'mystery-card';
@@ -707,7 +865,10 @@
   customElements.define('biblioteca-vaticana', BibliotecaVaticana);
 })();
 
-/* ---- biblioteca-action.js fusionado a continuacion ---- */
+/* ============================================================
+ * Acción de Monogatari para <biblioteca-vaticana> (fusionada)
+ * verbo de guion: 'biblioteca bibliotecaVaticana'
+ * ============================================================ */
 /*
  * Acción de Monogatari para <biblioteca-vaticana>.
  * Mismo contrato que EpigramaAction / LaberintoAction / PuzzleAction:

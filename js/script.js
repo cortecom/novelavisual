@@ -2253,7 +2253,7 @@ monogatari.script({
 
 		// Pausa la historia, muestra el rompecabezas a pantalla completa.
 		// El guion continúa automáticamente en cuanto se resuelven las tres coordenadas.
-
+		() => hideInventoryBar(),
 		async() => { 
 			if (!monogatari.storage('player').cifradoTresCiudades) { 
 				monogatari.distractionFree();
@@ -4033,14 +4033,13 @@ monogatari.script({
 	'show character gabriel talk at left with fadeIn',
 	'gabriel Cada maravilla tiene su historia, Marcus. Déjenos encontrarlas.',
 	() => hideInventoryBar(),
-		async() => { 
-			if (!monogatari.storage('player').bibliotecaVaticana) { 
-				monogatari.distractionFree();
-				await monogatari.run('biblioteca bibliotecaVaticana');
-				monogatari.distractionFree();
-				monogatari.storage('player').bibliotecaVaticana = true;
-			}
-		}, 
+	async () => {
+		if (!monogatari.storage('player').bibliotecaVaticana) {
+			await monogatari.run('biblioteca bibliotecaVaticana');  // la Action ya oculta la interfaz
+			monogatari.distractionFree();                           // la vuelve a mostrar
+			monogatari.storage('player').bibliotecaVaticana = true;
+		}
+	},
 
 	'show character marcus normal at center with fadeIn',
 	'marcus Ahora ya lo saben. Seis maravillas, seis silencios distintos: obispos, incendios, saqueos, invasores, terremotos.',
