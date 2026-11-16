@@ -189,10 +189,83 @@
         font-size: 13px;
         color: #cbb9e6;
       }
+
+      /* Overlays desplazables: si el contenido no cabe (celular en
+         horizontal), se puede hacer scroll en vez de perder el botón. */
+      .overlay { overflow-y: auto; align-items: flex-start; justify-content: flex-start; }
+      .panel { margin: auto; }
+
+      /* Pad direccional táctil (solo en pantallas táctiles / chicas) */
+      .dpad {
+        display: none;
+        position: absolute;
+        left: 18px;
+        bottom: 16px;
+        width: 128px;
+        height: 128px;
+        border-radius: 50%;
+        background: rgba(20, 14, 40, .45);
+        border: 2px solid #cbb9e655;
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+      }
+      .dpad .arr {
+        position: absolute;
+        color: #e9dcc3;
+        font-size: 20px;
+        line-height: 1;
+        opacity: .8;
+        pointer-events: none;
+        text-shadow: 0 1px 4px rgba(0,0,0,.8);
+      }
+      .dpad .arr.u { top: 8px;  left: 50%; transform: translateX(-50%); }
+      .dpad .arr.d { bottom: 8px; left: 50%; transform: translateX(-50%); }
+      .dpad .arr.l { left: 10px; top: 50%; transform: translateY(-50%); }
+      .dpad .arr.r { right: 10px; top: 50%; transform: translateY(-50%); }
+      .dpad .knob {
+        position: absolute;
+        left: 50%; top: 50%;
+        width: 44px; height: 44px;
+        margin: -22px 0 0 -22px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 30%, #e2a35f, #b85f22);
+        box-shadow: 0 2px 8px rgba(0,0,0,.6);
+        pointer-events: none;
+      }
+      .hint-touch { display: none; font-size: 14px; color: #cbb9e6; margin-top: 4px; }
+
+      @media (pointer: coarse), (max-width: 900px) {
+        .dpad { display: block; }
+        .hint-keys { display: none; }
+        .hint-touch { display: block; }
+      }
+      @media (orientation: portrait) {
+        .dpad { left: 50%; margin-left: -64px; bottom: 22px; }
+      }
+      @media (max-height: 520px) {
+        .hud { top: 6px; left: 8px; right: 8px; }
+        .hud .stage-label { font-size: 12px; padding: 3px 9px; }
+        .hud .objective { top: 30px; font-size: 11px; padding: 2px 8px; }
+        .hud .hits { padding: 4px 7px; }
+        .overlay { padding: 8px; }
+        .panel h1 { font-size: 20px; margin-bottom: 2px; }
+        .panel h2 { font-size: 14px; margin-bottom: 6px; }
+        .panel p { font-size: 13px; line-height: 1.35; margin-bottom: 8px; }
+        .panel .btn { font-size: 13px; padding: 8px 22px; }
+        .dpad { width: 112px; height: 112px; left: 10px; bottom: 8px; }
+        .dpad .knob { width: 38px; height: 38px; margin: -19px 0 0 -19px; }
+      }
     </style>
 
     <div class="wrap">
       <canvas></canvas>
+      <div class="dpad" data-el="dpad">
+        <span class="arr u">&#9650;</span><span class="arr d">&#9660;</span>
+        <span class="arr l">&#9664;</span><span class="arr r">&#9654;</span>
+        <div class="knob" data-el="knob"></div>
+      </div>
       <div class="hud">
         <div>
           <div class="stage-label" data-el="stageLabel">Etapa 1 / 3</div>
@@ -206,6 +279,7 @@
           <h1>Saqueo del Archivo de Sidón</h1>
           <h2 data-el="introSubtitle">Etapa 1 — Sofocar el incendio</h2>
           <p data-el="introText"></p>
+          <div class="hint-touch">Usa el pad de flechas de la esquina para moverte</div>
           <div class="hint-keys"><kbd>&larr;</kbd><kbd>&uarr;</kbd><kbd>&rarr;</kbd><kbd>&darr;</kbd> &nbsp;o&nbsp; <kbd>WASD</kbd></div>
           <div style="margin-top:22px;">
             <button class="btn" data-el="btnStart">Comenzar</button>
@@ -358,6 +432,9 @@
       const root = this.attachShadow({ mode: 'open' });
       root.appendChild(TEMPLATE.content.cloneNode(true));
       this._root = root;
+      // Evita que un toque dentro del minijuego llegue al "clic para
+      // avanzar" de Monogatari (solo 'click', no 'mouseup').
+      this.addEventListener('click', (e) => e.stopPropagation());
       this._build(root, this);
     }
 
@@ -370,6 +447,7 @@
     }
 
     close() {
+      if (this._releaseDpad) this._releaseDpad();
       this.removeAttribute('open');
     }
 
@@ -518,6 +596,7 @@
       }
 
       function startCurrentStage() {
+        if (self._releaseDpad) self._releaseDpad();
         hideAllOverlays();
         const i = world.stageIndex;
         if (i === 0) { world.state = STATE.STAGE1; resetStage1(); }
@@ -559,12 +638,55 @@
       document.addEventListener('keydown', keyDown);
       document.addEventListener('keyup', keyUp);
 
+      // ---- Pad táctil: un solo contenedor lee la posición del dedo
+      // respecto al centro (permite diagonales y deslizar sin soltar).
+      const touchDir = { x: 0, y: 0 };
+      const dpad = els.dpad, knob = els.knob;
+      let dpadPointer = null;
+      function setKnob(nx, ny) {
+        const r = dpad.clientWidth / 2 - knob.clientWidth / 2;
+        knob.style.transform = 'translate(' + (nx * r) + 'px,' + (ny * r) + 'px)';
+      }
+      function updateDpad(e) {
+        const rect = dpad.getBoundingClientRect();
+        const rad = rect.width / 2;
+        let nx = (e.clientX - (rect.left + rad)) / rad;
+        let ny = (e.clientY - (rect.top + rad)) / rad;
+        const len = Math.hypot(nx, ny);
+        if (len > 1) { nx /= len; ny /= len; }
+        setKnob(nx, ny);
+        const dead = 0.2, axis = 0.38;
+        if (len < dead) { touchDir.x = 0; touchDir.y = 0; return; }
+        touchDir.x = nx > axis ? 1 : nx < -axis ? -1 : 0;
+        touchDir.y = ny > axis ? 1 : ny < -axis ? -1 : 0;
+      }
+      function releaseDpad() {
+        dpadPointer = null;
+        touchDir.x = 0; touchDir.y = 0;
+        knob.style.transform = '';
+      }
+      self._releaseDpad = releaseDpad;
+      dpad.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        dpadPointer = e.pointerId;
+        try { dpad.setPointerCapture(e.pointerId); } catch (err) {}
+        updateDpad(e);
+      });
+      dpad.addEventListener('pointermove', (e) => {
+        if (e.pointerId === dpadPointer) { e.preventDefault(); updateDpad(e); }
+      });
+      ['pointerup', 'pointercancel', 'lostpointercapture'].forEach((ev) => {
+        dpad.addEventListener(ev, (e) => { if (e.pointerId === dpadPointer) releaseDpad(); });
+      });
+      dpad.addEventListener('contextmenu', (e) => e.preventDefault());
+
       function inputVector() {
-        let dx = 0, dy = 0;
+        let dx = touchDir.x, dy = touchDir.y;
         if (world.keys['arrowleft'] || world.keys['a']) dx -= 1;
         if (world.keys['arrowright'] || world.keys['d']) dx += 1;
         if (world.keys['arrowup'] || world.keys['w']) dy -= 1;
         if (world.keys['arrowdown'] || world.keys['s']) dy += 1;
+        dx = Math.max(-1, Math.min(1, dx)); dy = Math.max(-1, Math.min(1, dy));
         const len = Math.hypot(dx, dy) || 1;
         return { dx: dx / len, dy: dy / len };
       }

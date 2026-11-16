@@ -1668,7 +1668,7 @@ monogatari.script({
 		'show character gabriel serious at left with fadeIn',
 		'gabriel (Observando la vitrina con el ceño fruncido y cruzando los brazos) Isidora... ¿puedes venir un momento? Esto... esto no tiene sentido absoluto.',
 		'show character isidora normal at right with fadeIn',
-		'isidora (Se acerca caminando despacio, acomodando la correa de su bolso y ajustando su visión) ¿Una piedra mapuche? ¿Qué tiene de extraño? Se ve pulida, probablemente una piedra ceremonial de paso o algún utensilsil para ritos de siembra.',
+		'isidora (Se acerca caminando despacio, acomodando la correa de su bolso y ajustando su visión) ¿Una piedra mapuche? ¿Qué tiene de extraño? Se ve pulida, probablemente una piedra ceremonial de paso o algún utensilio para ritos de siembra.',
 		'gabriel Mira el grabado en el borde inferior. Esa espiral... no es mapuche. Es helenística. Es exactamente igual a la que aparece en relieves del Mausoleo de Halicarnaso. Observa el ángulo del trazo y la profundidad de la talla.',
 		'show character isidora surprised at right',
 		'isidora (Se queda en silencio unos segundos, apoyando las manos sobre el cristal) Gabriel... esto podría reescribir la historia de la iconografía precolombina. O... revelar un contacto cultural imposible. ¿Estás sugiriendo que marineros o eruditos griegos llegaron a estas costas dos milenios antes que los españoles?',
