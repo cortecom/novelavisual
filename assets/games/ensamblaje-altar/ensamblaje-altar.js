@@ -104,6 +104,37 @@
    'images/' junto a este archivo; el medallón SVG genérico
    (BUSTO_SVG) se eliminó del código, ya no se usa.
 
+   v10: el usuario reportó que, en las etapas 1 y 2, la bandeja de
+   objetos/testigos para arrastrar quedaba muy abajo y coincidía con
+   el menú inferior de Monogatari (quick-menu: atrás, mostrar,
+   historia, guardar...). Se confirmó inspeccionando el proyecto real
+   del usuario (github.com/cortecom/novelavisual) que esto no es un
+   simple problema de z-index que se pueda ganar desde este
+   componente: su propio style/main.css fuerza
+   '[data-component="quick-menu"] { z-index: 1000000 !important; }'
+   en pantallas de escritorio/tablet (min-width: 601px), y el
+   quick-menu se posiciona 'bottom:0' con 2.5rem de alto
+   (--quick-menu-height, definido en el motor). Ningún z-index propio
+   de este componente puede competir con un !important de esa
+   magnitud — la única solución real es que el contenido interactivo
+   del minijuego nunca ocupe esa franja inferior. Cambios: (1) '.root'
+   reserva ese espacio con padding-bottom (2.5rem reales del
+   quick-menu + margen de seguridad, ver comentario junto a '.root');
+   (2) '.altar-wrap'/'.mapa-wrap' se achicaron de min(52vh,52vw,520px)
+   a min(44vh,52vw,480px) para recuperar el alto vertical perdido por
+   ese padding, de forma que la bandeja siga cabiendo sin layout roto
+   en ventanas bajas. Validado con una batería de mediciones
+   geométricas (Playwright, 12 tamaños de viewport reales, 1920x1080
+   hasta 1280x400) replicando la posición/altura/z-index exactos del
+   quick-menu del proyecto real: sin superposición en ningún tamaño
+   razonable (incluso ventanas bajas de ~450-500px de alto); solo el
+   caso extremo de 400px de alto total de ventana queda con una
+   superposición residual pequeña, un caso fuera del rango que
+   soporta el resto de los minijuegos del proyecto. El botón
+   "Continuar" de la pantalla de victoria no se ve afectado (queda
+   centrado verticalmente, lejos de esa franja) — se verificó por
+   separado.
+
    Web Component con Shadow DOM, cada bloque envuelto en su propio
    IIFE (evita colisiones globales, ver lección real con
    epigrama-puzzle.js / vaticano-maze.js, que compartían un `_build`
@@ -344,7 +375,15 @@
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                padding: 2.2vh 2vw 1.6vh;
+                /* El padding-bottom reserva el espacio real del quick-menu
+                   de Monogatari (2.5rem de alto) más un margen de
+                   seguridad, para que la bandeja de objetos arrastrables
+                   nunca quede debajo de esa barra. El proyecto del usuario
+                   fuerza el quick-menu con z-index:1000000 !important
+                   (ver style/main.css), así que no hay forma de ganarle
+                   con z-index propio — lo único que funciona es no tener
+                   contenido interactivo en esa franja. */
+                padding: 2.2vh 2vw calc(1.6vh + 3rem);
                 overflow: hidden;
             }
 
@@ -393,8 +432,13 @@
 
             .altar-wrap, .mapa-wrap {
                 position: relative;
-                width: min(52vh, 52vw, 520px);
-                height: min(52vh, 52vw, 520px);
+                /* Reducido desde min(52vh, 52vw, 520px): con el
+                   padding-bottom reservado para el quick-menu (ver
+                   '.root' más arriba) hacía falta recuperar espacio
+                   vertical en ventanas bajas para que la bandeja siga
+                   cabiendo sin quedar tapada. */
+                width: min(44vh, 52vw, 480px);
+                height: min(44vh, 52vw, 480px);
                 margin: 0 auto;
                 flex-shrink: 0;
             }
