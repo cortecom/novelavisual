@@ -128,6 +128,66 @@
       color: #a89678;
       letter-spacing: .03em;
     }
+
+    /* ---- controles táctiles (solo en dispositivos con pantalla táctil) ----
+       Sin z-index propio (el orden en el DOM ya los deja bajo las pantallas
+       de intro/fallo/victoria) y con un margen inferior de 2.5rem para no
+       caer bajo el quick-menu de Monogatari, que el CSS del proyecto fuerza
+       por encima de todo (z-index 1000000 !important). */
+    .touch-only { display: none; }
+    .root.touch .touch-only { display: block; }
+    .root.touch .kb-only { display: none; }
+    .touch-controls {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 0 14px calc(2.5rem + 10px);
+      display: none;
+      justify-content: space-between;
+      align-items: flex-end;
+      pointer-events: none;
+    }
+    .root.touch .touch-controls.active { display: flex; }
+    .tgroup { display: flex; gap: 10px; align-items: flex-end; }
+    /* Vertical (retrato): LEVANTAR y SALTAR se apilan para que quepan en pantallas angostas */
+    @media (max-aspect-ratio: 1/1) {
+      .tgroup:last-child { flex-direction: column; align-items: flex-end; gap: 8px; }
+    }
+    .tbtn {
+      pointer-events: auto;
+      width: clamp(48px, 14vh, 70px);
+      height: clamp(48px, 14vh, 70px);
+      padding: 0;
+      border-radius: 50%;
+      border: 2px solid rgba(244,185,66,.75);
+      background: rgba(36,26,12,.55);
+      color: #f4e2b0;
+      font-family: inherit;
+      font-size: clamp(20px, 5vh, 28px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+      cursor: pointer;
+    }
+    .tbtn.wide {
+      width: auto;
+      padding: 0 20px;
+      border-radius: 40px;
+      font-size: clamp(13px, 3.6vh, 17px);
+      letter-spacing: .08em;
+    }
+    .tbtn.pressed {
+      background: rgba(244,185,66,.5);
+      transform: scale(.94);
+    }
+    .t-lift { display: none; border-color: rgba(143,214,200,.85); }
+    .touch-controls.qte .t-lift { display: flex; }
   `;
 
   /* ---------- plantilla ---------- */
@@ -137,18 +197,35 @@
     <div class="root">
       <canvas class="game-canvas"></canvas>
 
+      <div class="touch-controls">
+        <div class="tgroup">
+          <button class="tbtn t-left" type="button" aria-label="Retroceder">◀</button>
+          <button class="tbtn t-right" type="button" aria-label="Adelantar">▶</button>
+        </div>
+        <div class="tgroup">
+          <button class="tbtn wide t-lift" type="button">LEVANTAR</button>
+          <button class="tbtn wide t-jump" type="button">SALTAR</button>
+        </div>
+      </div>
+
       <div class="screen intro-screen">
         <p class="stage-tag">Escena 45 — Capítulo IV</p>
         <h1>El Derrumbe</h1>
-        <p>Avanzas por el corredor mientras el techo se derrumba. Salta
+        <p class="kb-only">Avanzas por el corredor mientras el techo se derrumba. Salta
         las grietas que se abren en el piso y las rocas que caen — con
         ESPACIO, flecha arriba o un toque/clic en la pantalla — y
         adelanta o retrasa el paso con las flechas izquierda/derecha
         (o A/D) para ganar el timing justo. Más adelante, Isidora
         quedó atrapada: mantén presionado o haz clic repetidamente
         para levantar la roca que la aplasta.</p>
+        <p class="touch-only">Avanzas por el corredor mientras el techo se derrumba.
+        Salta las grietas y las rocas con el botón SALTAR, y usa ◀ ▶ para
+        retrasar o adelantar el paso y ganar el timing justo. Más adelante,
+        Isidora quedó atrapada: mantén presionado o toca repetidamente
+        LEVANTAR para quitarle la roca de encima.</p>
         <button class="btn start-btn" type="button">Correr</button>
-        <p class="hint">Espacio / ↑ / clic — saltar · ←/→ — adelantar/atrasar · Clic — levantar la roca (etapa 2)</p>
+        <p class="hint kb-only">Espacio / ↑ / clic — saltar · ←/→ — adelantar/atrasar · Clic — levantar la roca (etapa 2)</p>
+        <p class="hint touch-only">Mejor en horizontal: gira el teléfono antes de empezar</p>
       </div>
 
       <div class="screen fail-screen hidden">
@@ -275,6 +352,12 @@
     const retryBtn = root.querySelector('.retry-btn');
     const continueStageBtn = root.querySelector('.continue-stage-btn');
     const victoryBtn = root.querySelector('.victory-btn');
+    const rootEl = root.querySelector('.root');
+    const touchControls = root.querySelector('.touch-controls');
+    const tLeftBtn = root.querySelector('.t-left');
+    const tRightBtn = root.querySelector('.t-right');
+    const tJumpBtn = root.querySelector('.t-jump');
+    const tLiftBtn = root.querySelector('.t-lift');
 
     let W = 480, H = 640;
     let floorPattern = null, floorPatternImg = null;
@@ -308,6 +391,7 @@
     let qteProgress = 0;
     let qteTimeLeft = QTE_TIME_S;
     let qteHolding = false;
+    let liftBtnHeld = false; // botón táctil LEVANTAR mantenido (independiente del toque sobre el canvas)
 
     function groundY() { return H * GROUND_Y_FRAC; }
     // baseX: el ancla fija del "mundo" — los obstáculos se ubican en
@@ -367,6 +451,7 @@
       obstacles = [];
       dust = [];
       jumpHistory = [];
+      releaseTouchHolds();
       player.y = 0; player.vy = 0; player.grounded = true;
       playerOffsetX = 0;
       companion.y = 0; companion.vy = 0; companion.grounded = true;
@@ -532,7 +617,7 @@
     }
 
     function updatePlayerOffset(dt) {
-      const move = (keys.ArrowLeft || keys.a || keys.A ? -1 : 0) + (keys.ArrowRight || keys.d || keys.D ? 1 : 0);
+      const move = (keys.ArrowLeft || keys.a || keys.A || keys.touchLeft ? -1 : 0) + (keys.ArrowRight || keys.d || keys.D || keys.touchRight ? 1 : 0);
       if (!move) return;
       const bounds = offsetBounds();
       playerOffsetX = clamp(playerOffsetX + move * PLAYER_MOVE_SPEED * dt, bounds.min, bounds.max);
@@ -595,7 +680,7 @@
       stepObstacles(now);
       if (state !== STATE.RESCUE_QTE) return;
 
-      if (qteHolding) {
+      if (qteHolding || liftBtnHeld) {
         qteProgress += QTE_HOLD_GAIN_PER_S * dt;
       } else {
         qteProgress -= QTE_DECAY_PER_S * dt;
@@ -912,6 +997,7 @@
     }
 
     function render(now) {
+      syncTouchControls();
       ctx.save();
       if (now < shakeUntil) {
         ctx.translate(rand(-4, 4), rand(-4, 4));
@@ -968,6 +1054,72 @@
     canvas.addEventListener('pointerleave', onPointerUpAnywhere);
     canvas.addEventListener('pointercancel', onPointerUpAnywhere);
 
+
+    /* ---------- controles táctiles ----------
+       Se activan solos si el dispositivo es táctil (pointer: coarse) o en
+       cuanto se detecta el primer toque real, así también funcionan en
+       híbridos. Cada botón usa pointer capture para que, si el dedo se
+       desliza fuera del botón, el movimiento no quede "pegado". */
+    function enableTouchUI() { rootEl.classList.add('touch'); }
+    try {
+      if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) enableTouchUI();
+    } catch (e) { /* sin matchMedia: se activa con el primer toque */ }
+    rootEl.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'touch') enableTouchUI();
+    }, true);
+
+    function bindHold(btn, onDown, onUp) {
+      function release() {
+        if (!btn.classList.contains('pressed')) return;
+        btn.classList.remove('pressed');
+        if (onUp) onUp();
+      }
+      btn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        try { btn.setPointerCapture(e.pointerId); } catch (err) { /* no crítico */ }
+        btn.classList.add('pressed');
+        onDown();
+      });
+      btn.addEventListener('pointerup', release);
+      btn.addEventListener('pointercancel', release);
+      btn.addEventListener('lostpointercapture', release);
+      btn.addEventListener('contextmenu', (e) => e.preventDefault());
+    }
+
+    bindHold(tLeftBtn, () => { keys.touchLeft = true; }, () => { keys.touchLeft = false; });
+    bindHold(tRightBtn, () => { keys.touchRight = true; }, () => { keys.touchRight = false; });
+    bindHold(tJumpBtn, () => { doJump(); }, null);
+    bindHold(tLiftBtn, () => {
+      if (state !== STATE.RESCUE_QTE) return;
+      liftBtnHeld = true;
+      qteProgress = clamp(qteProgress + QTE_TAP_GAIN, 0, QTE_TARGET);
+    }, () => { liftBtnHeld = false; });
+
+    function releaseTouchHolds() {
+      keys.touchLeft = false;
+      keys.touchRight = false;
+      liftBtnHeld = false;
+      [tLeftBtn, tRightBtn, tJumpBtn, tLiftBtn].forEach((b) => b.classList.remove('pressed'));
+    }
+
+    // Muestra los botones solo mientras se juega (etapas de carrera y rescate);
+    // LEVANTAR aparece únicamente durante el rescate de Isidora.
+    let lastTouchActive = null, lastTouchQte = null;
+    function syncTouchControls() {
+      const active = (state === STATE.RUN || state === STATE.RESCUE_QTE);
+      const qte = (state === STATE.RESCUE_QTE);
+      if (active !== lastTouchActive) {
+        touchControls.classList.toggle('active', active);
+        if (!active) releaseTouchHolds();
+        lastTouchActive = active;
+      }
+      if (qte !== lastTouchQte) {
+        touchControls.classList.toggle('qte', qte);
+        lastTouchQte = qte;
+      }
+    }
+
     root.addEventListener('click', (e) => { e.stopPropagation(); });
 
     startBtn.addEventListener('click', () => startGame());
@@ -994,6 +1146,7 @@
     };
     self.close = function () {
       self.removeAttribute('open');
+      releaseTouchHolds();
     };
   }
 
